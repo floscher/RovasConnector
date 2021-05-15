@@ -6,13 +6,10 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
-import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.tools.I18n;
 
-public class RovasDialog extends ToggleDialog implements DataSetListenerAdapter.Listener {
-  private int counter = 0;
+public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private JLabel counterLabel = new JLabel();
 
 
@@ -24,11 +21,18 @@ public class RovasDialog extends ToggleDialog implements DataSetListenerAdapter.
     panel.add(counterLabel);
 
     createLayout(panel, false, new ArrayList<>());
+
+    TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(this);
   }
 
   @Override
-  public void processDatasetEvent(AbstractDatasetChangedEvent event) {
-    counter++;
-    counterLabel.setText(counter + " changes");
+  public void destroy() {
+    super.destroy();
+    TimeTrackingManager.getInstance().removeTimeTrackingUpdateListener(this);
+  }
+
+  @Override
+  public void updateNumberOfTrackedChanges(long n) {
+    counterLabel.setText(n + " changes");
   }
 }
