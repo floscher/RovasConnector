@@ -7,12 +7,14 @@ buildscript {
 }
 plugins {
   id("org.openstreetmap.josm").version("0.7.1")
+  java
+  `java-test-fixtures`
   jacoco
   pmd
 }
 
 dependencies {
-  testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+  testFixturesApi("org.junit.jupiter:junit-jupiter:5.7.1")
 }
 
 tasks.withType(JavaCompile::class) {

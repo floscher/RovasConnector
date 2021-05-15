@@ -2,10 +2,11 @@ package app.rovas.josm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import app.rovas.josm.fixture.UtilityClassTest;
 import app.rovas.josm.util.URIs;
 import org.junit.jupiter.api.Test;
 
-public class RovasPropertiesTest {
+public class RovasPropertiesTest implements UtilityClassTest<RovasProperties> {
 
   @Test
   public void test() {

@@ -3,7 +3,7 @@ package app.rovas.josm;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
 
-public class RovasProperties {
+public final class RovasProperties {
   /**
    * The fraction of all earnings that goes to the Rovas connector project.
    * A value of 1.0 would be equal to 100%, 0.01 means 1%.
@@ -21,4 +21,8 @@ public class RovasProperties {
     new StringProperty("rovas.api-token", null);
   public static final IntegerProperty ROVAS_ACTIVE_PROJECT_ID =
     new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
+
+  private RovasProperties() {
+    // private constructor to avoid instantiation
+  }
 }
