@@ -1,5 +1,6 @@
 package app.rovas.josm;
 
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.plugins.Plugin;
@@ -18,7 +19,7 @@ public final class RovasPlugin extends Plugin {
    */
   public RovasPlugin(PluginInformation info) {
     super(info);
-    TimeTrackingManager.enableListeningForAllOsmDataChanges();
+    MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
   }
 
   @Override

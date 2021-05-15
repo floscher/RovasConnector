@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
-import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.layer.LayerManager;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.Logging;
@@ -48,10 +47,22 @@ public final class TimeTrackingManager {
     listeners.remove(listener);
   }
 
+  /**
+   * @return the singleton instance of the {@link TimeTrackingManager}
+   */
   public static TimeTrackingManager getInstance() {
     return INSTANCE;
   }
 
+  public synchronized void addCommittedSeconds(final long n) {
+    committedSeconds += Math.max(0, n);
+    fireTimeTrackingUpdateListeners();
+  }
+
+  /**
+   * Whenever this method is called, a change is tracked for the current timestamp.
+   * This is equivalent to calling {@link #trackChangeAt(Instant)} with {@link Instant#now()} as argument.
+   */
   public void trackChangeNow() {
     trackChangeAt(Instant.now());
   }
@@ -100,17 +111,11 @@ public final class TimeTrackingManager {
   }
 
   /**
-   * When this method is called, all {@link OsmDataLayer}s that exist at that moment and all {@link OsmDataLayer}s
-   * that are added later will call {@link #trackChangeNow()} for all changes that are made to those layers.
+   * This listener notifies the (singleton) {@link TimeTrackingManager} of all changes in any {@link OsmDataLayer}.
+   * Add this to JOSM's {@link LayerManager} using
+   * {@link LayerManager#addAndFireLayerChangeListener(LayerManager.LayerChangeListener)}.
    */
-  public static void enableListeningForAllOsmDataChanges() {
-    MainApplication.getLayerManager().addAndFireLayerChangeListener(new AnyOsmDataChangeListener());
-  }
-
-  /**
-   * This listener notifies the (singleton) {@link TimeTrackingManager} of any changes in any {@link OsmDataLayer}.
-   */
-  private static class AnyOsmDataChangeListener implements LayerManager.LayerChangeListener {
+  public static class AnyOsmDataChangeListener implements LayerManager.LayerChangeListener {
     @Override
     public void layerAdded(LayerManager.LayerAddEvent e) {
       Utils.instanceOfAndCast(e.getAddedLayer(), OsmDataLayer.class)

@@ -3,7 +3,6 @@ package app.rovas.josm;
 import java.awt.GridBagLayout;
 import java.net.URI;
 import java.util.function.Supplier;
-
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -13,33 +12,21 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import app.rovas.josm.util.JMultilineLinkedLabel;
-import app.rovas.josm.util.URIs;
-import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.OpenBrowser;
 
+import app.rovas.josm.util.GBCUtil;
+import app.rovas.josm.util.GuiComponentFactory;
+import app.rovas.josm.util.URIs;
+
 public final class RovasPreferencePanel extends VerticallyScrollablePanel {
 
-  private static final GBC GBC_COLUMN_A = fixedToColumn(0, GBC.std().insets(5).span(1).anchor(GBC.LINE_END));
-  private static final GBC GBC_COLUMNS_BC = fixedToColumn(1, GBC.eol().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
-  private static final GBC GBC_COLUMN_B = fixedToColumn(1, GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
-  private static final GBC GBC_COLUMN_C = fixedToColumn(2, GBC.eol().insets(5).span(1).anchor(GBC.LINE_START));
-
-  /**
-   * Modifies GridBagConstraints, so that {@link java.awt.GridBagConstraints#gridx} is set to {@code columnIndex}.
-   *
-   * @param columnIndex the index of the column where the cell should be constrained to
-   * @param gbc         the constraints that should be modified
-   * @return the object that was passed as parameter {@code gbc}, modified to have {@code gridx} set to the value {@code columnIndex}.
-   */
-  @NotNull
-  private static GBC fixedToColumn(final int columnIndex, @NotNull final GBC gbc) {
-    gbc.gridx = columnIndex;
-    return gbc;
-  }
+  private static final GBC GBC_COLUMN_A = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1).anchor(GBC.LINE_END));
+  private static final GBC GBC_COLUMNS_BC = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMN_B = GBCUtil.fixedToColumn(1, GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMN_C = GBCUtil.fixedToColumn(2, GBC.eol().insets(5).span(1).anchor(GBC.LINE_START));
 
   private final JLabel apiKeyLabel = new JLabel(I18n.tr("API key"));
   private final JTextField apiKeyField = new JPasswordField();
@@ -47,7 +34,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   private final JLabel apiTokenLabel = new JLabel(I18n.tr("API token"));
   private final JTextField apiTokenField = new JPasswordField();
 
-  private final JEditorPane seeProfilePageNote = new JMultilineLinkedLabel(
+  private final JEditorPane seeProfilePageNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     I18n.tr("<html>Values for these fields can be found on your {0}.</html>", String.format("<a href=\"%s\">%s</a>", URIs.USER_PROFILE, I18n.tr("Rovas profile page")))
   );
 
@@ -58,16 +45,14 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   private final JButton activeProjectOpenButton = new JButton(I18n.tr("Open the project page in Rovas"));
 
   private final URI connectorURI = URIs.project(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID);
-  private final JEditorPane feeNote = new JMultilineLinkedLabel(
+  private final JEditorPane feeNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
       // i18n: {0} will be replaced by a decimal number with 2 decimal places
       // i18n: {1} will be replaced by a link labeled with "Rovas connector"
       I18n.tr(
-        "Please note: A fee equal to {0}% of the amount you earn for your reports will be charged to you and used to reward the {1} project.",
+        "To reward the authors of this {1}, a fee equal to {0}% of the amount you earn from reports created by the plugin will be levied on those earnings.",
         String.format("%.2f", RovasProperties.ASSET_USAGE_FEE * 100),
-        connectorURI == null
-          ? I18n.tr("Rovas connector")
-          : String.format("<a href=\"%s\">%s</a>", connectorURI, I18n.tr("Rovas connector").replace(" ", "&nbsp;"))
+        String.format("<a href=\"%s\">%s</a>", connectorURI == null ? "#" : connectorURI, I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;"))
       ) +
     "</html>"
   );

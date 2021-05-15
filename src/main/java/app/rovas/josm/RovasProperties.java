@@ -1,5 +1,7 @@
 package app.rovas.josm;
 
+import java.util.Optional;
+
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
 
@@ -21,6 +23,20 @@ public final class RovasProperties {
     new StringProperty("rovas.api-token", null);
   public static final IntegerProperty ROVAS_ACTIVE_PROJECT_ID =
     new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
+
+  /**
+   * @return the active project ID, or {@code null} if no value is set
+   */
+  public static Integer getActiveProjectID() {
+    return Optional.of(ROVAS_ACTIVE_PROJECT_ID).map(IntegerProperty::get).filter(it -> it > 0).orElse(null);
+  }
+  public static String getApiKey() {
+    return Optional.of(ROVAS_API_KEY).map(StringProperty::get).filter(it -> !it.trim().isEmpty()).orElse(null);
+  }
+  public static String getApiToken() {
+    return Optional.of(ROVAS_API_TOKEN).map(StringProperty::get).filter(it -> !it.trim().isEmpty()).orElse(null);
+  }
+
   /**
    * The number of seconds of inactivity after each edit, which should still be counted.
    *
@@ -32,6 +48,11 @@ public final class RovasProperties {
    */
   public static final IntegerProperty INACTIVITY_TOLERANCE_SECONDS =
     new IntegerProperty("rovas.inactivity-tolerance-seconds", 30);
+  /**
+   * This property persists the time that was already tracked across restarts
+   */
+  public static final IntegerProperty ALREADY_TRACKED_TIME =
+    new IntegerProperty("rovas.already-tracked-time", 0);
 
   private RovasProperties() {
     // private constructor to avoid instantiation
