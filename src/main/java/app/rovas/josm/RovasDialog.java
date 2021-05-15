@@ -2,7 +2,6 @@ package app.rovas.josm;
 
 import java.awt.Font;
 import java.util.ArrayList;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -32,7 +31,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
   }
 
   @Override
-  public void updateNumberOfTrackedChanges(long n) {
-    counterLabel.setText(n + " changes");
+  public void updateNumberOfTrackedSeconds(long n) {
+    counterLabel.setText(n + " seconds tracked");
   }
 }

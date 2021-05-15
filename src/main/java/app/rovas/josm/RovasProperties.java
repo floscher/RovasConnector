@@ -21,6 +21,17 @@ public final class RovasProperties {
     new StringProperty("rovas.api-token", null);
   public static final IntegerProperty ROVAS_ACTIVE_PROJECT_ID =
     new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
+  /**
+   * The number of seconds of inactivity after each edit, which should still be counted.
+   *
+   * For a value of 30 this means: If you make only one edit, automatically 30 seconds are counted.
+   * If you make one edit and after 15 seconds another one, then 45 seconds are counted, because the clock is
+   * stopped 30 seconds after the second edit.
+   * If you make one edit and another one after 60 seconds, then 60 seconds are counted, because 30 seconds
+   * after the first edit the clock is stopped and also 30 seconds after the second edit.
+   */
+  public static final IntegerProperty INACTIVITY_TOLERANCE_SECONDS =
+    new IntegerProperty("rovas.inactivity-tolerance-seconds", 30);
 
   private RovasProperties() {
     // private constructor to avoid instantiation

@@ -1,29 +1,29 @@
 package app.rovas.josm;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.layer.LayerManager;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
-public final class TimeTrackingManager extends DataSetListenerAdapter implements DataSetListenerAdapter.Listener {
+public final class TimeTrackingManager {
 
   private final CopyOnWriteArrayList<TimeTrackingUpdateListener> listeners = new CopyOnWriteArrayList<>();
 
   private static final TimeTrackingManager INSTANCE = new TimeTrackingManager();
-  private static final DataSetListenerAdapter DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(INSTANCE);
+  private static final DataSetListenerAdapter DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
 
-  // TODO: Improve this, to limit how much accumulates
-  private final List<Long> timestamps = new ArrayList<>();
+  private long committedSeconds = 0;
+
+  private Long firstUncommittedChangeTimestamp = null;
+  private Long lastUncommittedChangeTimestamp = null;
 
   private TimeTrackingManager() {
-    super(INSTANCE);
     // private constructor to avoid instantiation
   }
 
@@ -33,7 +33,15 @@ public final class TimeTrackingManager extends DataSetListenerAdapter implements
   }
 
   private void fireTimeTrackingUpdateListeners() {
-    listeners.forEach(it -> it.updateNumberOfTrackedChanges(timestamps.size()));
+    listeners.forEach(it -> it.updateNumberOfTrackedSeconds(
+      committedSeconds +
+      Optional.ofNullable(firstUncommittedChangeTimestamp)
+        .flatMap(first ->
+          Optional.ofNullable(lastUncommittedChangeTimestamp)
+            .map(last -> last - first)
+        )
+        .orElse(0L)
+    ));
   }
 
   public void removeTimeTrackingUpdateListener(final TimeTrackingUpdateListener listener) {
@@ -44,20 +52,56 @@ public final class TimeTrackingManager extends DataSetListenerAdapter implements
     return INSTANCE;
   }
 
-  @Override
-  public void processDatasetEvent(AbstractDatasetChangedEvent event) {
-    trackInstant(Instant.now());
+  public void trackChangeNow() {
+    trackChangeAt(Instant.now());
   }
 
-  private synchronized void trackInstant(final Instant instant) {
-    timestamps.add(instant.toEpochMilli());
+  /**
+   * Registers the given instant with the time tracker. This should be called whenever a change occurs.
+   *
+   * Usually you should use {@link #trackChangeNow()} instead. This method exists
+   * for easier testing with arbitrary timestamps.
+   *
+   * <p>
+   * <strong>Note:</strong> We expect to receive the calls to this method in order.
+   * If an instant A is registered later than instant B (where B has a higher unix timestamp than A),
+   * then an error is logged. It's handled gracefully, but should be avoided.
+   * This should really only happen if the user manually set their clock to an earlier time.
+   * </p>
+   *
+   * @param instant the timestamp when the change occured. The seconds of that instant are recorded.
+   */
+  protected synchronized void trackChangeAt(final Instant instant) {
+    final int tolerance = Math.max(0, RovasProperties.INACTIVITY_TOLERANCE_SECONDS.get());
+    final Long firstTimestamp = firstUncommittedChangeTimestamp;
+    final Long lastTimestamp = lastUncommittedChangeTimestamp;
+    final long currentTimestamp = instant.getEpochSecond();
+
+    Logging.debug(String.format("Time tracker received new change at %d: uncommitted interval: %d - %d", currentTimestamp, firstTimestamp, lastTimestamp));
+
+    if (firstTimestamp == null) {
+      // initialize when no time was tracked before
+      firstUncommittedChangeTimestamp = currentTimestamp;
+    } else if (lastTimestamp != null) {
+      // something went wrong, current time is before the last timestamp that was recorded previously.
+      if (currentTimestamp < lastTimestamp) {
+        Logging.error("Your clock seems to have been running backwards!");
+      }
+      // In case the current time is not inside the uncommitted timespan (including tolerance), then that timespan is committed.
+      if (currentTimestamp > lastTimestamp + tolerance || currentTimestamp < firstTimestamp) {
+        Logging.debug("Committing {0} (+ {1}) seconds to time tracker", lastTimestamp - firstTimestamp, tolerance);
+        committedSeconds = lastTimestamp - firstTimestamp + committedSeconds + tolerance;
+        firstUncommittedChangeTimestamp = currentTimestamp;
+      }
+    }
+    lastUncommittedChangeTimestamp = currentTimestamp;
+
     fireTimeTrackingUpdateListeners();
   }
 
   /**
    * When this method is called, all {@link OsmDataLayer}s that exist at that moment and all {@link OsmDataLayer}s
-   * that are added later will call {@link #processDatasetEvent(AbstractDatasetChangedEvent)} for
-   * all changes that are made to those layers.
+   * that are added later will call {@link #trackChangeNow()} for all changes that are made to those layers.
    */
   public static void enableListeningForAllOsmDataChanges() {
     MainApplication.getLayerManager().addAndFireLayerChangeListener(new AnyOsmDataChangeListener());
