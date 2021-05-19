@@ -93,6 +93,7 @@ public final class TimeTrackingManager {
     if (firstTimestamp == null) {
       // initialize when no time was tracked before
       firstUncommittedChangeTimestamp = currentTimestamp;
+      committedSeconds += tolerance;
     } else if (lastTimestamp != null) {
       // something went wrong, current time is before the last timestamp that was recorded previously.
       if (currentTimestamp < lastTimestamp) {
@@ -125,6 +126,7 @@ public final class TimeTrackingManager {
   public static class AnyOsmDataChangeListener implements LayerManager.LayerChangeListener {
     @Override
     public void layerAdded(LayerManager.LayerAddEvent e) {
+      INSTANCE.trackChangeNow();
       Utils.instanceOfAndCast(e.getAddedLayer(), OsmDataLayer.class)
         .ifPresent(layer -> layer.data.addDataSetListener(DATASET_LISTENER_ADAPTER));
     }
