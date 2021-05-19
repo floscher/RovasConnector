@@ -14,6 +14,7 @@ public final class URIs {
     return orNull(String.format("https://%s/node/%d", ROVAS_DOMAIN, id));
   }
 
+  public static final URI RULES = orNull(String.format("https://%s/rules", ROVAS_DOMAIN));
   public static final URI USER_PROFILE = orNull(String.format("https://%s/user", ROVAS_DOMAIN));
 
   @Nullable
@@ -23,5 +24,13 @@ public final class URIs {
     } catch (URISyntaxException e) {
       return null;
     }
+  }
+
+  public static String toHtmlHyperlink(@Nullable final URI uri, @NotNull final String label) {
+    return uri == null ? label : String.format("<a href=\"%s\">%s</a>", uri, label);
+  }
+
+  private URIs() {
+    // private constructor to prevent instantiation
   }
 }

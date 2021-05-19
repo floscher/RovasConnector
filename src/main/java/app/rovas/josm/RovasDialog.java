@@ -59,10 +59,11 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     createLayout(panel, false, Arrays.asList(playPauseButton, resetButton));
 
     TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(this);
-    RovasProperties.ROVAS_ACTIVE_PROJECT_ID.addListener(apiConfigurationChangeListener);
+    RovasProperties.ACTIVE_PROJECT_ID.addListener(apiConfigurationChangeListener);
     RovasProperties.ROVAS_API_KEY.addListener(apiConfigurationChangeListener);
     RovasProperties.ROVAS_API_TOKEN.addListener(apiConfigurationChangeListener);
-    RovasProperties.INACTIVITY_TOLERANCE_SECONDS.addListener(apiConfigurationChangeListener);
+    RovasProperties.ALWAYS_CREATE_REPORT.addListener(apiConfigurationChangeListener);
+    RovasProperties.INACTIVITY_TOLERANCE.addListener(apiConfigurationChangeListener);
 
     updateMissingConfigurationWarning();
     updateStatusLabel();
@@ -70,22 +71,23 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
   public void updateMissingConfigurationWarning() {
     savingStatusValue.setText(
-      RovasProperties.ROVAS_ACTIVE_PROJECT_ID.get() == null ||
+      !RovasProperties.isActiveProjectIdSet() ||
       RovasProperties.ROVAS_API_KEY.get() == null ||
       RovasProperties.ROVAS_API_TOKEN.get() == null
-        ? (
-          RovasProperties.ALWAYS_CREATE_REPORT.get()
-            ? I18n.tr("A report is automatically created")
-            : I18n.tr("A report is only created, if requested manually"))
-        : "<html><div style='background:#fdc14b;padding:5px 10px'>" +
+        ? "<html><div style='background:#fdc14b;padding:5px 10px'>" +
           I18n.tr("The plugin is not configured to send work reports to Rovas. Click the preferences icon at the top right of this dialog.") +
           "</div></html>"
+        : (
+          RovasProperties.ALWAYS_CREATE_REPORT.get()
+            ? I18n.tr("A report is automatically created")
+            : I18n.tr("A report is only created, if requested manually")
+        )
     );
   }
 
   public void updateStatusLabel() {
     statusValue.setIcon(ICON_SCANNER_ANIMATION);
-    statusValue.setText(I18n.tr("automatic change detection (+{0}\u2009s)", RovasProperties.INACTIVITY_TOLERANCE_SECONDS.get()));
+    statusValue.setText(I18n.tr("automatic change detection (+{0}\u2009s)", RovasProperties.INACTIVITY_TOLERANCE.get()));
   }
 
   @Override

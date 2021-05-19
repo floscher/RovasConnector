@@ -1,5 +1,7 @@
 package app.rovas.josm;
 
+import java.util.Optional;
+
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
@@ -26,10 +28,43 @@ public final class RovasProperties {
     new StringProperty("rovas.api-token", null),
     it -> !it.trim().isEmpty()
   );
-  public static final NullableProperty<Integer> ROVAS_ACTIVE_PROJECT_ID = new NullableProperty<>(
-    new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID),
-    it -> it > 1
-  );
+
+  /**
+   * When a value smaller than {@link #ACTIVE_PROJECT_ID_MIN_VALUE} is set for {@link #ACTIVE_PROJECT_ID},
+   * then the value is replaced by this value, which is equivalent to no value being set.
+   */
+  public static final int ACTIVE_PROJECT_ID_NO_VALUE = -1;
+  /**
+   * The minimum value for {@link #ACTIVE_PROJECT_ID} that is considered a valid project ID.
+   * Smaller values are allowed, though. These smaller values are all treated as "no value"
+   * (see {@link #ACTIVE_PROJECT_ID_NO_VALUE}).
+   */
+  public static final int ACTIVE_PROJECT_ID_MIN_VALUE = 2;
+  /**
+   * The Rovas project ID for which the JOSM user is submitting their work report.
+   */
+  public static final IntegerProperty ACTIVE_PROJECT_ID =
+    new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
+
+  /**
+   * @return {@code true} iff {@link #ACTIVE_PROJECT_ID} has a value greater than or equal to {@link #ACTIVE_PROJECT_ID_MIN_VALUE}
+   */
+  public static boolean isActiveProjectIdSet() {
+    return Optional.ofNullable(ACTIVE_PROJECT_ID.get()).orElse(ACTIVE_PROJECT_ID_NO_VALUE) >= ACTIVE_PROJECT_ID_MIN_VALUE;
+  }
+
+  /**
+   * The minimum value allowed for {@link #INACTIVITY_TOLERANCE}, smaller values are treated as if this value was set.
+   */
+  public static final int INACTIVITY_TOLERANCE_MIN_VALUE = 1;
+  /**
+   * The default value for {@link #INACTIVITY_TOLERANCE}.
+   */
+  public static final int INACTIVITY_TOLERANCE_DEFAULT_VALUE = 30;
+  /**
+   * The maximum value allowed for {@link #INACTIVITY_TOLERANCE}, larger values are treated as if this value was set.
+   */
+  public static final int INACTIVITY_TOLERANCE_MAX_VALUE = 240;
 
   /**
    * The number of seconds of inactivity after each edit, which should still be counted.
@@ -40,8 +75,9 @@ public final class RovasProperties {
    * If you make one edit and another one after 60 seconds, then 60 seconds are counted, because 30 seconds
    * after the first edit the clock is stopped and also 30 seconds after the second edit.
    */
-  public static final IntegerProperty INACTIVITY_TOLERANCE_SECONDS =
-    new IntegerProperty("rovas.inactivity-tolerance-seconds", 30);
+  public static final IntegerProperty INACTIVITY_TOLERANCE =
+    new IntegerProperty("rovas.inactivity-tolerance-seconds", INACTIVITY_TOLERANCE_DEFAULT_VALUE);
+
   /**
    * This property persists the time that was already tracked across restarts
    */

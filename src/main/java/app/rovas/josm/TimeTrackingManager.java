@@ -2,17 +2,17 @@ package app.rovas.josm;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
 import org.openstreetmap.josm.gui.layer.LayerManager;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.tools.ListenerList;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 public final class TimeTrackingManager {
 
-  private final CopyOnWriteArrayList<TimeTrackingUpdateListener> listeners = new CopyOnWriteArrayList<>();
+  private final ListenerList<TimeTrackingUpdateListener> listeners = ListenerList.create();
 
   private static final TimeTrackingManager INSTANCE = new TimeTrackingManager();
   private static final DataSetListenerAdapter DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
@@ -27,12 +27,12 @@ public final class TimeTrackingManager {
   }
 
   public void addAndFireTimeTrackingUpdateListener(final TimeTrackingUpdateListener listener) {
-    listeners.addIfAbsent(listener);
+    listeners.addListener(listener);
     fireTimeTrackingUpdateListeners();
   }
 
   private void fireTimeTrackingUpdateListeners() {
-    listeners.forEach(it -> it.updateNumberOfTrackedSeconds(
+    listeners.fireEvent(it -> it.updateNumberOfTrackedSeconds(
       committedSeconds +
       Optional.ofNullable(firstUncommittedChangeTimestamp)
         .flatMap(first ->
@@ -44,7 +44,7 @@ public final class TimeTrackingManager {
   }
 
   public void removeTimeTrackingUpdateListener(final TimeTrackingUpdateListener listener) {
-    listeners.remove(listener);
+    listeners.removeListener(listener);
   }
 
   /**
@@ -83,7 +83,7 @@ public final class TimeTrackingManager {
    * @param instant the timestamp when the change occured. The seconds of that instant are recorded.
    */
   protected synchronized void trackChangeAt(final Instant instant) {
-    final int tolerance = Math.max(0, RovasProperties.INACTIVITY_TOLERANCE_SECONDS.get());
+    final int tolerance = Math.max(0, RovasProperties.INACTIVITY_TOLERANCE.get());
     final Long firstTimestamp = firstUncommittedChangeTimestamp;
     final Long lastTimestamp = lastUncommittedChangeTimestamp;
     final long currentTimestamp = instant.getEpochSecond();
