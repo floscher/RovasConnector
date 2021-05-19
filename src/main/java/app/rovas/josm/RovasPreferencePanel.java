@@ -2,6 +2,7 @@ package app.rovas.josm;
 
 import java.awt.GridBagLayout;
 import java.net.URI;
+import java.util.Optional;
 import java.util.function.Supplier;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -84,12 +85,15 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     buildGui();
   }
 
+  /**
+   * Adding the individual components and lay them out.
+   */
   private void buildGui() {
     setLayout(new GridBagLayout());
 
+    // API key and token
     add(apiKeyLabel, GBC_COLUMN_A);
     add(apiKeyField, GBC_COLUMNS_BC);
-
     add(apiTokenLabel, GBC_COLUMN_A);
     add(apiTokenField, GBC_COLUMNS_BC);
 
@@ -107,24 +111,23 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   }
 
   public int getActiveProjectIdValue() {
-    final int activeProjectId = activeProjectIdSpinnerModel.getNumber().intValue();
-    if (activeProjectId <= 0) {
-      return -1;
-    }
-    return activeProjectId;
+    return activeProjectIdSpinnerModel.getNumber().intValue();
   }
 
-  public void setActiveProjectIdValue(final int projectId) {
-    activeProjectIdSpinnerModel.setValue(projectId <= 0 ? -1 : projectId);
+  public void setActiveProjectIdValue(final Integer projectId) {
+    activeProjectIdSpinnerModel.setValue(Optional.ofNullable(projectId).filter(it -> it > 1).orElse(-1));
   }
 
   public String getStringFieldValue(final Supplier<JTextField> fieldSupplier) {
-    final String value = fieldSupplier.get().getText().trim();
-    return value.isEmpty() ? null : value;
+    return Optional.of(fieldSupplier.get())
+      .map(JTextField::getText)
+      .map(String::trim)
+      .filter(it -> !it.isEmpty())
+      .orElse(null);
   }
 
   public void setStringFieldValue(final Supplier<JTextField> fieldSupplier, final String newValue) {
-    fieldSupplier.get().setText(newValue == null ? null : newValue.trim());
+    fieldSupplier.get().setText(Optional.ofNullable(newValue).map(String::trim).orElse(null));
   }
 
   public String getApiKeyValue() {

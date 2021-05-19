@@ -110,6 +110,13 @@ public final class TimeTrackingManager {
     fireTimeTrackingUpdateListeners();
   }
 
+  public synchronized void setCurrentlyTrackedSeconds(final int numSeconds) {
+    this.committedSeconds = numSeconds;
+    this.firstUncommittedChangeTimestamp = null;
+    this.lastUncommittedChangeTimestamp = null;
+    fireTimeTrackingUpdateListeners();
+  }
+
   /**
    * This listener notifies the (singleton) {@link TimeTrackingManager} of all changes in any {@link OsmDataLayer}.
    * Add this to JOSM's {@link LayerManager} using

@@ -1,9 +1,10 @@
 package app.rovas.josm;
 
-import java.util.Optional;
-
+import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
+
+import app.rovas.josm.util.NullableProperty;
 
 public final class RovasProperties {
   /**
@@ -17,25 +18,18 @@ public final class RovasProperties {
    */
   public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 1998;
 
-  public static final StringProperty ROVAS_API_KEY =
-    new StringProperty("rovas.api-key", null);
-  public static final StringProperty ROVAS_API_TOKEN =
-    new StringProperty("rovas.api-token", null);
-  public static final IntegerProperty ROVAS_ACTIVE_PROJECT_ID =
-    new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
-
-  /**
-   * @return the active project ID, or {@code null} if no value is set
-   */
-  public static Integer getActiveProjectID() {
-    return Optional.of(ROVAS_ACTIVE_PROJECT_ID).map(IntegerProperty::get).filter(it -> it > 0).orElse(null);
-  }
-  public static String getApiKey() {
-    return Optional.of(ROVAS_API_KEY).map(StringProperty::get).filter(it -> !it.trim().isEmpty()).orElse(null);
-  }
-  public static String getApiToken() {
-    return Optional.of(ROVAS_API_TOKEN).map(StringProperty::get).filter(it -> !it.trim().isEmpty()).orElse(null);
-  }
+  public static final NullableProperty<String> ROVAS_API_KEY = new NullableProperty<>(
+    new StringProperty("rovas.api-key", null),
+    it -> !it.trim().isEmpty()
+  );
+  public static final NullableProperty<String> ROVAS_API_TOKEN = new NullableProperty<>(
+    new StringProperty("rovas.api-token", null),
+    it -> !it.trim().isEmpty()
+  );
+  public static final NullableProperty<Integer> ROVAS_ACTIVE_PROJECT_ID = new NullableProperty<>(
+    new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID),
+    it -> it > 1
+  );
 
   /**
    * The number of seconds of inactivity after each edit, which should still be counted.
@@ -53,6 +47,7 @@ public final class RovasProperties {
    */
   public static final IntegerProperty ALREADY_TRACKED_TIME =
     new IntegerProperty("rovas.already-tracked-time", 0);
+  public static final BooleanProperty ALWAYS_CREATE_REPORT = new BooleanProperty("rovas.always-create-report", false);
 
   private RovasProperties() {
     // private constructor to avoid instantiation
