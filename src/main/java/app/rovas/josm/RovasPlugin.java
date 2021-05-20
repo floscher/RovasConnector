@@ -20,6 +20,7 @@ public final class RovasPlugin extends Plugin {
   public RovasPlugin(PluginInformation info) {
     super(info);
     MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
+    TimeTrackingManager.getInstance().trackChangeNow();
   }
 
   @Override

@@ -2,6 +2,10 @@ package app.rovas.josm;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
 import org.openstreetmap.josm.gui.layer.LayerManager;
@@ -22,6 +26,10 @@ public final class TimeTrackingManager {
   private Long firstUncommittedChangeTimestamp = null;
   private Long lastUncommittedChangeTimestamp = null;
 
+  private Long firstManualTimestamp = null;
+  private long lastManualTimestamp = 0L;
+  private ScheduledExecutorService manualExecutor;
+
   private TimeTrackingManager() {
     // private constructor to avoid instantiation
   }
@@ -39,6 +47,9 @@ public final class TimeTrackingManager {
           Optional.ofNullable(lastUncommittedChangeTimestamp)
             .map(last -> last - first)
         )
+        .orElse(0L) +
+      Optional.ofNullable(firstManualTimestamp)
+        .map(first -> Instant.now().getEpochSecond() - first)
         .orElse(0L)
     ));
   }
@@ -57,6 +68,18 @@ public final class TimeTrackingManager {
   public synchronized void addCommittedSeconds(final long n) {
     committedSeconds += Math.max(0, n);
     fireTimeTrackingUpdateListeners();
+  }
+
+  public boolean isManual() {
+    return firstManualTimestamp != null;
+  }
+  public Long getManualTimerDurationSeconds() {
+    return Optional.ofNullable(firstManualTimestamp)
+      .map(first -> Instant.now().getEpochSecond() - first)
+      .orElse(null);
+  }
+  public Long getLastDetectedChangeTimestamp() {
+    return lastUncommittedChangeTimestamp;
   }
 
   /**
@@ -83,6 +106,10 @@ public final class TimeTrackingManager {
    * @param instant the timestamp when the change occured. The seconds of that instant are recorded.
    */
   protected synchronized void trackChangeAt(final Instant instant) {
+    if (isManual()) {
+      return; // do nothing if manual timer is running
+    }
+
     final int tolerance = Math.max(0, RovasProperties.INACTIVITY_TOLERANCE.get());
     final Long firstTimestamp = firstUncommittedChangeTimestamp;
     final Long lastTimestamp = lastUncommittedChangeTimestamp;
@@ -92,29 +119,67 @@ public final class TimeTrackingManager {
 
     if (firstTimestamp == null) {
       // initialize when no time was tracked before
-      firstUncommittedChangeTimestamp = currentTimestamp;
-      committedSeconds += tolerance;
+      resetAutomaticTracker(currentTimestamp, false);
     } else if (lastTimestamp != null) {
       // something went wrong, current time is before the last timestamp that was recorded previously.
       if (currentTimestamp < lastTimestamp) {
         Logging.error("Your clock seems to have been running backwards!");
       }
-      // In case the current time is not inside the uncommitted timespan (including tolerance), then that timespan is committed.
+      // In case the current time is not inside the uncommitted timespan (including tolerance), then that timespan is committed and a new timespan is started.
       if (currentTimestamp > lastTimestamp + tolerance || currentTimestamp < firstTimestamp) {
         Logging.debug("Committing {0} (+ {1}) seconds to time tracker", lastTimestamp - firstTimestamp, tolerance);
-        committedSeconds = lastTimestamp - firstTimestamp + committedSeconds + tolerance;
-        firstUncommittedChangeTimestamp = currentTimestamp;
+        resetAutomaticTracker(currentTimestamp, true);
+      } else {
+        // if inside tolerance, extend the current uncommitted timespan
+        lastUncommittedChangeTimestamp = Math.max(lastTimestamp, currentTimestamp);
       }
     }
-    lastUncommittedChangeTimestamp = currentTimestamp;
 
     fireTimeTrackingUpdateListeners();
   }
 
   public synchronized void setCurrentlyTrackedSeconds(final int numSeconds) {
+    stopManualTracker();
+    resetAutomaticTracker(null, false);
     this.committedSeconds = numSeconds;
-    this.firstUncommittedChangeTimestamp = null;
-    this.lastUncommittedChangeTimestamp = null;
+    fireTimeTrackingUpdateListeners();
+  }
+
+  private void resetAutomaticTracker(final Long newValue, final boolean commitUncommittedTime) {
+    if (commitUncommittedTime) {
+      final Long firstUncommitted = this.firstUncommittedChangeTimestamp;
+      final Long lastUncommitted = this.lastUncommittedChangeTimestamp;
+      if (firstUncommitted != null && lastUncommitted != null) {
+        this.committedSeconds +=
+          Math.max(0, lastUncommitted - firstUncommitted) + // uncommitted time
+            Math.min(
+              Instant.now().getEpochSecond() - lastUncommitted, // time since last uncommitted timestamp
+              Math.max(0, RovasProperties.INACTIVITY_TOLERANCE.get()) // tolerance
+            );
+      }
+    }
+    this.firstUncommittedChangeTimestamp = newValue;
+    this.lastUncommittedChangeTimestamp = newValue;
+  }
+
+  public synchronized void startManualTracker() {
+    resetAutomaticTracker(null, true);
+    firstManualTimestamp = Instant.now().getEpochSecond();
+    manualExecutor = Executors.newSingleThreadScheduledExecutor();
+    manualExecutor.scheduleAtFixedRate(
+      this::fireTimeTrackingUpdateListeners,
+      0, 1, TimeUnit.SECONDS
+    );
+  }
+
+  public synchronized void stopManualTracker() {
+    final long now = Instant.now().getEpochSecond();
+    Optional.ofNullable(this.firstManualTimestamp).ifPresent(first ->
+      this.committedSeconds += now - first
+    );
+    Optional.ofNullable(manualExecutor).ifPresent(ExecutorService::shutdown);
+    this.firstManualTimestamp = null;
+    this.lastManualTimestamp = now;
     fireTimeTrackingUpdateListeners();
   }
 

@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -30,15 +31,17 @@ import app.rovas.josm.util.URIs;
 public final class RovasPreferencePanel extends VerticallyScrollablePanel {
 
   private static final GBC GBC_COLUMN_A = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1).anchor(GBC.LINE_END));
-  private static final GBC GBC_COLUMNS_BC = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.FIRST_LINE_START));
-  private static final GBC GBC_COLUMN_B = GBCUtil.fixedToColumn(1, GBC.std().insets(5).span(1).anchor(GBC.LINE_START));
-  private static final GBC GBC_COLUMN_C = GBCUtil.fixedToColumn(2, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMNS_BC = GBCUtil.fixedToColumn(1, GBC.std().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMN_B = GBCUtil.fixedToColumn(1, GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).weight(0.0, 0.0).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMN_D = GBCUtil.fixedToColumn(3, GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMNS_CD = GBCUtil.fixedToColumn(2, GBC.std().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
+  private static final GBC GBC_COLUMNS_BCD = GBCUtil.fixedToColumn(1, GBC.std().insets(5).span(3).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START));
 
   private final JLabel apiKeyLabel = new JLabel(I18n.tr("API key"));
-  private final JTextField apiKeyField = new JPasswordField();
+  private final JTextField apiKeyField = new JPasswordField(35);
 
   private final JLabel apiTokenLabel = new JLabel(I18n.tr("API token"));
-  private final JTextField apiTokenField = new JPasswordField();
+  private final JTextField apiTokenField = new JPasswordField(35);
 
   private final JEditorPane seeProfilePageNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
@@ -50,10 +53,10 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   );
 
   private final JLabel activeProjectIdLabel = new JLabel(I18n.tr("Project ID"));
-  private final SpinnerNumberModel activeProjectIdSpinnerModel = new SpinnerNumberModel(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, Integer.MAX_VALUE, 1);
-  private final JSpinner activeProjectIdSpinner = GuiComponentFactory.createSpinner(activeProjectIdSpinnerModel, 5);
+  private final SpinnerNumberModel activeProjectIdSpinnerModel = new SpinnerNumberModel(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, Integer.MAX_VALUE, 0);
+  private final JSpinner activeProjectIdSpinner = GuiComponentFactory.createSpinner(activeProjectIdSpinnerModel, 5, true);
   private URI activeProjectURI = null;
-  private final JButton activeProjectOpenButton = new JButton(I18n.tr("Open the project page in Rovas"));
+  private final JButton activeProjectOpenButton = new JButton(I18n.tr("Open project page in Rovas"));
   private final JLabel activeProjectIdDescription = GuiComponentFactory.createLabel(I18n.tr("(the parent project of the created work reports)"), false);
 
   private final JLabel alwaysCreateWorkReportLabel = new JLabel(I18n.tr("Work reports"));
@@ -84,7 +87,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     "</html>"
   );
 
-  private final JLabel inactivityToleranceLabel = new JLabel(I18n.tr("Automatic change detection"));
+  private final JLabel inactivityToleranceLabel = new JLabel(I18n.tr("Timer tolerance"));
   private final SpinnerNumberModel inactivityToleranceModel = new SpinnerNumberModel(
     Utils.clamp(
       RovasProperties.INACTIVITY_TOLERANCE.get(),
@@ -96,11 +99,12 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     1
   );
   private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5);
-  private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("seconds before each change are counted as work time"), false);
+  private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
   public RovasPreferencePanel() {
     super();
 
+    // Update the URL that the button opens
     activeProjectIdSpinnerModel.addChangeListener((changeEvent) -> {
       final int currentActiveProjectId = activeProjectIdSpinnerModel.getNumber().intValue();
       if (currentActiveProjectId >= RovasProperties.ACTIVE_PROJECT_ID_MIN_VALUE) {
@@ -136,36 +140,33 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     // API key and token
     add(apiKeyLabel, GBC_COLUMN_A);
     add(apiKeyField, GBC_COLUMNS_BC);
+    add(Box.createHorizontalGlue(), GBC_COLUMN_D);
     add(apiTokenLabel, GBC_COLUMN_A);
     add(apiTokenField, GBC_COLUMNS_BC);
+    add(Box.createHorizontalGlue(), GBC_COLUMN_D);
 
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(seeProfilePageNote, GBC_COLUMNS_BC);
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(GBC.glue(1, 1), GBC_COLUMNS_BC);
+    add(Box.createHorizontalGlue(), GBC_COLUMN_A);
+    add(GuiComponentFactory.createWrapperPanel(seeProfilePageNote), GBC_COLUMNS_BCD);
 
     add(activeProjectIdLabel, GBC_COLUMN_A);
     add(activeProjectIdSpinner, GBC_COLUMN_B);
-    add(activeProjectIdDescription, GBC_COLUMN_C);
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
+    add(activeProjectIdDescription, GBC_COLUMNS_CD);
+    add(Box.createHorizontalGlue(), GBC_COLUMN_A);
     add(activeProjectOpenButton, GBC_COLUMNS_BC);
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(GBC.glue(1, 1), GBC_COLUMNS_BC);
+    add(Box.createHorizontalGlue(), GBC_COLUMN_D);
 
     add(alwaysCreateWorkReportLabel, GBC_COLUMN_A);
-    add(alwaysCreateWorkReportValue, GBC_COLUMNS_BC);
+    add(alwaysCreateWorkReportValue, GBC_COLUMNS_BCD);
 
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(verificationNote, GBC_COLUMNS_BC);
+    add(new JPanel(), GBC_COLUMN_A);
+    add(GuiComponentFactory.createWrapperPanel(verificationNote), GBC_COLUMNS_BCD);
 
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(feeNote, GBC_COLUMNS_BC);
-    add(GBC.glue(1, 1), GBC_COLUMN_A);
-    add(GBC.glue(1, 1), GBC_COLUMNS_BC);
+    add(new JPanel(), GBC_COLUMN_A);
+    add(GuiComponentFactory.createWrapperPanel(feeNote), GBC_COLUMNS_BCD);
 
     add(inactivityToleranceLabel, GBC_COLUMN_A);
     add(inactivityToleranceValue, GBC_COLUMN_B);
-    add(inactivityToleranceDescription, GBC_COLUMN_C);
+    add(inactivityToleranceDescription, GBC_COLUMNS_CD);
 
     add(Box.createVerticalGlue(), GBC_COLUMN_A.fill(GBC.VERTICAL));
   }

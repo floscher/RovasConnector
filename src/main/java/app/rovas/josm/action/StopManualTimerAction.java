@@ -8,18 +8,18 @@ import org.openstreetmap.josm.tools.I18n;
 import app.rovas.josm.RovasDialog;
 import app.rovas.josm.TimeTrackingManager;
 
-public class StartManualTimerAction extends JosmAction {
+public class StopManualTimerAction extends JosmAction {
 
   private final RovasDialog dialog;
 
-  public StartManualTimerAction(final RovasDialog dialog) {
-    super(I18n.tr("Start manual timer"), "audio-play", null, null, false);
+  public StopManualTimerAction(final RovasDialog dialog) {
+    super(I18n.tr("Stop manual timer"), "audio-pause", null, null, false);
     this.dialog = dialog;
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    TimeTrackingManager.getInstance().startManualTracker();
+    TimeTrackingManager.getInstance().stopManualTracker();
     dialog.updateStatusLabel();
     dialog.updateStartStopAction();
   }
