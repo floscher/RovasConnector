@@ -47,7 +47,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     "<html>" +
     I18n.tr(
       "Values for these fields can be found on your {0}.",
-      URIs.toHtmlHyperlink(URIs.USER_PROFILE, I18n.tr("Rovas profile page"))
+      URIs.toHtmlHyperlink(URIs.userProfile(), I18n.tr("Rovas profile page"))
     ) +
     "</html>"
   );
@@ -69,7 +69,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     // i18n: {0} is replaced by a link labeled "rules page in Rovas"
     I18n.tr(
       "See the {0} for more information",
-      URIs.toHtmlHyperlink(URIs.RULES, I18n.tr("rules page in Rovas"))
+      URIs.toHtmlHyperlink(URIs.rules(), I18n.tr("rules page in Rovas"))
     ) +
     "</p>"
   );
@@ -98,7 +98,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
     RovasProperties.INACTIVITY_TOLERANCE_MAX_VALUE,
     1
   );
-  private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5);
+  private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5, true);
   private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
   public RovasPreferencePanel() {

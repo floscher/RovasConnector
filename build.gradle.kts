@@ -42,6 +42,7 @@ tasks.withType(Test::class) {
 }
 
 josm {
+  initialPreferences.set("<tag key='rovas.developer' value='true'/>")
   josmCompileVersion = "17833" // "15660"
   manifest {
     description = "A plugin to keep track of the time spent for mapping. Can be used to report that time to https://rovas.app ."

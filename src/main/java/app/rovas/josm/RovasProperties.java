@@ -85,6 +85,8 @@ public final class RovasProperties {
     new IntegerProperty("rovas.already-tracked-time", 0);
   public static final BooleanProperty ALWAYS_CREATE_REPORT = new BooleanProperty("rovas.always-create-report", false);
 
+  public static final BooleanProperty DEVELOPER = new BooleanProperty("rovas.developer", false);
+
   private RovasProperties() {
     // private constructor to avoid instantiation
   }

@@ -6,16 +6,24 @@ import java.net.URISyntaxException;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 
+import app.rovas.josm.RovasProperties;
+
 public final class URIs {
-  public static final String ROVAS_DOMAIN = "dev.merit.world";
+  public static String getRovasDomain() {
+    return RovasProperties.DEVELOPER.get() ? "dev.merit.world" : "merit.world";
+  }
 
   @Nullable
   public static URI project(final int id) {
-    return orNull(String.format("https://%s/node/%d", ROVAS_DOMAIN, id));
+    return orNull(String.format("https://%s/node/%d", getRovasDomain(), id));
   }
 
-  public static final URI RULES = orNull(String.format("https://%s/rules", ROVAS_DOMAIN));
-  public static final URI USER_PROFILE = orNull(String.format("https://%s/user", ROVAS_DOMAIN));
+  public static URI rules() {
+    return orNull(String.format("https://%s/rules", getRovasDomain()));
+  }
+  public static URI userProfile() {
+    return orNull(String.format("https://%s/user", getRovasDomain()));
+  }
 
   @Nullable
   public static URI orNull(@NotNull final String stringUri) {
