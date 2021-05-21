@@ -77,9 +77,9 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   private final URI connectorURI = URIs.project(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID);
   private final JEditorPane feeNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
-      // i18n: {0} will be replaced by a decimal number with 2 decimal places
-      // i18n: {1} will be replaced by a link labeled with "Rovas connector"
       I18n.tr(
+        // i18n: {0} will be replaced by a decimal number with 2 decimal places
+        // i18n: {1} will be replaced by a link labeled with "Rovas connector"
         "To reward the authors of this {1}, a fee equal to {0}% of the amount you earn from reports created by the plugin will be levied on those earnings.",
         String.format("%.2f", RovasProperties.ASSET_USAGE_FEE * 100),
         String.format("<a href=\"%s\">%s</a>", connectorURI == null ? "#" : connectorURI, I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;"))

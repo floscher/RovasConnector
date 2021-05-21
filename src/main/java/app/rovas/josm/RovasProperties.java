@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
+import org.openstreetmap.josm.data.preferences.LongProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
 
 import app.rovas.josm.util.NullableProperty;
@@ -81,8 +82,8 @@ public final class RovasProperties {
   /**
    * This property persists the time that was already tracked across restarts
    */
-  public static final IntegerProperty ALREADY_TRACKED_TIME =
-    new IntegerProperty("rovas.already-tracked-time", 0);
+  public static final LongProperty ALREADY_TRACKED_TIME =
+    new LongProperty("rovas.already-tracked-time", 0);
   public static final BooleanProperty ALWAYS_CREATE_REPORT = new BooleanProperty("rovas.always-create-report", false);
 
   public static final BooleanProperty DEVELOPER = new BooleanProperty("rovas.developer", false);
