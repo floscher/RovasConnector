@@ -1,33 +1,44 @@
 import proguard.gradle.ProGuardTask
+import java.nio.charset.StandardCharsets
 
 buildscript {
   dependencies {
-    classpath("net.sf.proguard:proguard-gradle:6.3.0beta1")
+    classpath("net.sf.proguard:proguard-gradle:${Version.PROGUARD}")
   }
 }
 plugins {
-  id("org.openstreetmap.josm").version("0.7.1")
+  id("org.openstreetmap.josm").version(Version.GRADLE_JOSM_PLUGIN)
   java
   `java-test-fixtures`
   jacoco
   pmd
 }
 
+repositories {
+  mavenCentral()
+}
+
 dependencies {
-  testFixturesApi("org.junit.jupiter:junit-jupiter:5.7.1")
+  testFixturesApi("org.junit.jupiter:junit-jupiter-api:${Version.JUNIT}")
+
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Version.JUNIT}")
+  // The following two lines can be removed, once JOSM drops JUnit 4 support
+  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${Version.JUNIT}")
+  testCompileOnly("junit:junit:${Version.JUNIT4}")
+
+  testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){ isChanging = true }
+  testImplementation("com.github.tomakehurst:wiremock:${Version.WIREMOCK}")
+  testImplementation("org.awaitility:awaitility:${Version.AWAITILITY}")
 }
 
 tasks.withType(JavaCompile::class) {
-  sourceCompatibility = "1.8"
-  targetCompatibility = "1.8"
+  options.encoding = StandardCharsets.UTF_8.name()
+  sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+  targetCompatibility = JavaVersion.VERSION_1_8.toString()
 }
 
 tasks.withType(Test::class) {
   useJUnitPlatform()
-}
-
-repositories {
-  mavenCentral()
 }
 
 josm {
