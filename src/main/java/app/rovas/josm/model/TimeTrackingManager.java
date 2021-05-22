@@ -1,4 +1,4 @@
-package app.rovas.josm;
+package app.rovas.josm.model;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -9,6 +9,9 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.ListenerList;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
+
+import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.gui.TimeTrackingUpdateListener;
 
 public final class TimeTrackingManager {
 

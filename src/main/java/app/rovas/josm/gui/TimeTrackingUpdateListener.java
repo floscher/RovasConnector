@@ -1,4 +1,6 @@
-package app.rovas.josm;
+package app.rovas.josm.gui;
+
+import app.rovas.josm.model.TimeTrackingManager;
 
 /**
  * This listener is used to notify other components about changes in {@link TimeTrackingManager}.

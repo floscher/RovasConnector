@@ -17,6 +17,9 @@ import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 import app.rovas.josm.gui.CreateRovasReportDialog;
+import app.rovas.josm.gui.RovasDialog;
+import app.rovas.josm.model.RovasPreference;
+import app.rovas.josm.model.TimeTrackingManager;
 
 public final class RovasPlugin extends Plugin {
   public static final ImageProvider LOGO = new ImageProvider("rovas_logo");

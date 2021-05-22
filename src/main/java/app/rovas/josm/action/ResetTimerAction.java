@@ -8,7 +8,7 @@ import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.I18n;
 
-import app.rovas.josm.TimeTrackingManager;
+import app.rovas.josm.model.TimeTrackingManager;
 
 /**
  * Resets the timer to 0 or an arbitrary value

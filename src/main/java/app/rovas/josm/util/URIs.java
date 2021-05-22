@@ -6,8 +6,6 @@ import java.net.URISyntaxException;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 
-import app.rovas.josm.RovasProperties;
-
 public final class URIs {
   public static String getRovasDomain() {
     return RovasProperties.DEVELOPER.get() ? "dev.merit.world" : "rovas.app";

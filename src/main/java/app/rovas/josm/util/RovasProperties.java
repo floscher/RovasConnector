@@ -1,4 +1,4 @@
-package app.rovas.josm;
+package app.rovas.josm.util;
 
 import java.util.Optional;
 
@@ -6,8 +6,6 @@ import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.LongProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
-
-import app.rovas.josm.util.NullableProperty;
 
 public final class RovasProperties {
   /**

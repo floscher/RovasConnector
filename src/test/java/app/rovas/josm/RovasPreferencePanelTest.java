@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 
+import app.rovas.josm.gui.RovasPreferencePanel;
+
 public class RovasPreferencePanelTest {
 
   @RegisterExtension

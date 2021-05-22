@@ -1,4 +1,4 @@
-package app.rovas.josm;
+package app.rovas.josm.gui;
 
 import java.awt.GridBagLayout;
 import java.time.ZoneId;
@@ -16,6 +16,9 @@ import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 
+import app.rovas.josm.model.RovasPreference;
+import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.action.ResetTimerAction;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;

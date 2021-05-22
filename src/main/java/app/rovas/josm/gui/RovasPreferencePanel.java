@@ -1,4 +1,4 @@
-package app.rovas.josm;
+package app.rovas.josm.gui;
 
 import java.awt.GridBagLayout;
 import java.net.URI;
@@ -24,6 +24,7 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.OpenBrowser;
 import org.openstreetmap.josm.tools.Utils;
 
+import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;

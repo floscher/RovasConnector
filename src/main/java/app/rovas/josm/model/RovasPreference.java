@@ -1,9 +1,12 @@
-package app.rovas.josm;
+package app.rovas.josm.model;
 
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
+
+import app.rovas.josm.gui.RovasPreferencePanel;
+import app.rovas.josm.util.RovasProperties;
 
 public final class RovasPreference extends DefaultTabPreferenceSetting {
 
