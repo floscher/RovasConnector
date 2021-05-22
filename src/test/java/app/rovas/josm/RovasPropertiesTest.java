@@ -13,8 +13,8 @@ public class RovasPropertiesTest implements UtilityClassTest<RovasProperties> {
 
   @Test
   public void test() {
-    assertEquals("https://dev.merit.world/node/42", URIs.project(42).toString());
-    assertEquals("https://dev.merit.world/node/-73", URIs.project(-73).toString());
+    assertEquals("https://rovas.app/node/42", URIs.project(42).toString());
+    assertEquals("https://rovas.app/node/-73", URIs.project(-73).toString());
 
     TimeTrackingManager.getInstance().trackChangeAt(Instant.now());
   }

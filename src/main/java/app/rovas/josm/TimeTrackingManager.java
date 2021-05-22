@@ -112,7 +112,17 @@ public final class TimeTrackingManager {
     fireTimeTrackingUpdateListeners();
   }
 
-  private void resetAutomaticTracker(final Long newValue, final boolean commitUncommittedTime) {
+  public long commit() {
+    return resetAutomaticTracker(null, true);
+  }
+
+  /**
+   *
+   * @param newValue
+   * @param commitUncommittedTime
+   * @return the current number of tracked seconds, after the reset
+   */
+  private long resetAutomaticTracker(final Long newValue, final boolean commitUncommittedTime) {
     if (commitUncommittedTime) {
       final Long firstUncommitted = this.firstUncommittedChangeTimestamp;
       final Long lastUncommitted = this.lastUncommittedChangeTimestamp;
@@ -127,6 +137,7 @@ public final class TimeTrackingManager {
     }
     this.firstUncommittedChangeTimestamp = newValue;
     this.lastUncommittedChangeTimestamp = newValue;
+    return this.committedSeconds;
   }
 
   /**

@@ -16,8 +16,9 @@ import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 
-import app.rovas.josm.action.ResetManualTimerAction;
+import app.rovas.josm.action.ResetTimerAction;
 import app.rovas.josm.util.GBCUtil;
+import app.rovas.josm.util.I18nStrings;
 
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private final AbstractProperty.ValueChangeListener<Object> apiConfigurationChangeListener = __ -> {
@@ -31,7 +32,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
   private final DateTimeFormatter lastDetectedChangeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
   private final JLabel savingStatusLabel = new JLabel(I18n.tr("Saving status"));
 
-  private final SideButton resetButton = new SideButton(new ResetManualTimerAction());
+  private final SideButton resetButton = new SideButton(new ResetTimerAction());
 
   private final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
   private final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
@@ -73,11 +74,11 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
         RovasProperties.ROVAS_API_KEY.get() == null ||
         RovasProperties.ROVAS_API_TOKEN.get() == null
           ? "<html><div style='background:#fdc14b;padding:5px 10px'>" +
-            I18n.tr("The plugin is not configured to send work reports to Rovas. Click the preferences icon at the top right of this dialog.") +
+            I18n.tr("Complete the plugin setup process and choose if you want to have a report created.") +
             "</div></html>"
           : (
             RovasProperties.ALWAYS_CREATE_REPORT.get()
-              ? I18n.tr("report will be created")
+              ? I18n.tr("a report will be created automatically")
               : I18n.tr("save report manually when uploading")
           )
       )
@@ -98,9 +99,9 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     GuiHelper.runInEDT(() ->
       counterValue.setText(String.format(
         "<html><strong style='font-size:1.8em'>%d</strong>&thinsp;" +
-          I18n.trc("shorthand for hours", "h") +
+          I18nStrings.trShorthandForHours() +
           "&nbsp;<strong style='font-size:1.8em'>%02d</strong>&thinsp;" +
-          I18n.trc("shorthand for minutes", "m") +
+          I18nStrings.trShorthandForMinutes() +
           "&nbsp;<span style='color:#bbbbbb'>(%d&nbsp;" +
           I18n.tr("seconds") +
           ")</span></html>",

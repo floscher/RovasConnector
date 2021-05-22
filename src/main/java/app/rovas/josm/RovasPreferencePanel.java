@@ -26,6 +26,7 @@ import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.GuiComponentFactory;
+import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.URIs;
 
 public final class RovasPreferencePanel extends VerticallyScrollablePanel {
@@ -63,15 +64,7 @@ public final class RovasPreferencePanel extends VerticallyScrollablePanel {
   private final JCheckBox alwaysCreateWorkReportValue = new JCheckBox(I18n.tr("Always create a work report by default when uploading OSM data"));
 
   private final JEditorPane verificationNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
-    "<p><span style='color:#ff0000'>" +
-    I18n.tr("<strong>Please note,</strong> by creating a work report you also agree to verify (typically) two work reports submitted by other users for each of your submitted work reports.") +
-    "</span> " +
-    // i18n: {0} is replaced by a link labeled "rules page in Rovas"
-    I18n.tr(
-      "See the {0} for more information",
-      URIs.toHtmlHyperlink(URIs.rules(), I18n.tr("rules page in Rovas"))
-    ) +
-    "</p>"
+    I18nStrings.trVerificationWarningWithHyperlink()
   );
 
   private final URI connectorURI = URIs.project(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID);

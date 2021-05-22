@@ -10,9 +10,12 @@ import org.openstreetmap.josm.tools.I18n;
 
 import app.rovas.josm.TimeTrackingManager;
 
-public class ResetManualTimerAction extends JosmAction {
+/**
+ * Resets the timer to 0 or an arbitrary value
+ */
+public class ResetTimerAction extends JosmAction {
 
-  public ResetManualTimerAction() {
+  public ResetTimerAction() {
     super(
       I18n.tr("Reset timer"),
       "preferences/reset",
