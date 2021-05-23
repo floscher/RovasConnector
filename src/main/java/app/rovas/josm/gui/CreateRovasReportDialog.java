@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -97,7 +96,7 @@ public class CreateRovasReportDialog extends JDialog {
       setVisible(false);
       @NotNull final ApiCredentials apiCredentials;
       if (!this.apiCredentials.isPresent()) {
-        final ApiCredentialsPanel apiCredentialsPanel = new ApiCredentialsPanel();
+        final ApiCredentialsPanel apiCredentialsPanel = new ApiCredentialsPanel(true);
         Optional<ApiCredentials> newApiCredentials = Optional.empty();
         while (!newApiCredentials.isPresent()) {
           if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(MainApplication.getMainFrame(), apiCredentialsPanel, "Enter API credentials", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE)) {
@@ -117,10 +116,10 @@ public class CreateRovasReportDialog extends JDialog {
         apiCredentials = this.apiCredentials.get();
       }
 
-      JOptionPane.showMessageDialog(MainApplication.getMainFrame(), "Creating a report for project " + apiCredentials.getProjectId() + " is currently not implement, this is coming soon!", "Coming soon", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(MainApplication.getMainFrame(), "This dialog is just a placeholder. Normally, now the work report for project " + apiCredentials.getProjectId() + " would be created!", "Coming soon", JOptionPane.INFORMATION_MESSAGE);
     });
     panel.add(GuiComponentFactory.createWrapperPanel(submitReportButton, new FlowLayout(FlowLayout.LEFT)), DEFAULT_GBC.insets(10, 5, 10, 0));
-    panel.add(new JCheckBox("Remember this choice"), DEFAULT_GBC.insets(10, 0, 10, 5));
+    //panel.add(new JCheckBox("Remember this choice"), DEFAULT_GBC.insets(10, 0, 10, 5));
 
     panel.add(GuiComponentFactory.createHyperlinkedMultilineLabel(I18nStrings.trVerificationWarningWithHyperlink()), DEFAULT_GBC.insets(10, 5, 10, 5));
 

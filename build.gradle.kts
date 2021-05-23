@@ -47,7 +47,11 @@ josm {
   manifest {
     description = "A plugin to keep track of the time spent for mapping. Can be used to report that time to https://rovas.app ."
     mainClass = "app.rovas.josm.RovasPlugin"
-    minJosmVersion = "16438" // MapFrame.getToggleDialog // "15650"
+    minJosmVersion = "17238"
+    /*
+     * 17238: AbstractTextComponentValidator.addChangeListener()
+     * 16438: MapFrame.getToggleDialog()
+     */
     iconPath = "images/rovas_logo.svg"
   }
 }

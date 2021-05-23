@@ -56,7 +56,7 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
   private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
   public RovasPreferencePanel() {
-    super();
+    super(false);
     extendGui();
 
     ExpertToggleAction.addVisibilitySwitcher(inactivityToleranceLabel);
@@ -68,11 +68,13 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
    * Extends the GUI that was previously added by {@link ApiCredentialsPanel#buildGui()}, by adding more components.
    */
   private void extendGui() {
+    /*
     add(alwaysCreateWorkReportLabel, GBC_COLUMN_A);
     add(alwaysCreateWorkReportValue, GBC_COLUMNS_BCD);
 
     add(new JPanel(), GBC_COLUMN_A);
     add(GuiComponentFactory.createWrapperPanel(verificationNote), GBC_COLUMNS_BCD);
+*/
 
     add(new JPanel(), GBC_COLUMN_A);
     add(GuiComponentFactory.createWrapperPanel(feeNote), GBC_COLUMNS_BCD);

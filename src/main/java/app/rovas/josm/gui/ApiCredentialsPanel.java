@@ -1,7 +1,9 @@
 package app.rovas.josm.gui;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.swing.Box;
@@ -16,6 +18,8 @@ import javax.swing.event.ChangeEvent;
 
 import com.drew.lang.annotations.Nullable;
 
+import org.openstreetmap.josm.gui.widgets.AbstractTextComponentValidator;
+import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
@@ -33,6 +37,9 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
 
   protected static final GBC GBC_COLUMN_A = GBCUtil.fixedToColumn(0,
     GBC.std().insets(5).span(1).anchor(GBC.LINE_END)
+  );
+  protected static final GBC GBC_COLUMNS_ABCD = GBCUtil.fixedToColumn(0,
+    GBC.std().insets(5).span(4).fill(GBC.HORIZONTAL).anchor(GBC.CENTER)
   );
   protected static final GBC GBC_COLUMNS_BC = GBCUtil.fixedToColumn(1,
     GBC.std().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START)
@@ -71,8 +78,45 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
   private final JButton activeProjectOpenButton = new JButton(I18n.tr("Open project page in Rovas"), ImageProvider.get("help", "internet", ImageProvider.ImageSizes.SIDEBUTTON));
   private final JLabel activeProjectIdDescription = GuiComponentFactory.createLabel(I18n.tr("(the parent project of the created work reports)"), false);
 
-  public ApiCredentialsPanel() {
+  private final JEditorPane validationWarning = new JMultilineLabel(
+    "<html><div style='background:#fdc14b;padding:5px 10px'>" +
+      I18n.tr("All fields have to be filled out!") +
+    "</div></html>"
+  );
+
+  public ApiCredentialsPanel(final boolean showValidationWarning) {
     super();
+    validationWarning.setVisible(false);
+    if (showValidationWarning) {
+      final AbstractTextComponentValidator apiKeyValidator = new NonBlankTextFieldValidator(apiKeyField);
+      final AbstractTextComponentValidator apiTokenValidator = new NonBlankTextFieldValidator(apiTokenField);
+      final AbstractTextComponentValidator projectIdValidator = new AbstractTextComponentValidator(((JSpinner.DefaultEditor) activeProjectIdSpinner.getEditor()).getTextField()) {
+        @Override
+        public void validate() {
+          if (isValid()) {
+            feedbackValid("");
+          } else {
+            feedbackInvalid(I18n.tr("The project ID must be ≥ {0}!", ApiCredentials.MIN_PROJECT_ID));
+          }
+        }
+        @Override
+        public boolean isValid() {
+          return ApiCredentials.isValidProjectId(activeProjectIdSpinnerModel.getNumber().intValue());
+        }
+      };
+
+      final List<AbstractTextComponentValidator> validators = Arrays.asList(apiKeyValidator, apiTokenValidator, projectIdValidator);
+      validators.forEach(validator -> {
+        validator.addChangeListener(__ ->
+          validationWarning.setVisible(!validators.stream().allMatch(AbstractTextComponentValidator::isValid))
+        );
+        validator.validate();
+      });
+
+      activeProjectIdSpinnerModel.addChangeListener(ce -> projectIdValidator.validate());
+      apiKeyField.getDocument().addDocumentListener(apiKeyValidator);
+      apiTokenField.getDocument().addDocumentListener(apiTokenValidator);
+    }
 
     // Update the URL that the button opens
     activeProjectIdSpinnerModel.addChangeListener(
@@ -108,6 +152,8 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
   private void buildGui() {
     setLayout(new GridBagLayout());
 
+    add(validationWarning, GBC_COLUMNS_ABCD);
+
     // API key and token
     add(apiKeyLabel, GBC_COLUMN_A);
     add(apiKeyField, GBC_COLUMNS_BC);
@@ -123,7 +169,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     add(activeProjectIdSpinner, GBC_COLUMN_B);
     add(activeProjectIdDescription, GBC_COLUMNS_CD);
     add(Box.createHorizontalGlue(), GBC_COLUMN_A);
-    add(activeProjectOpenButton, GBC_COLUMNS_BC);
+    add(GuiComponentFactory.createWrapperPanel(activeProjectOpenButton, new FlowLayout(FlowLayout.LEFT, 0, 0)), GBC_COLUMNS_BC);
     add(Box.createHorizontalGlue(), GBC_COLUMN_D);
   }
 

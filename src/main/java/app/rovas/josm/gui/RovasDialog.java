@@ -56,8 +56,10 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
     panel.add(counterLabel, GBC_LEFT_COLUMN);
     panel.add(counterValue, GBC_RIGHT_COLUMN);
+    /*
     panel.add(savingStatusLabel, GBC_LEFT_COLUMN);
     panel.add(savingStatusValue, GBC_RIGHT_COLUMN);
+    */
     panel.add(Box.createVerticalGlue(), GBC_LEFT_COLUMN.fill(GBC.VERTICAL));
 
     createLayout(panel.getVerticalScrollPane(), false, Collections.singletonList(resetButton));
