@@ -4,7 +4,7 @@ import java.awt.GridBagConstraints;
 
 import com.drew.lang.annotations.NotNull;
 
-public class GBCUtil {
+public final class GBCUtil {
   /**
    * Modifies GridBagConstraints, so that {@link java.awt.GridBagConstraints#gridx} is set to {@code columnIndex}.
    *
@@ -16,5 +16,9 @@ public class GBCUtil {
   public static <G extends GridBagConstraints> G fixedToColumn(final int columnIndex, @NotNull final G gbc) {
     gbc.gridx = columnIndex;
     return gbc;
+  }
+
+  private GBCUtil() {
+    // private constructor to prevent instantiation
   }
 }

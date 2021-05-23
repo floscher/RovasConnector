@@ -2,10 +2,15 @@ package app.rovas.josm.util;
 
 import java.util.Optional;
 
+import com.drew.lang.annotations.NotNull;
+
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.LongProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
+
+import app.rovas.josm.gui.ApiCredentialsPanel;
+import app.rovas.josm.model.ApiCredentials;
 
 public final class RovasProperties {
   /**
@@ -29,27 +34,18 @@ public final class RovasProperties {
   );
 
   /**
-   * When a value smaller than {@link #ACTIVE_PROJECT_ID_MIN_VALUE} is set for {@link #ACTIVE_PROJECT_ID},
+   * When a value smaller than {@link ApiCredentials#MIN_PROJECT_ID} is set for {@link #ACTIVE_PROJECT_ID},
    * then the value is replaced by this value, which is equivalent to no value being set.
    */
   public static final int ACTIVE_PROJECT_ID_NO_VALUE = -1;
-  /**
-   * The minimum value for {@link #ACTIVE_PROJECT_ID} that is considered a valid project ID.
-   * Smaller values are allowed, though. These smaller values are all treated as "no value"
-   * (see {@link #ACTIVE_PROJECT_ID_NO_VALUE}).
-   */
-  public static final int ACTIVE_PROJECT_ID_MIN_VALUE = 2;
   /**
    * The Rovas project ID for which the JOSM user is submitting their work report.
    */
   public static final IntegerProperty ACTIVE_PROJECT_ID =
     new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
 
-  /**
-   * @return {@code true} iff {@link #ACTIVE_PROJECT_ID} has a value greater than or equal to {@link #ACTIVE_PROJECT_ID_MIN_VALUE}
-   */
-  public static boolean isActiveProjectIdSet() {
-    return Optional.ofNullable(ACTIVE_PROJECT_ID.get()).orElse(ACTIVE_PROJECT_ID_NO_VALUE) >= ACTIVE_PROJECT_ID_MIN_VALUE;
+  public static Optional<ApiCredentials> getApiCredentials() {
+    return ApiCredentials.createFrom(ROVAS_API_KEY.get(), ROVAS_API_TOKEN.get(), ACTIVE_PROJECT_ID.get());
   }
 
   /**
@@ -88,5 +84,11 @@ public final class RovasProperties {
 
   private RovasProperties() {
     // private constructor to avoid instantiation
+  }
+
+  public static void persistApiCredentials(@NotNull final ApiCredentialsPanel apiCredentialsPanel) {
+    ROVAS_API_KEY.put(apiCredentialsPanel.getApiKeyValue());
+    ROVAS_API_TOKEN.put(apiCredentialsPanel.getApiTokenValue());
+    ACTIVE_PROJECT_ID.put(apiCredentialsPanel.getActiveProjectIdValue());
   }
 }

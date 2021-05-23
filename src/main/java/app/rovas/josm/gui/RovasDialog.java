@@ -16,12 +16,12 @@ import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 
-import app.rovas.josm.model.RovasPreference;
-import app.rovas.josm.util.RovasProperties;
-import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.action.ResetTimerAction;
+import app.rovas.josm.model.RovasPreference;
+import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;
+import app.rovas.josm.util.RovasProperties;
 
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private final AbstractProperty.ValueChangeListener<Object> apiConfigurationChangeListener = __ -> {
@@ -73,9 +73,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
   public void updateMissingConfigurationWarning() {
     GuiHelper.runInEDT(() ->
       savingStatusValue.setText(
-        !RovasProperties.isActiveProjectIdSet() ||
-        RovasProperties.ROVAS_API_KEY.get() == null ||
-        RovasProperties.ROVAS_API_TOKEN.get() == null
+        !RovasProperties.getApiCredentials().isPresent()
           ? "<html><div style='background:#fdc14b;padding:5px 10px'>" +
             I18n.tr("Complete the plugin setup process and choose if you want to have a report created.") +
             "</div></html>"
