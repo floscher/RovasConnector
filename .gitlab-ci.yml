@@ -1,0 +1,19 @@
+image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin:latest
+
+assemble:
+  stage: build
+  script: ./gradlew assemble --stacktrace
+  artifacts:
+    paths:
+      - build/
+
+build:
+  stage: test
+  script: ./gradlew test jacocoTestReport --stacktrace
+  artifacts:
+    reports:
+      junit:
+        - build/test-results/**/TEST-*.xml
+  needs:
+    - assemble
+
