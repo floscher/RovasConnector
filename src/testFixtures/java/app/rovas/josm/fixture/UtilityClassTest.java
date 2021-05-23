@@ -36,21 +36,29 @@ public interface UtilityClassTest<T> {
     );
 
     // class must be final
-    assertTrue(Modifier.isFinal(c.getModifiers()));
+    assertTrue(Modifier.isFinal(c.getModifiers()), () -> "Utility class `" + c.getName() + "` is not declared final!");
     // with exactly one constructor
-    assertEquals(1, c.getDeclaredConstructors().length);
+    assertEquals(
+      1,
+      c.getDeclaredConstructors().length,
+      () -> "Utility class `" + c.getName() + "` has " + c.getDeclaredConstructors().length + " constructors (expected exactly one private constructor)!"
+    );
     final Constructor<?> constructor = c.getDeclaredConstructors()[0];
     // constructor has to be private
-    assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+    assertTrue(
+      Modifier.isPrivate(constructor.getModifiers()),
+      () -> "Utility class `" + c.getName() + "` has a constructor that is not private!"
+    );
 
     // Call private constructor for code coverage
     constructor.setAccessible(true);
     constructor.newInstance();
     constructor.setAccessible(false);
 
-    for (Method m : c.getMethods()) {
+    for (Method m : c.getDeclaredMethods()) {
       // Check if all methods are static
-      assertTrue(m.getDeclaringClass() != c || Modifier.isStatic(m.getModifiers()));
+      assertTrue(m.getDeclaringClass() != c || Modifier.isStatic(m.getModifiers()), () -> "Utility class `" + c.getName() + "` has method `" + m.getName() + "` that is not static!");
     }
+    System.out.println("✅ The class `" + c.getName() + "` is following the guidelines for utility classes.");
   }
 }
