@@ -1,3 +1,5 @@
+
+import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import proguard.gradle.ProGuardTask
 import java.nio.charset.StandardCharsets
 
@@ -20,6 +22,7 @@ repositories {
 
 dependencies {
   testFixturesApi("org.junit.jupiter:junit-jupiter-api:${Version.JUNIT}")
+  testFixturesApi("com.github.tomakehurst:wiremock:${Version.WIREMOCK}")
 
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Version.JUNIT}")
   // The following two lines can be removed, once JOSM drops JUnit 4 support
@@ -27,7 +30,6 @@ dependencies {
   testCompileOnly("junit:junit:${Version.JUNIT4}")
 
   testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){ isChanging = true }
-  testImplementation("com.github.tomakehurst:wiremock:${Version.WIREMOCK}")
   testImplementation("org.awaitility:awaitility:${Version.AWAITILITY}")
 }
 
@@ -41,6 +43,36 @@ tasks.withType(Test::class) {
   useJUnitPlatform()
 }
 
+val generatedSrcDir = buildDir.resolve("generated/sources/main")
+sourceSets {
+  main {
+    java {
+      srcDir(generatedSrcDir)
+    }
+  }
+}
+
+val generatePluginVersionClass by tasks.registering {
+  val content = """
+    package app.rovas.josm.gen;
+    public final class PluginVersion {
+      public static final String versionName = "${GitDescriber(projectDir).describe(trimLeading = true)}";
+    }""".trimIndent()
+  val file = generatedSrcDir.resolve("app/rovas/josm/gen/PluginVersion.java")
+
+  inputs.property("content", content)
+  outputs.file(file)
+  actions = listOf(
+    Action {
+      file.parentFile.mkdirs()
+      file.writeText(content)
+    }
+  )
+}
+
+tasks.withType(JavaCompile::class).named("compileJava") {
+  dependsOn(generatePluginVersionClass)
+}
 josm {
   initialPreferences.set("<tag key='rovas.developer' value='true'/>")
   josmCompileVersion = "17833" // "15660"
@@ -72,7 +104,7 @@ tasks.getByName("runJosm").dependsOn(
 
     printmapping()
     buildDir.resolve("proguard-mapping.txt").apply {
-      writeText("app.rovas.josm.RovasDialog -> app.rovas.josm.aDialog:")
+      writeText("app.rovas.josm.gui.RovasDialog -> app.rovas.josm.gui.aDialog:")
       applymapping(absolutePath)
     }
     overloadaggressively()
