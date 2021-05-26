@@ -12,7 +12,7 @@ public class RovasPropertiesTest implements UtilityClassTest<RovasProperties> {
 
   @Test
   public void test() {
-    assertEquals("https://rovas.app/node/42", URIs.project(42).toString());
-    assertEquals("https://rovas.app/node/-73", URIs.project(-73).toString());
+    assertEquals("https://rovas.app/node/42", URIs.getInstance().node(42).toString());
+    assertEquals("https://rovas.app/node/-73", URIs.getInstance().node(-73).toString());
   }
 }

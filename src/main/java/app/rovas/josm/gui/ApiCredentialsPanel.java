@@ -2,6 +2,7 @@ package app.rovas.josm.gui;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 
 import com.drew.lang.annotations.Nullable;
@@ -67,7 +69,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     "<html>" +
       I18n.tr(
         "Values for these fields can be found on your {0}.",
-        URIs.toHtmlHyperlink(URIs.userProfile(), I18n.tr("Rovas profile page"))
+        URIs.toHtmlHyperlink(URIs.getInstance().userProfile(), I18n.tr("Rovas profile page"))
       ) +
       "</html>"
   );
@@ -107,9 +109,10 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
 
       final List<AbstractTextComponentValidator> validators = Arrays.asList(apiKeyValidator, apiTokenValidator, projectIdValidator);
       validators.forEach(validator -> {
-        validator.addChangeListener(__ ->
-          validationWarning.setVisible(!validators.stream().allMatch(AbstractTextComponentValidator::isValid))
-        );
+        validator.addChangeListener(__ -> {
+          validationWarning.setVisible(!validators.stream().allMatch(AbstractTextComponentValidator::isValid));
+          Optional.ofNullable((Window) SwingUtilities.getAncestorOfClass(Window.class, this)).ifPresent(Window::pack);
+        });
         validator.validate();
       });
 
@@ -131,7 +134,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
         .filter(ApiCredentials::isValidProjectId);
 
       if (projectId.isPresent()) {
-        OpenBrowser.displayUrl(URIs.project(projectId.get()));
+        OpenBrowser.displayUrl(URIs.getInstance().node(projectId.get()).toString());
       } else {
         activeProjectOpenButton.setEnabled(false);
         Arrays.stream(activeProjectIdSpinnerModel.getChangeListeners())

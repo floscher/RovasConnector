@@ -1,17 +1,13 @@
 package app.rovas.josm.gui;
 
 import java.awt.GridBagLayout;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import javax.swing.Box;
 import javax.swing.JLabel;
 
-import org.openstreetmap.josm.data.preferences.AbstractProperty;
 import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.util.GuiHelper;
-import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
@@ -21,19 +17,11 @@ import app.rovas.josm.model.RovasPreference;
 import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;
-import app.rovas.josm.util.RovasProperties;
 
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
-  private final AbstractProperty.ValueChangeListener<Object> apiConfigurationChangeListener = __ -> {
-    updateMissingConfigurationWarning();
-  };
 
-
-  private final JMultilineLabel savingStatusValue = new JMultilineLabel("");
   private final JLabel counterLabel = new JLabel(I18n.tr("Active time"));
   private final JLabel counterValue = new JLabel("");
-  private final DateTimeFormatter lastDetectedChangeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
-  private final JLabel savingStatusLabel = new JLabel(I18n.tr("Saving status"));
 
   private final SideButton resetButton = new SideButton(new ResetTimerAction());
 
@@ -56,36 +44,12 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
     panel.add(counterLabel, GBC_LEFT_COLUMN);
     panel.add(counterValue, GBC_RIGHT_COLUMN);
-    /*
-    panel.add(savingStatusLabel, GBC_LEFT_COLUMN);
-    panel.add(savingStatusValue, GBC_RIGHT_COLUMN);
-    */
+
     panel.add(Box.createVerticalGlue(), GBC_LEFT_COLUMN.fill(GBC.VERTICAL));
 
     createLayout(panel.getVerticalScrollPane(), false, Collections.singletonList(resetButton));
 
     TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(this);
-    RovasProperties.ACTIVE_PROJECT_ID.addListener(apiConfigurationChangeListener);
-    RovasProperties.ROVAS_API_KEY.addListener(apiConfigurationChangeListener);
-    RovasProperties.ROVAS_API_TOKEN.addListener(apiConfigurationChangeListener);
-    RovasProperties.ALWAYS_CREATE_REPORT.addListener(apiConfigurationChangeListener);
-    apiConfigurationChangeListener.valueChanged(null);
-  }
-
-  public void updateMissingConfigurationWarning() {
-    GuiHelper.runInEDT(() ->
-      savingStatusValue.setText(
-        !RovasProperties.getApiCredentials().isPresent()
-          ? "<html><div style='background:#fdc14b;padding:5px 10px'>" +
-            I18n.tr("Complete the plugin setup process and choose if you want to have a report created.") +
-            "</div></html>"
-          : (
-            RovasProperties.ALWAYS_CREATE_REPORT.get()
-              ? I18n.tr("a report will be created automatically")
-              : I18n.tr("save report manually when uploading")
-          )
-      )
-    );
   }
 
   @Override

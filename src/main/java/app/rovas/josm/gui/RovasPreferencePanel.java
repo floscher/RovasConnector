@@ -1,9 +1,7 @@
 package app.rovas.josm.gui;
 
-import java.net.URI;
 import java.util.Optional;
 import javax.swing.Box;
-import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,14 +19,11 @@ import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.URIs;
 
 public final class RovasPreferencePanel extends ApiCredentialsPanel {
-  private final JLabel alwaysCreateWorkReportLabel = new JLabel(I18n.tr("Work reports"));
-  private final JCheckBox alwaysCreateWorkReportValue = new JCheckBox(I18n.tr("Always create a work report by default when uploading OSM data"));
 
   private final JEditorPane verificationNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     I18nStrings.trVerificationWarningWithHyperlink()
   );
 
-  private final URI connectorURI = URIs.project(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID);
   private final JEditorPane feeNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
       I18n.tr(
@@ -36,7 +31,10 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
         // i18n: {1} will be replaced by a link labeled with "Rovas connector"
         "To reward the authors of this {1}, a fee equal to {0}% of the amount you earn from reports created by the plugin will be levied on those earnings.",
         String.format("%.2f", RovasProperties.ASSET_USAGE_FEE * 100),
-        String.format("<a href=\"%s\">%s</a>", connectorURI == null ? "#" : connectorURI, I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;"))
+        URIs.toHtmlHyperlink(
+          URIs.getInstance().node(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID),
+          I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;")
+        )
       ) +
     "</html>"
   );
@@ -84,14 +82,6 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
     add(inactivityToleranceDescription, GBC_COLUMNS_CD);
 
     add(Box.createVerticalGlue(), GBC_COLUMN_A.fill(GBC.VERTICAL));
-  }
-
-  public boolean getAlwaysCreateWorkReport() {
-    return alwaysCreateWorkReportValue.isSelected();
-  }
-
-  public void setAlwaysCreateWorkReport(final boolean value) {
-    alwaysCreateWorkReportValue.setSelected(value);
   }
 
 

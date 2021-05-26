@@ -13,16 +13,18 @@ import app.rovas.josm.gui.ApiCredentialsPanel;
 import app.rovas.josm.model.ApiCredentials;
 
 public final class RovasProperties {
+  public static final int NACE_CLASSIFICATION = 1645;
   /**
    * The fraction of all earnings that goes to the Rovas connector project.
    * A value of 1.0 would be equal to 100%, 0.01 means 1%.
    * So for a value of {@code 0.01} from every 100 chrons earned, one of them would go to project {@link #ROVAS_CONNECTOR_PROJECT_ID}.
    */
-  public static final double ASSET_USAGE_FEE = 0.01;
+  public static final double ASSET_USAGE_FEE = 0.03;
   /**
    * The project ID of the JOSM connector project in Rovas.
    */
-  public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 1998;
+  public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 35259;
+  public static final String ROVAS_CONNECTOR_PROJECT_URL = "https://rovas.app/josm_rovas_connector";
 
   public static final NullableProperty<String> ROVAS_API_KEY = new NullableProperty<>(
     new StringProperty("rovas.api-key", null),
@@ -76,9 +78,7 @@ public final class RovasProperties {
   /**
    * This property persists the time that was already tracked across restarts
    */
-  public static final LongProperty ALREADY_TRACKED_TIME =
-    new LongProperty("rovas.already-tracked-time", 0);
-  public static final BooleanProperty ALWAYS_CREATE_REPORT = new BooleanProperty("rovas.always-create-report", false);
+  public static final LongProperty ALREADY_TRACKED_TIME = new LongProperty("rovas.already-tracked-time", 0);
 
   public static final BooleanProperty DEVELOPER = new BooleanProperty("rovas.developer", false);
 

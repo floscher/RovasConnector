@@ -12,12 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-
-import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -28,14 +25,11 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 import app.rovas.josm.RovasPlugin;
-import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.gui.upload.UploadStep1AddShareholder;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
-import app.rovas.josm.util.RovasProperties;
 
 public class CreateRovasReportDialog extends JDialog {
-
-  private final Optional<ApiCredentials> apiCredentials;
 
   private final SpinnerNumberModel hoursModel;
   private final SpinnerNumberModel minutesModel;
@@ -46,8 +40,6 @@ public class CreateRovasReportDialog extends JDialog {
 
   public CreateRovasReportDialog(final Optional<Changeset> changeset, final long defaultReportedSeconds) {
     super(MainApplication.getMainFrame(), I18n.tr("Create work report"), true);
-
-    this.apiCredentials = RovasProperties.getApiCredentials();
 
     final long defaultReportedMinutes = (defaultReportedSeconds + 30) / 60;
 
@@ -92,34 +84,8 @@ public class CreateRovasReportDialog extends JDialog {
     );
 
     submitReportButton.setIcon(ImageProvider.get("misc/statusreport", ImageProvider.ImageSizes.SIDEBUTTON));
-    submitReportButton.addActionListener(e -> {
-      setVisible(false);
-      @NotNull final ApiCredentials apiCredentials;
-      if (!this.apiCredentials.isPresent()) {
-        final ApiCredentialsPanel apiCredentialsPanel = new ApiCredentialsPanel(true);
-        Optional<ApiCredentials> newApiCredentials = Optional.empty();
-        while (!newApiCredentials.isPresent()) {
-          if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(MainApplication.getMainFrame(), apiCredentialsPanel, "Enter API credentials", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE)) {
-            newApiCredentials = ApiCredentials.createFrom(
-              apiCredentialsPanel.getApiKeyValue(),
-              apiCredentialsPanel.getApiTokenValue(),
-              apiCredentialsPanel.getActiveProjectIdValue()
-            );
-          } else {
-            setVisible(true);
-            return;
-          }
-        }
-        RovasProperties.persistApiCredentials(apiCredentialsPanel);
-        apiCredentials = newApiCredentials.get();
-      } else {
-        apiCredentials = this.apiCredentials.get();
-      }
-
-      JOptionPane.showMessageDialog(MainApplication.getMainFrame(), "This dialog is just a placeholder. Normally, now the work report for project " + apiCredentials.getProjectId() + " would be created!", "Coming soon", JOptionPane.INFORMATION_MESSAGE);
-    });
+    submitReportButton.addActionListener(e -> new UploadStep1AddShareholder(this).showStep());
     panel.add(GuiComponentFactory.createWrapperPanel(submitReportButton, new FlowLayout(FlowLayout.LEFT)), DEFAULT_GBC.insets(10, 5, 10, 0));
-    //panel.add(new JCheckBox("Remember this choice"), DEFAULT_GBC.insets(10, 0, 10, 5));
 
     panel.add(GuiComponentFactory.createHyperlinkedMultilineLabel(I18nStrings.trVerificationWarningWithHyperlink()), DEFAULT_GBC.insets(10, 5, 10, 5));
 

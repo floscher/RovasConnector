@@ -21,7 +21,6 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
     prefPanel.setApiKeyValue(RovasProperties.ROVAS_API_KEY.get());
     prefPanel.setApiTokenValue(RovasProperties.ROVAS_API_TOKEN.get());
     prefPanel.setActiveProjectIdValue(RovasProperties.ACTIVE_PROJECT_ID.get());
-    prefPanel.setAlwaysCreateWorkReport(RovasProperties.ALWAYS_CREATE_REPORT.get());
     prefPanel.setInactivityTolerance(RovasProperties.INACTIVITY_TOLERANCE.get());
     gui.createPreferenceTab(this).add(prefPanel, GBC.eol().fill());
   }
@@ -29,7 +28,6 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
   @Override
   public boolean ok() {
     RovasProperties.persistApiCredentials(prefPanel); // API key and token, active project ID
-    RovasProperties.ALWAYS_CREATE_REPORT.put(prefPanel.getAlwaysCreateWorkReport());
     RovasProperties.INACTIVITY_TOLERANCE.put(prefPanel.getInactivityTolerance());
     return false; // no restart required
   }
