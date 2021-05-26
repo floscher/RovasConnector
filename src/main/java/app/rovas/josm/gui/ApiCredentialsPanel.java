@@ -111,6 +111,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
       validators.forEach(validator -> {
         validator.addChangeListener(__ -> {
           validationWarning.setVisible(!validators.stream().allMatch(AbstractTextComponentValidator::isValid));
+          // In case the panel is embedded in a window, resize it to fit the new content
           Optional.ofNullable((Window) SwingUtilities.getAncestorOfClass(Window.class, this)).ifPresent(Window::pack);
         });
         validator.validate();

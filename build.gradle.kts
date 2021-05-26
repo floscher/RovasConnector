@@ -42,6 +42,10 @@ tasks.withType(JavaCompile::class) {
 tasks.withType(Test::class) {
   useJUnitPlatform()
 }
+tasks.withType(JacocoReport::class) {
+  reports.xml.isEnabled = true
+  reports.html.isEnabled = true
+}
 
 val generatedSrcDir = buildDir.resolve("generated/sources/main")
 sourceSets {
@@ -70,7 +74,7 @@ val generatePluginVersionClass by tasks.registering {
   )
 }
 
-tasks.withType(JavaCompile::class).named("compileJava") {
+tasks.withType(JavaCompile::class) {
   dependsOn(generatePluginVersionClass)
 }
 josm {

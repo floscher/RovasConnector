@@ -1,19 +1,47 @@
 image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin:latest
 
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
 assemble:
   stage: build
-  script: ./gradlew assemble --stacktrace
+  script: ./gradlew assemble --stacktrace --build-cache
   artifacts:
     paths:
       - build/
 
+minJosm:
+  stage: build
+  script: ./gradlew compileJava_minJosm --stacktrace --build-cache
+
 build:
   stage: test
-  script: ./gradlew test jacocoTestReport --stacktrace
+  script: ./gradlew test jacocoTestReport --stacktrace --build-cache
   artifacts:
     reports:
       junit:
         - build/test-results/**/TEST-*.xml
+    paths:
+      - build/reports/jacoco/test/jacocoTestReport.xml
   needs:
     - assemble
 
+# See https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html
+coverage:
+  stage: deploy
+  image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
+  script:
+    # convert report from jacoco to cobertura, use relative project path
+    - 'python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml src/main/java > build/cobertura.xml'
+    # read the <source></source> tag and prepend the path to every filename attribute
+    - 'python /opt/source2filename.py build/cobertura.xml'
+  needs:
+    - build
+  artifacts:
+    reports:
+      cobertura: build/cobertura.xml
