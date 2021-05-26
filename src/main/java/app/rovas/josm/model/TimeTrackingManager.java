@@ -103,10 +103,10 @@ public final class TimeTrackingManager {
       } else {
         // if inside tolerance, extend the current uncommitted timespan
         lastUncommittedChangeTimestamp = Math.max(lastTimestamp, currentTimestamp);
+        fireTimeTrackingUpdateListeners();
       }
     }
 
-    fireTimeTrackingUpdateListeners();
   }
 
   public synchronized void setCurrentlyTrackedSeconds(final int numSeconds) {
@@ -133,13 +133,14 @@ public final class TimeTrackingManager {
         this.committedSeconds +=
           Math.max(0, lastUncommitted - firstUncommitted) + // uncommitted time
             Math.min(
-              Instant.now().getEpochSecond() - lastUncommitted, // time since last uncommitted timestamp
+              Math.max(0, Instant.now().getEpochSecond() - lastUncommitted), // time since last uncommitted timestamp
               Math.max(0, RovasProperties.INACTIVITY_TOLERANCE.get()) // tolerance
             );
       }
     }
     this.firstUncommittedChangeTimestamp = newValue;
     this.lastUncommittedChangeTimestamp = newValue;
+    fireTimeTrackingUpdateListeners();
     return this.committedSeconds;
   }
 
