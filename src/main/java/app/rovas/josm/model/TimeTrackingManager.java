@@ -3,6 +3,7 @@ package app.rovas.josm.model;
 import java.time.Instant;
 import java.util.Optional;
 
+import org.openstreetmap.josm.data.osm.event.DataSetListener;
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
 import org.openstreetmap.josm.gui.layer.LayerManager;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
@@ -10,15 +11,15 @@ import org.openstreetmap.josm.tools.ListenerList;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
-import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.gui.TimeTrackingUpdateListener;
+import app.rovas.josm.util.RovasProperties;
 
 public final class TimeTrackingManager {
 
   private final ListenerList<TimeTrackingUpdateListener> listeners = ListenerList.create();
 
   private static final TimeTrackingManager INSTANCE = new TimeTrackingManager();
-  private static final DataSetListenerAdapter DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
+  private static final DataSetListener DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
 
   private long committedSeconds = 0;
 

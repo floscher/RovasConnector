@@ -24,7 +24,7 @@ import app.rovas.josm.model.TimeTrackingManager;
 public final class RovasPlugin extends Plugin {
   public static final ImageProvider LOGO = new ImageProvider("rovas_logo");
 
-  public static final RovasPreference PREFERENCE = new RovasPreference();
+  public static final PreferenceSetting PREFERENCE = new RovasPreference();
 
   /**
    * Creates the plugin
