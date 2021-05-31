@@ -16,7 +16,7 @@ import org.openstreetmap.josm.tools.Utils;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.RovasProperties;
-import app.rovas.josm.util.URIs;
+import app.rovas.josm.util.UrlProvider;
 
 public final class RovasPreferencePanel extends ApiCredentialsPanel {
 
@@ -31,8 +31,8 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
         // i18n: {1} will be replaced by a link labeled with "Rovas connector"
         "To reward the authors of this {1}, a fee equal to {0}% of the amount you earn from reports created by the plugin will be levied on those earnings.",
         String.format("%.2f", RovasProperties.ASSET_USAGE_FEE * 100),
-        URIs.toHtmlHyperlink(
-          URIs.getInstance().node(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID),
+        UrlProvider.toHtmlHyperlink(
+          UrlProvider.getInstance().node(RovasProperties.ROVAS_CONNECTOR_PROJECT_ID),
           I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;")
         )
       ) +
@@ -65,15 +65,8 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
   /**
    * Extends the GUI that was previously added by {@link ApiCredentialsPanel#buildGui()}, by adding more components.
    */
+  @SuppressWarnings("JavadocReference")
   private void extendGui() {
-    /*
-    add(alwaysCreateWorkReportLabel, GBC_COLUMN_A);
-    add(alwaysCreateWorkReportValue, GBC_COLUMNS_BCD);
-
-    add(new JPanel(), GBC_COLUMN_A);
-    add(GuiComponentFactory.createWrapperPanel(verificationNote), GBC_COLUMNS_BCD);
-*/
-
     add(new JPanel(), GBC_COLUMN_A);
     add(GuiComponentFactory.createWrapperPanel(feeNote), GBC_COLUMNS_BCD);
 

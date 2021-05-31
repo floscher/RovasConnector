@@ -33,7 +33,7 @@ import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.RovasProperties;
-import app.rovas.josm.util.URIs;
+import app.rovas.josm.util.UrlProvider;
 
 public class ApiCredentialsPanel extends VerticallyScrollablePanel {
 
@@ -69,7 +69,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     "<html>" +
       I18n.tr(
         "Values for these fields can be found on your {0}.",
-        URIs.toHtmlHyperlink(URIs.getInstance().userProfile(), I18n.tr("Rovas profile page"))
+        UrlProvider.toHtmlHyperlink(UrlProvider.getInstance().userProfile(), I18n.tr("Rovas profile page"))
       ) +
       "</html>"
   );
@@ -135,7 +135,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
         .filter(ApiCredentials::isValidProjectId);
 
       if (projectId.isPresent()) {
-        OpenBrowser.displayUrl(URIs.getInstance().node(projectId.get()).toString());
+        OpenBrowser.displayUrl(UrlProvider.getInstance().node(projectId.get()).toString());
       } else {
         activeProjectOpenButton.setEnabled(false);
         Arrays.stream(activeProjectIdSpinnerModel.getChangeListeners())

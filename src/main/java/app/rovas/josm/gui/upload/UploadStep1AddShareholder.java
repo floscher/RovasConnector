@@ -11,16 +11,16 @@ import app.rovas.josm.api.ApiCheckOrAddShareholder;
 import app.rovas.josm.gui.ApiCredentialsPanel;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.util.UrlProvider;
 
-public class UploadStep1AddShareholder {
+public class UploadStep1AddShareholder extends UploadStep {
   private static final int MAX_STEP_REPETITIONS = 5;
 
-  private final Window parent;
-
   public UploadStep1AddShareholder(final Window parent) {
-    this.parent = parent;
+    super(parent);
   }
 
+  @Override
   public void showStep() {
     parent.setVisible(false);
     showStep(false, 0);
@@ -52,17 +52,20 @@ public class UploadStep1AddShareholder {
       credentials = initialCredentials.get();
     }
 
-    ApiCheckOrAddShareholder.query(
+    new ApiCheckOrAddShareholder(UrlProvider.getInstance()).query(
       credentials,
       meritId -> {
         JOptionPane.showMessageDialog(parent, meritId, I18n.tr("Successful check"), JOptionPane.PLAIN_MESSAGE);
         parent.dispose();
       },
-      (errorMessage, forceCredentialsDialogAgain) -> {
+      (errorCode) -> {
+        final boolean forceCredentialsDialogAgain =
+          ApiCheckOrAddShareholder.ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS == errorCode.getContinueOption();
+
         if (recursionDepth < MAX_STEP_REPETITIONS && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
           parent,
           "<html>" +
-            I18n.tr(errorMessage) + "<br>" +
+            I18n.tr(errorCode.getTranslatableMessage()) + "<br>" +
             (
               forceCredentialsDialogAgain
               ? I18n.tr("Do you want to modify the API credentials and then retry?")

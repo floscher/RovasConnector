@@ -38,6 +38,7 @@ public class TimeTrackingManagerTest {
 
   @Test
   public void testTimeSeriesWithBackwardsComponent() {
+    Logging.clearLastErrorAndWarnings();
     assertChangeEventSeries(
       new long[] { 0,   0,   5,  12,  12,  30, 60 },
       new long[] {    100, 105, 112, 106, 130 }

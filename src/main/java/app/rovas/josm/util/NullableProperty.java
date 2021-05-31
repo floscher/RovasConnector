@@ -64,6 +64,7 @@ public class NullableProperty<T> {
    * @return {@code true}, if {@link #delegate} has changed, same as {@link AbstractToStringProperty#put(Object)}
    * @see AbstractToStringProperty#put(Object)
    */
+  @SuppressWarnings("UnusedReturnValue")
   public boolean put(@Nullable T value) {
     return delegate.put(Optional.ofNullable(value).filter(acceptableValues).orElse(pseudoNull));
   }

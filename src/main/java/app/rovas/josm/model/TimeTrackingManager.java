@@ -120,9 +120,6 @@ public final class TimeTrackingManager {
   }
 
   /**
-   *
-   * @param newValue
-   * @param commitUncommittedTime
    * @return the current number of tracked seconds, after the reset
    */
   private long resetAutomaticTracker(final Long newValue, final boolean commitUncommittedTime) {

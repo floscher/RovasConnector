@@ -36,10 +36,10 @@ public final class RovasPlugin extends Plugin {
     MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
     TimeTrackingManager.getInstance().trackChangeNow();
     OsmServerWriter.registerPostprocessor((p, progress) ->
-      new Thread(() -> {
-        new CreateRovasReportDialog(Optional.ofNullable(OsmApi.getOsmApi()).map(OsmApi::getChangeset), TimeTrackingManager.getInstance().commit());
-        TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(0);
-      })
+      new Thread(() -> new CreateRovasReportDialog(
+        Optional.ofNullable(OsmApi.getOsmApi()).map(OsmApi::getChangeset),
+        TimeTrackingManager.getInstance().commit()
+      ))
     );
 
     MainApplication.getMainFrame().getMenu().add(createRovasMenu());

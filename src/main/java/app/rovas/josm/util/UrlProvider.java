@@ -6,11 +6,11 @@ import java.net.URL;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 
-public final class URIs {
+public class UrlProvider {
 
-  private static final URIs INSTANCE = new URIs();
+  private static final UrlProvider INSTANCE = new UrlProvider();
 
-  public static URIs getInstance() {
+  public static UrlProvider getInstance() {
     return INSTANCE;
   }
 
@@ -18,17 +18,27 @@ public final class URIs {
     return url == null ? label : String.format("<a href=\"%s\">%s</a>", url, label);
   }
 
-  private final String domain = RovasProperties.DEVELOPER.get() ? "https://dev.merit.world" : "https://rovas.app";
-
-  private URIs() {
+  protected UrlProvider() {
     // private constructor to prevent instantiation
   }
   private URL uncheckedURL(final String path) {
     try {
-      return new URL(domain + path);
+      return new URL(getBaseUrl() + path);
     } catch (MalformedURLException e) {
-      throw new RuntimeException("The rovas plugin builds broken URLs: " + domain + path, e);
+      throw new RuntimeException("The rovas plugin builds broken URLs: " + getBaseUrl() + path, e);
     }
+  }
+
+  private static final String BASE_URL_DEVELOPMENT = "https://dev.merit.world";
+  private static final String BASE_URL_PRODUCTION = "https://rovas.app";
+
+  protected String getBaseUrl() {
+    return RovasProperties.DEVELOPER.get() ? BASE_URL_DEVELOPMENT : BASE_URL_PRODUCTION;
+  }
+
+  @NotNull
+  public URL osmWikiPluginArticle() {
+    return uncheckedURL("https://wiki.openstreetmap.org/wiki/JOSM/Plugins/RovasConnector");
   }
 
   @NotNull

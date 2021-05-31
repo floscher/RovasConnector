@@ -24,7 +24,7 @@ public final class I18nStrings {
       I18n.tr(
         // i18n: {0} is replaced by a link labeled "rules page in Rovas"
         "See the {0} for more information",
-        URIs.toHtmlHyperlink(URIs.getInstance().rules(), I18n.tr("rules page in Rovas"))
+        UrlProvider.toHtmlHyperlink(UrlProvider.getInstance().rules(), I18n.tr("rules page in Rovas"))
       );
   }
 }

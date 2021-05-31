@@ -25,6 +25,13 @@ public final class RovasProperties {
    */
   public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 35259;
   public static final String ROVAS_CONNECTOR_PROJECT_URL = "https://rovas.app/josm_rovas_connector";
+  /**
+   * The address at which the edits can be seen.<br>
+   * This <strong>must</strong> contain {@code %d} exactly one time. That will be replaced by the changeset ID.<br>
+   * Any other percent signs that occur in the URL would have to be encoded as two percent signs ({@code %%}).<br>
+   * @see java.util.Formatter
+   */
+  public static final String ROVAS_PROOF_URL = "https://overpass-api.de/achavi/?changeset=%d";
 
   public static final NullableProperty<String> ROVAS_API_KEY = new NullableProperty<>(
     new StringProperty("rovas.api-key", null),
