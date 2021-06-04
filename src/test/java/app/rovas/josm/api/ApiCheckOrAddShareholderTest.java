@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import app.rovas.josm.StaticConfig;
 import app.rovas.josm.fixture.NoTimeConsumer;
 import app.rovas.josm.fixture.OneTimeConsumer;
 import app.rovas.josm.fixture.WiremockExtension;
@@ -90,19 +90,7 @@ public class ApiCheckOrAddShareholderTest {
   }
 
   @Test
-  @DisplayName("error code -2 (expected if the user's API-key and API-token are invalid)")
-  public void testErrorInvalidCredentials(final WireMockServer server, final UrlProvider urlProvider) {
-    assertQueryError(
-      server,
-      urlProvider,
-      -2,
-      ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS,
-      okJson("{\"result\":\"-2\"}").withStatusMessage("OK")
-    );
-  }
-
-  @Test
-  @DisplayName("error code -1 (expected if the requested node ID is not referring to a project)")
+  @DisplayName("error code -1 (expected if the API credentials are not correct)")
   public void testErrorNotAProject(final WireMockServer server, final UrlProvider urlProvider) {
     assertQueryError(
       server,
@@ -114,7 +102,7 @@ public class ApiCheckOrAddShareholderTest {
   }
 
   @Test
-  @DisplayName("error code 0 (expected if the provided node ID belongs to a private project)")
+  @DisplayName("error code 0 (expected if the user can't access the project with the given ID)")
   public void testErrorProjectPrivate(final WireMockServer server, final UrlProvider urlProvider) {
     assertQueryError(
       server,
@@ -160,7 +148,7 @@ public class ApiCheckOrAddShareholderTest {
     final ErrorCode.ContinueOption expectedContinueOption,
     final ResponseDefinitionBuilder response
   ) {
-    stubForDefaultCredentials(server, response);
+    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
     final OneTimeConsumer<ErrorCode> errorConsumer = new OneTimeConsumer<>(
       new ErrorCode(Optional.ofNullable(expectedErrorCode), "", expectedContinueOption),
       (a, b) ->
@@ -185,7 +173,7 @@ public class ApiCheckOrAddShareholderTest {
     final Class<? extends ApiException> expectedException,
     final ResponseDefinitionBuilder response
   ) {
-    stubForDefaultCredentials(server, response);
+    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
     assertThrows(expectedException, () -> new ApiCheckOrAddShareholder(urlProvider).query(DEFAULT_CREDENTIALS));
     verifyOneRequestAndReset(server);
 
@@ -198,7 +186,7 @@ public class ApiCheckOrAddShareholderTest {
     final int value,
     final ResponseDefinitionBuilder response
   ) {
-    stubForDefaultCredentials(server, response);
+    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
     final OneTimeConsumer<Integer> successConsumer = new OneTimeConsumer<>(value);
     new ApiCheckOrAddShareholder(urlProvider).query(DEFAULT_CREDENTIALS, successConsumer, new NoTimeConsumer<>());
     successConsumer.assertHasAccepted();
@@ -211,17 +199,17 @@ public class ApiCheckOrAddShareholderTest {
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  private static StubMapping stubForDefaultCredentials(final Stubbing server, final ResponseDefinitionBuilder response) {
+  private static StubMapping stubForCredentials(final Stubbing server, final ApiCredentials credentials, final ResponseDefinitionBuilder response) {
     return server.stubFor(
       post("/rovas/rules/rules_proxy_check_or_add_shareholder")
-        .withHeader("API-KEY", equalTo(StaticConfig.PLUGIN_API_KEY))
-        .withHeader("TOKEN", equalTo(StaticConfig.PLUGIN_API_TOKEN))
-        .withHeader("Content-Type", equalTo("application/json"))
+        .withHeader("API-KEY", equalTo(credentials.getApiKey()))
+        .withHeader("TOKEN", equalTo(credentials.getApiToken()))
+        .withHeader("Content-Type", matching("application/json;.+"))
         .withRequestBody(
           equalToJson(
             String.format(
-              "{\"project_id\": %d,\"token\":\"%s\",\"api_key\":\"%s\"}",
-              DEFAULT_CREDENTIALS.getProjectId(), DEFAULT_CREDENTIALS.getApiToken(), DEFAULT_CREDENTIALS.getApiKey()
+              "{\"project_id\": %d}",
+              DEFAULT_CREDENTIALS.getProjectId()
             )
           )
         )

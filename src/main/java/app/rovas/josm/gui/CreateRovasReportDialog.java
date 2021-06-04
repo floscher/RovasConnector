@@ -28,6 +28,7 @@ import app.rovas.josm.RovasPlugin;
 import app.rovas.josm.gui.upload.UploadStep1AddShareholder;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
+import app.rovas.josm.util.UrlProvider;
 
 public class CreateRovasReportDialog extends JDialog {
 
@@ -37,14 +38,16 @@ public class CreateRovasReportDialog extends JDialog {
   private final JButton submitReportButton = new JButton();
 
   private static final GBC DEFAULT_GBC = GBC.eol().anchor(GBC.LINE_START).fill(GBC.HORIZONTAL).insets(5);
+  private final Optional<Changeset> changeset;
 
   public CreateRovasReportDialog(final Optional<Changeset> changeset, final long defaultReportedSeconds) {
     super(MainApplication.getMainFrame(), I18n.tr("Create work report"), true);
 
     final long defaultReportedMinutes = (defaultReportedSeconds + 30) / 60;
 
-    hoursModel = new SpinnerNumberModel(Math.max(0, (int) Math.min(Integer.MAX_VALUE, defaultReportedMinutes / 60)), 0, Integer.MAX_VALUE, 1);
-    minutesModel = new SpinnerNumberModel((int) (defaultReportedMinutes % 60), 0, 59, 1);
+    this.changeset = changeset;
+    this.hoursModel = new SpinnerNumberModel(Math.max(0, (int) Math.min(Integer.MAX_VALUE, defaultReportedMinutes / 60)), 0, Integer.MAX_VALUE, 1);
+    this.minutesModel = new SpinnerNumberModel((int) (defaultReportedMinutes % 60), 0, 59, 1);
 
     onTimeChange();
     hoursModel.addChangeListener(__ -> this.onTimeChange());
@@ -84,7 +87,7 @@ public class CreateRovasReportDialog extends JDialog {
     );
 
     submitReportButton.setIcon(ImageProvider.get("misc/statusreport", ImageProvider.ImageSizes.SIDEBUTTON));
-    submitReportButton.addActionListener(e -> new UploadStep1AddShareholder(this).showStep());
+    submitReportButton.addActionListener(__ -> new UploadStep1AddShareholder(this, UrlProvider.getInstance(), hoursModel.getNumber().doubleValue() + minutesModel.getNumber().doubleValue() / 60.0, changeset).showStep());
     panel.add(GuiComponentFactory.createWrapperPanel(submitReportButton, new FlowLayout(FlowLayout.LEFT)), DEFAULT_GBC.insets(10, 5, 10, 0));
 
     panel.add(GuiComponentFactory.createHyperlinkedMultilineLabel(I18nStrings.trVerificationWarningWithHyperlink()), DEFAULT_GBC.insets(10, 5, 10, 5));

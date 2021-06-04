@@ -4,6 +4,7 @@ import java.awt.Window;
 import java.util.Optional;
 import javax.swing.JOptionPane;
 
+import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.tools.I18n;
 
@@ -14,10 +15,14 @@ import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 public class UploadStep1AddShareholder extends UploadStep {
-  private static final int MAX_STEP_REPETITIONS = 5;
 
-  public UploadStep1AddShareholder(final Window parent) {
-    super(parent);
+  private final double hours;
+  private final Optional<Changeset> changeset;
+
+  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final double hours, final Optional<Changeset> changeset) {
+    super(parent, urlProvider);
+    this.hours = hours;
+    this.changeset = changeset;
   }
 
   @Override
@@ -52,20 +57,19 @@ public class UploadStep1AddShareholder extends UploadStep {
       credentials = initialCredentials.get();
     }
 
-    new ApiCheckOrAddShareholder(UrlProvider.getInstance()).query(
+    new ApiCheckOrAddShareholder(urlProvider).query(
       credentials,
-      meritId -> {
-        JOptionPane.showMessageDialog(parent, meritId, I18n.tr("Successful check"), JOptionPane.PLAIN_MESSAGE);
-        parent.dispose();
-      },
-      (errorCode) -> {
+      meritId -> new UploadStep2CreateWorkReport(parent, urlProvider, credentials, hours, changeset).showStep(),
+      errorCode -> {
         final boolean forceCredentialsDialogAgain =
           ApiCheckOrAddShareholder.ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS == errorCode.getContinueOption();
 
         if (recursionDepth < MAX_STEP_REPETITIONS && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
           parent,
           "<html>" +
-            I18n.tr(errorCode.getTranslatableMessage()) + "<br>" +
+            I18n.tr(errorCode.getTranslatableMessage()) +
+            errorCode.getCode().map(code -> " " + I18n.tr("(error {0})", code)).orElse("") +
+            "<br>" +
             (
               forceCredentialsDialogAgain
               ? I18n.tr("Do you want to modify the API credentials and then retry?")

@@ -8,12 +8,13 @@ public abstract class ApiException extends Exception {
 
   private final URL url;
   private final String message;
-  private final boolean shouldbeReportedAsBug;
+  private final boolean shouldBeReportedAsBug;
 
-  public ApiException(final URL url, final String message, final boolean shouldbeReportedAsBug) {
+  public ApiException(final URL url, final String message, final boolean shouldBeReportedAsBug, final Throwable cause) {
+    super(cause);
     this.url = url;
     this.message = message;
-    this.shouldbeReportedAsBug = shouldbeReportedAsBug;
+    this.shouldBeReportedAsBug = shouldBeReportedAsBug;
   }
 
   @Override
@@ -30,25 +31,25 @@ public abstract class ApiException extends Exception {
     return this.url;
   }
 
-  public boolean shouldBeReportedAsBug() {
-    return shouldbeReportedAsBug;
+  public boolean isShouldBeReportedAsBug() {
+    return shouldBeReportedAsBug;
   }
 
   public static class ConnectionFailure extends ApiException {
-    public ConnectionFailure(final URL url) {
-      super(url, I18n.marktr("There was a connection issue!"), false);
+    public ConnectionFailure(final URL url, final Throwable cause) {
+      super(url, I18n.marktr("There was a connection issue!"), false, cause);
     }
   }
 
   public static class DecodeResponse extends ApiException {
-    public DecodeResponse(final URL url) {
-      super(url, I18n.marktr("There was an error decoding the server response!"), false);
+    public DecodeResponse(final URL url, final Throwable cause) {
+      super(url, I18n.marktr("There was an error decoding the server response!"), false, cause);
     }
   }
 
   public static class WrongPluginApiCredentials extends ApiException {
     public WrongPluginApiCredentials(final URL url) {
-      super(url, I18n.marktr("The server did not accept the credentials of the plugin. Please report this to the maintainer of the Rovas plugin!"), true);
+      super(url, I18n.marktr("The server did not accept the credentials of the plugin. Please report this to the maintainer of the Rovas plugin!"), true, null);
     }
   }
 

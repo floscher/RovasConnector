@@ -19,31 +19,11 @@ import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
 
-  public static class ErrorCode extends ApiQuery.ErrorCode {
-    public enum ContinueOption {
-      SHOW_WORK_REPORT_DIALOG_AGAIN,
-      CONTINUE_TO_AUR_QUERY
-    }
-
-    @NotNull
-    private final ContinueOption continueOption;
-
-    public ErrorCode(@NotNull final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
-      super(code, translatableMessage);
-      this.continueOption = Objects.requireNonNull(continueOption);
-    }
-
-    @NotNull
-    public ContinueOption getContinueOption() {
-      return continueOption;
-    }
-  }
-
   private final double hours;
-  private final Changeset changeset;
+  private final Optional<Changeset> changeset;
 
-  public ApiCreateWorkReport(final UrlProvider urlProvider, final double hours, @NotNull final Changeset changeset) {
-    super(urlProvider, urlProvider.rules_createWorkReport());
+  public ApiCreateWorkReport(final UrlProvider urlProvider, final double hours, @NotNull final Optional<Changeset> changeset) {
+    super(urlProvider, urlProvider.rulesCreateWorkReport());
     this.hours = hours;
     this.changeset = changeset;
   }
@@ -86,9 +66,8 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
     random.nextBytes(accessToken);
 
     final URLConnection connection = sendPostRequest(
+      credentials,
       Json.createObjectBuilder()
-        .add("api_key", credentials.getApiKey())
-        .add("token", credentials.getApiToken())
         .add("wr_classification", RovasProperties.NACE_CLASSIFICATION)
         .add("wr_description", I18n.tr(
           // i18n: {0} will be replaced by a link labeled: "Rovas connector plugin for JOSM"
@@ -97,16 +76,56 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
         ))
         .add("wr_activity_name", I18n.tr("Creating map data with JOSM"))
         .add("wr_hours", hours)
-        .add("wr_web_address", String.format(RovasProperties.ROVAS_PROOF_URL, changeset.getId()))
+        .add(
+          "wr_web_address",
+          changeset
+            .map(Changeset::getId)
+            .map(it -> String.format(RovasProperties.ROVAS_PROOF_URL, it))
+            .orElse("")
+        )
         .add("parent_project_nid", credentials.getProjectId())
-        .add("date_started",
-          Optional.ofNullable(changeset.getCreatedAt())
+        .add(
+          "date_started",
+          changeset
+            .map(Changeset::getCreatedAt)
             .map(Instant::getEpochSecond)
             .orElse(Instant.now().getEpochSecond())
         )
         .add("access_token", Base64.getEncoder().encodeToString(accessToken))
         .add("publish_status", 1)
     );
-    return decodeJsonResult(connection, "create_wr_id");
+    return decodeJsonResult(connection, "created_wr_nid");
+  }
+
+  /**
+   * An error code that the API call can return
+   */
+  public static class ErrorCode extends ApiQuery.ErrorCode {
+    /**
+     * The possible options on how to continue after an error happened
+     */
+    public enum ContinueOption {
+      /**
+       * Shows the original dialog again, so the user can try again
+       */
+      SHOW_WORK_REPORT_DIALOG_AGAIN,
+      /**
+       * Continue with the AUR query anyway, as if the work report was created successfully.
+       */
+      CONTINUE_TO_AUR_QUERY
+    }
+
+    @NotNull
+    private final ContinueOption continueOption;
+
+    public ErrorCode(@NotNull final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
+      super(code, translatableMessage);
+      this.continueOption = Objects.requireNonNull(continueOption);
+    }
+
+    @NotNull
+    public ContinueOption getContinueOption() {
+      return continueOption;
+    }
   }
 }

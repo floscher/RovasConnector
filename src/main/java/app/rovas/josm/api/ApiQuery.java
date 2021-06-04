@@ -1,7 +1,7 @@
 package app.rovas.josm.api;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
@@ -22,6 +22,7 @@ import javax.json.JsonString;
 import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.tools.I18n;
+import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 import org.openstreetmap.josm.tools.bugreport.BugReportQueue;
 import org.openstreetmap.josm.tools.bugreport.ReportedException;
@@ -29,6 +30,7 @@ import org.openstreetmap.josm.tools.bugreport.ReportedException;
 import app.rovas.josm.StaticConfig;
 import app.rovas.josm.gen.PluginVersion;
 import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.util.TeeInputStream;
 import app.rovas.josm.util.UrlProvider;
 
 public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
@@ -100,17 +102,17 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     }
   }
 
-  protected URLConnection sendPostRequest(final JsonObjectBuilder requestContent) throws ApiException.ConnectionFailure {
+  protected URLConnection sendPostRequest(final ApiCredentials credentials, final JsonObjectBuilder requestContent) throws ApiException.ConnectionFailure {
     final URLConnection connection;
     try {
       connection = queryUrl.openConnection();
     } catch (final IOException e) {
-      throw new ApiException.ConnectionFailure(queryUrl);
+      throw new ApiException.ConnectionFailure(queryUrl, e);
     }
     try {
-      connection.setRequestProperty("API-KEY", StaticConfig.PLUGIN_API_KEY);
-      connection.setRequestProperty("TOKEN", StaticConfig.PLUGIN_API_TOKEN);
-      connection.setRequestProperty("Content-Type", "application/json");
+      connection.setRequestProperty("API-KEY", credentials.getApiKey());
+      connection.setRequestProperty("TOKEN", credentials.getApiToken());
+      connection.setRequestProperty("Content-Type", "application/json;charset=" + StandardCharsets.UTF_8.name());
       connection.setRequestProperty("User-Agent", "JOSM-rovas/" + PluginVersion.versionName);
       connection.setRequestProperty("Accept", "application/json");
       connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
@@ -127,7 +129,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       }
     } catch (IOException e) {
       disconnect(connection);
-      throw new ApiException.ConnectionFailure(queryUrl);
+      throw new ApiException.ConnectionFailure(queryUrl, e);
     }
     return connection;
   }
@@ -138,11 +140,12 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * @param key the JSON key to which the resulting value is mapped
    */
   protected static int decodeJsonResult(final URLConnection connection, final String key) throws ApiException {
-    try {
+    final ByteArrayOutputStream capture = new ByteArrayOutputStream();
+    try (ByteArrayOutputStream capture2 = capture) {
       if (connection instanceof HttpURLConnection && HttpURLConnection.HTTP_UNAUTHORIZED == ((HttpURLConnection) connection).getResponseCode()) {
         throw new ApiException.WrongPluginApiCredentials(connection.getURL());
       }
-      try (final InputStream stream = connection.getInputStream()) {
+      try (TeeInputStream stream = new TeeInputStream(connection.getInputStream(), capture2)) {
         return Optional.ofNullable(Json.createReader(stream).readObject())
           .flatMap(it ->
             Optional.ofNullable(it.get(key))
@@ -157,12 +160,16 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
                     : Optional.empty()
                 )
               )
-          ).orElseThrow(() -> new ApiException.DecodeResponse(connection.getURL()));
+          ).orElseThrow(() -> {
+            Logging.warn("Can't decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8));
+            return new ApiException.DecodeResponse(connection.getURL(), null);
+          });
       }
     } catch (JsonException je) { // can be thrown by readObject()
-      throw new ApiException.DecodeResponse(connection.getURL());
+      Logging.warn("Can't decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8));
+      throw new ApiException.DecodeResponse(connection.getURL(), je);
     } catch (IOException e) {
-      throw new ApiException.ConnectionFailure(connection.getURL());
+      throw new ApiException.ConnectionFailure(connection.getURL(), e);
     } finally {
       disconnect(connection);
     }

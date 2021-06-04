@@ -57,17 +57,17 @@ public class UrlProvider {
   }
 
   @NotNull
-  public URL rules_createAUR() {
+  public URL rulesCreateAUR() {
     return uncheckedURL("/rovas/rules/rules_proxy_create_aur");
   }
 
   @NotNull
-  public URL rules_checkOrAddShareholder() {
+  public URL rulesCheckOrAddShareholder() {
     return uncheckedURL("/rovas/rules/rules_proxy_check_or_add_shareholder");
   }
 
   @NotNull
-  public URL rules_createWorkReport() {
+  public URL rulesCreateWorkReport() {
     return uncheckedURL("/rovas/rules/rules_proxy_create_work_report");
   }
 }

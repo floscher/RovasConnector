@@ -12,43 +12,29 @@ import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCheckOrAddShareholder extends ApiQuery<ApiCheckOrAddShareholder.ErrorCode> {
-
-  public static class ErrorCode extends ApiQuery.ErrorCode {
-    public enum ContinueOption {
-      RETRY_UPDATE_API_CREDENTIALS,
-      RETRY_IMMEDIATELY
-    }
-
-    @NotNull
-    private final ContinueOption continueOption;
-
-    public ErrorCode(final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
-      super(code, translatableMessage);
-      this.continueOption = continueOption;
-    }
-
-    @NotNull
-    public ContinueOption getContinueOption() {
-      return continueOption;
-    }
-  }
-
   @Override
   protected ErrorCode[] getErrorCodes() {
     return new ErrorCode[]{
-      new ErrorCode(Optional.of(0), I18n.marktr("Could not access the chosen project!"), ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS),
-      new ErrorCode(Optional.of(-1), I18n.marktr("Could not find any project with the given ID!"), ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS),
-      new ErrorCode(Optional.of(-2), I18n.marktr("Your API key and token seem to be invalid!"), ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS),
+      new ErrorCode(
+        Optional.of(0),
+        I18n.marktr("You could not have been made a shareholder of the project with the ID set in the preferences."),
+        ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS
+      ),
+      new ErrorCode(
+        Optional.of(-1),
+        I18n.marktr("Could not find any project with the project ID that is set in the preferences!"),
+        ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS
+      ),
     };
   }
 
   @Override
-  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, String translatableMessage) {
+  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
     return new ErrorCode(code, translatableMessage, ErrorCode.ContinueOption.RETRY_IMMEDIATELY);
   }
 
   public ApiCheckOrAddShareholder(final UrlProvider urlProvider) {
-    super(urlProvider, urlProvider.rules_checkOrAddShareholder());
+    super(urlProvider, urlProvider.rulesCheckOrAddShareholder());
   }
 
   /**
@@ -67,11 +53,35 @@ public final class ApiCheckOrAddShareholder extends ApiQuery<ApiCheckOrAddShareh
   @Override
   public int query(final ApiCredentials credentials) throws ApiException {
     final URLConnection connection = sendPostRequest(
-      Json.createObjectBuilder()
-        .add("project_id", credentials.getProjectId())
-        .add("api_key", credentials.getApiKey())
-        .add("token", credentials.getApiToken())
+      credentials,
+      Json.createObjectBuilder().add("project_id", credentials.getProjectId())
     );
     return decodeJsonResult(connection, "result");
+  }
+
+  /** An error code that the API endpoint can return */
+  public static class ErrorCode extends ApiQuery.ErrorCode {
+    /**
+     * Determines what should be done, when an error code occurs.
+     */
+    public enum ContinueOption {
+      /** Shows the API credentials dialog and then tries again. */
+      RETRY_UPDATE_API_CREDENTIALS,
+      /** Shows a yes/no dialog asking if the step should be retried */
+      RETRY_IMMEDIATELY
+    }
+
+    @NotNull
+    private final ContinueOption continueOption;
+
+    public ErrorCode(final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
+      super(code, translatableMessage);
+      this.continueOption = continueOption;
+    }
+
+    @NotNull
+    public ContinueOption getContinueOption() {
+      return continueOption;
+    }
   }
 }
