@@ -28,7 +28,7 @@ public class RovasPreferencePanelTest {
     assertValueChanges(it -> it::getActiveProjectIdValue, -1,  it -> it::setActiveProjectIdValue, 0);
     assertValueChanges(it -> it::getActiveProjectIdValue, -1,  it -> it::setActiveProjectIdValue, 1);
     assertValueChanges(it -> it::getActiveProjectIdValue, 2,  it -> it::setActiveProjectIdValue, 2);
-    assertValueChanges(it -> it::getActiveProjectIdValue, 123456,  it -> it::setActiveProjectIdValue, 123456);
+    assertValueChanges(it -> it::getActiveProjectIdValue, 123_456,  it -> it::setActiveProjectIdValue, 123_456);
     assertValueChanges(it -> it::getActiveProjectIdValue, Integer.MAX_VALUE,  it -> it::setActiveProjectIdValue, Integer.MAX_VALUE);
   }
 

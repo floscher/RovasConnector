@@ -25,7 +25,7 @@ public class NullableProperty<T> {
   /**
    * @see NullableProperty#NullableProperty(AbstractToStringProperty, Predicate, Object)
    */
-  public NullableProperty(@NotNull AbstractToStringProperty<T> delegate, @NotNull Predicate<T> acceptableValues) {
+  public NullableProperty(@NotNull final AbstractToStringProperty<T> delegate, @NotNull final Predicate<T> acceptableValues) {
     this(delegate, acceptableValues, null);
   }
 
@@ -37,7 +37,7 @@ public class NullableProperty<T> {
    * @param pseudoNull the value that is used internally to represent {@code null}. This is needed for properties,
    *   for which the default value is not {@code null}.
    */
-  public NullableProperty(@NotNull AbstractToStringProperty<T> delegate, @NotNull Predicate<T> acceptableValues, final T pseudoNull) {
+  public NullableProperty(@NotNull final AbstractToStringProperty<T> delegate, @NotNull final Predicate<T> acceptableValues, final T pseudoNull) {
     this.delegate = delegate;
     this.acceptableValues = it -> it != null && acceptableValues.test(it);
     this.pseudoNull = pseudoNull;
@@ -65,7 +65,7 @@ public class NullableProperty<T> {
    * @see AbstractToStringProperty#put(Object)
    */
   @SuppressWarnings("UnusedReturnValue")
-  public boolean put(@Nullable T value) {
+  public boolean put(@Nullable final T value) {
     return delegate.put(Optional.ofNullable(value).filter(acceptableValues).orElse(pseudoNull));
   }
 

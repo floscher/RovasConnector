@@ -6,7 +6,12 @@ import java.net.URL;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 
+import org.openstreetmap.josm.tools.JosmRuntimeException;
+
 public class UrlProvider {
+
+  private static final String BASE_URL_DEVELOPMENT = "https://dev.merit.world";
+  private static final String BASE_URL_PRODUCTION = "https://rovas.app";
 
   private static final UrlProvider INSTANCE = new UrlProvider();
 
@@ -25,12 +30,9 @@ public class UrlProvider {
     try {
       return new URL(getBaseUrl() + path);
     } catch (MalformedURLException e) {
-      throw new RuntimeException("The rovas plugin builds broken URLs: " + getBaseUrl() + path, e);
+      throw new JosmRuntimeException("The rovas plugin builds broken URLs: " + getBaseUrl() + path, e);
     }
   }
-
-  private static final String BASE_URL_DEVELOPMENT = "https://dev.merit.world";
-  private static final String BASE_URL_PRODUCTION = "https://rovas.app";
 
   protected String getBaseUrl() {
     return RovasProperties.DEVELOPER.get() ? BASE_URL_DEVELOPMENT : BASE_URL_PRODUCTION;

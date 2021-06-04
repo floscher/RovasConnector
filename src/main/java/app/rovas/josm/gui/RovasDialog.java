@@ -19,14 +19,13 @@ import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;
 
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
+  private static final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
+  private static final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
 
   private final JLabel counterLabel = new JLabel(I18n.tr("Active time"));
   private final JLabel counterValue = new JLabel("");
 
   private final SideButton resetButton = new SideButton(new ResetTimerAction());
-
-  private final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
-  private final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
 
   public RovasDialog() {
     super(
@@ -40,7 +39,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
       false
     );
 
-    VerticallyScrollablePanel panel = new VerticallyScrollablePanel(new GridBagLayout());
+    final VerticallyScrollablePanel panel = new VerticallyScrollablePanel(new GridBagLayout());
 
     panel.add(counterLabel, GBC_LEFT_COLUMN);
     panel.add(counterValue, GBC_RIGHT_COLUMN);

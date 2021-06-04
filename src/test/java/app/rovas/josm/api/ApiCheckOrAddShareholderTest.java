@@ -90,7 +90,7 @@ public class ApiCheckOrAddShareholderTest {
   }
 
   @Test
-  @DisplayName("error code -1 (expected if the API credentials are not correct)")
+  @DisplayName("error code -1 (expected if no project is found for the given ID)")
   public void testErrorNotAProject(final WireMockServer server, final UrlProvider urlProvider) {
     assertQueryError(
       server,

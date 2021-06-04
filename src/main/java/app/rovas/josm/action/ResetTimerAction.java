@@ -26,7 +26,7 @@ public class ResetTimerAction extends JosmAction {
   }
 
   @Override
-  public void actionPerformed(ActionEvent e) {
+  public void actionPerformed(final ActionEvent e) {
     // TODO: Allow for resetting to an arbitrary time, not just to 0:00.
     if (
       JOptionPane.showConfirmDialog(

@@ -55,7 +55,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
   }
 
   @Override
-  protected ErrorCode createAdditionalErrorCode(Optional<Integer> code, String translatableMessage) {
+  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
     return new ErrorCode(code, translatableMessage, ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN);
   }
 

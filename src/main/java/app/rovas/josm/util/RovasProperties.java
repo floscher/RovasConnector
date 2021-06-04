@@ -12,7 +12,13 @@ import org.openstreetmap.josm.data.preferences.StringProperty;
 import app.rovas.josm.gui.ApiCredentialsPanel;
 import app.rovas.josm.model.ApiCredentials;
 
+/**
+ * The available (user-configurable) properties
+ */
 public final class RovasProperties {
+  /**
+   * The classification ID that determines what kind of work is reported.
+   */
   public static final int NACE_CLASSIFICATION = 1645;
   /**
    * The fraction of all earnings that goes to the Rovas connector project.
@@ -23,7 +29,7 @@ public final class RovasProperties {
   /**
    * The project ID of the JOSM connector project in Rovas.
    */
-  public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 35259;
+  public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 35_259;
   public static final String ROVAS_CONNECTOR_PROJECT_URL = "https://rovas.app/josm_rovas_connector";
   /**
    * The address at which the edits can be seen.<br>
@@ -52,10 +58,6 @@ public final class RovasProperties {
    */
   public static final IntegerProperty ACTIVE_PROJECT_ID =
     new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
-
-  public static Optional<ApiCredentials> getApiCredentials() {
-    return ApiCredentials.createFrom(ROVAS_API_KEY.get(), ROVAS_API_TOKEN.get(), ACTIVE_PROJECT_ID.get());
-  }
 
   /**
    * The minimum value allowed for {@link #INACTIVITY_TOLERANCE}, smaller values are treated as if this value was set.
@@ -91,6 +93,10 @@ public final class RovasProperties {
 
   private RovasProperties() {
     // private constructor to avoid instantiation
+  }
+
+  public static Optional<ApiCredentials> getApiCredentials() {
+    return ApiCredentials.createFrom(ROVAS_API_KEY.get(), ROVAS_API_TOKEN.get(), ACTIVE_PROJECT_ID.get());
   }
 
   public static void persistApiCredentials(@NotNull final ApiCredentialsPanel apiCredentialsPanel) {

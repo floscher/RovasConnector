@@ -7,8 +7,7 @@ import org.openstreetmap.josm.gui.widgets.AbstractTextComponentValidator;
 
 public class NonBlankTextFieldValidator extends AbstractTextComponentValidator {
 
-
-  public NonBlankTextFieldValidator(JTextComponent component) {
+  public NonBlankTextFieldValidator(final JTextComponent component) {
     super(component);
   }
 

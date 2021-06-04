@@ -14,16 +14,10 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.util.GuiComponentFactory;
-import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 public final class RovasPreferencePanel extends ApiCredentialsPanel {
-
-  private final JEditorPane verificationNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
-    I18nStrings.trVerificationWarningWithHyperlink()
-  );
-
   private final JEditorPane feeNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
       I18n.tr(

@@ -21,6 +21,9 @@ import app.rovas.josm.gui.RovasDialog;
 import app.rovas.josm.model.RovasPreference;
 import app.rovas.josm.model.TimeTrackingManager;
 
+/**
+ * The main class of the rovas plugin.
+ */
 public final class RovasPlugin extends Plugin {
   public static final ImageProvider LOGO = new ImageProvider("rovas_logo");
 
@@ -31,7 +34,7 @@ public final class RovasPlugin extends Plugin {
    *
    * @param info the plugin information describing the plugin.
    */
-  public RovasPlugin(PluginInformation info) {
+  public RovasPlugin(final PluginInformation info) {
     super(info);
     MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
     TimeTrackingManager.getInstance().trackChangeNow();
@@ -60,7 +63,7 @@ public final class RovasPlugin extends Plugin {
 
     final JMenuItem triggerReportItem = new JMenuItem(new AbstractAction("Open the work report upload dialog") {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(final ActionEvent e) {
         new CreateRovasReportDialog(Optional.empty(), TimeTrackingManager.getInstance().commit());
         TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(0);
       }
@@ -70,7 +73,7 @@ public final class RovasPlugin extends Plugin {
   }
 
   @Override
-  public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
+  public void mapFrameInitialized(final MapFrame oldFrame, final MapFrame newFrame) {
     super.mapFrameInitialized(oldFrame, newFrame);
     if (newFrame != null && newFrame.getToggleDialog(RovasDialog.class) == null) {
       newFrame.addToggleDialog(new RovasDialog());

@@ -183,7 +183,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
       .orElse(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE);
   }
 
-  public void setActiveProjectIdValue(@Nullable final Integer projectId) {
+  public final void setActiveProjectIdValue(@Nullable final Integer projectId) {
     activeProjectIdSpinnerModel.setValue(
       Utils.clamp(
         Optional.ofNullable(projectId).orElse(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE),
@@ -205,19 +205,19 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     fieldSupplier.get().setText(Optional.ofNullable(newValue).map(String::trim).orElse(null));
   }
 
-  public String getApiKeyValue() {
+  public final String getApiKeyValue() {
     return getStringFieldValue(() -> apiKeyField);
   }
 
-  public void setApiKeyValue(final String apiKey) {
+  public final void setApiKeyValue(final String apiKey) {
     setStringFieldValue(() -> apiKeyField, apiKey);
   }
 
-  public String getApiTokenValue() {
+  public final String getApiTokenValue() {
     return getStringFieldValue(() -> apiTokenField);
   }
 
-  public void setApiTokenValue(final String apiToken) {
+  public final void setApiTokenValue(final String apiToken) {
     setStringFieldValue(() -> apiTokenField, apiToken);
   }
 }

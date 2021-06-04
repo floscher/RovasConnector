@@ -17,7 +17,7 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
   }
 
   @Override
-  public void addGui(PreferenceTabbedPane gui) {
+  public void addGui(final PreferenceTabbedPane gui) {
     prefPanel.setApiKeyValue(RovasProperties.ROVAS_API_KEY.get());
     prefPanel.setApiTokenValue(RovasProperties.ROVAS_API_TOKEN.get());
     prefPanel.setActiveProjectIdValue(RovasProperties.ACTIVE_PROJECT_ID.get());

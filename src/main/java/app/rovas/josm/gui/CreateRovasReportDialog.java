@@ -94,7 +94,7 @@ public class CreateRovasReportDialog extends JDialog {
 
     final JButton skipButton = new JButton(new AbstractAction(I18n.tr("Skip without creating a report"), ImageProvider.get("dialogs/next", ImageProvider.ImageSizes.SIDEBUTTON)) {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(final ActionEvent e) {
         dispose();
       }
     });
