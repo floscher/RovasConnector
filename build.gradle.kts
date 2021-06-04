@@ -1,7 +1,7 @@
-
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import proguard.gradle.ProGuardTask
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 
 buildscript {
   dependencies {
@@ -14,6 +14,13 @@ plugins {
   `java-test-fixtures`
   jacoco
   pmd
+}
+
+pmd {
+  ruleSets.clear()
+  ruleSetConfig = resources.text.fromFile(projectDir.resolve("config/pmd.xml"))
+  isIgnoreFailures = true
+  toolVersion = Version.PMD
 }
 
 repositories {
@@ -59,8 +66,10 @@ sourceSets {
 val generatePluginVersionClass by tasks.registering {
   val content = """
     package app.rovas.josm.gen;
+    import javax.annotation.Generated;
+    @Generated(value = "gradle", date = "${Instant.now().toString()}")
     public final class PluginVersion {
-      public static final String versionName = "${GitDescriber(projectDir).describe(trimLeading = true)}";
+      public static final String VERSION_NAME = "${GitDescriber(projectDir).describe(trimLeading = true)}";
     }""".trimIndent()
   val file = generatedSrcDir.resolve("app/rovas/josm/gen/PluginVersion.java")
 
@@ -79,7 +88,7 @@ tasks.withType(JavaCompile::class) {
 }
 josm {
   initialPreferences.set("<tag key='rovas.developer' value='true'/>")
-  josmCompileVersion = "17833" // "15660"
+  josmCompileVersion = "17833"
   manifest {
     description = "A plugin to keep track of the time spent for mapping. Can be used to report that time to https://rovas.app ."
     mainClass = "app.rovas.josm.RovasPlugin"

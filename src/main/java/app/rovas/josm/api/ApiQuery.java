@@ -74,6 +74,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * @param successCallback in case a successful result was retrieved, the result will be passed to this consumer as a positive integer
    * @param errorCallback in case an error occurs, the error code will be passed to this consumer
    */
+  @SuppressWarnings("PMD.AvoidInstanceofChecksInCatchClause")
   public void query(
     final ApiCredentials credentials,
     final Consumer<Integer> successCallback,
@@ -91,7 +92,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
         if (success.isPresent()) {
           successCallback.accept(success.get());
         } else {
-          errorCallback.accept(createAdditionalErrorCode(Optional.of(result), I18n.marktr("An unknown error occured!")));
+          errorCallback.accept(createAdditionalErrorCode(Optional.of(result), I18n.marktr("An unknown error occurred!")));
         }
       }
     } catch (final ApiException e) {
@@ -113,7 +114,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       connection.setRequestProperty("API-KEY", credentials.getApiKey());
       connection.setRequestProperty("TOKEN", credentials.getApiToken());
       connection.setRequestProperty("Content-Type", "application/json;charset=" + StandardCharsets.UTF_8.name());
-      connection.setRequestProperty("User-Agent", "JOSM-rovas/" + PluginVersion.versionName);
+      connection.setRequestProperty("User-Agent", "JOSM-rovas/" + PluginVersion.VERSION_NAME);
       connection.setRequestProperty("Accept", "application/json");
       connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
       connection.setDoOutput(true);
@@ -124,7 +125,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
         ((HttpURLConnection) connection).setChunkedStreamingMode(0);
         ((HttpURLConnection) connection).setRequestMethod("POST");
       }
-      try (final Writer writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
+      try (Writer writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
         writer.write(requestContent.build().toString());
       }
     } catch (IOException e) {
@@ -179,9 +180,18 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     Utils.instanceOfAndCast(connection, HttpURLConnection.class).ifPresent(HttpURLConnection::disconnect);
   }
 
+  /**
+   * An error state for an API request.
+   */
   public static class ErrorCode {
+    /**
+     * Server errors will have an error code, other errors (like connection issues) will have an empty code.
+     */
     @NotNull
     private final Optional<Integer> code;
+    /**
+     * A message that can be passed to {@link I18n#tr(String, Object...)} and shown to the user
+     */
     @NotNull
     private final String translatableMessage;
 

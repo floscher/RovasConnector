@@ -1,0 +1,18 @@
+version: "2"
+plugins:
+  pmd:
+    enabled: true
+    channel: "beta"
+    config:
+      file: config/pmd.xml
+  sonar-java:
+    enabled: true
+    config:
+      test_patterns:
+        - src/test/**
+exclude_patterns:
+  - ".gradle/**"
+  - "buildSrc/**"
+  - "src/test/**"
+  - "src/testFixtures/**"
+  - "build/**"

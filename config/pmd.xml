@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description/>
+
+  <!-- Best practices -->
+  <rule ref="category/java/bestpractices.xml"/>
+
+  <!-- Code style -->
+  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+    <properties>
+      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]*"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/FormalParameterNamingConventions">
+    <properties>
+      <property name="lambdaParameterPattern" value="(__+)|([a-z][a-zA-Z0-9]*)"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/CommentDefaultAccessModifier">
+    <properties>
+      <property name="ignoredAnnotations" value="com.google.common.annotations.VisibleForTesting|android.support.annotation.VisibleForTesting|app.rovas.josm.util.VisibleForTesting"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml">
+    <exclude name="GenericsNaming"/>
+    <exclude name="LongVariable"/>
+    <exclude name="ShortMethodName"/>
+    <exclude name="ShortVariable"/>
+    <exclude name="UselessParentheses"/>
+  </rule>
+
+  <!-- Design -->
+  <rule ref="category/java/design.xml">
+    <exclude name="LawOfDemeter"/>
+    <exclude name="LoosePackageCoupling"/>
+  </rule>
+
+  <!-- Documentation -->
+  <rule ref="category/java/documentation.xml/CommentRequired">
+    <properties>
+      <property name="fieldCommentRequirement" value="Ignored"/>
+    </properties>
+  </rule>
+  <rule ref="category/java/documentation.xml">
+    <exclude name="CommentContent"/>
+    <exclude name="CommentSize"/>
+  </rule>
+
+  <!-- Error prone -->
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="MissingSerialVersionUID"/>
+    <exclude name="BeanMembersShouldSerialize"/>
+  </rule>
+
+  <!-- Multithreading -->
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="DoNotUseThreads"/>
+  </rule>
+
+  <!-- Performance -->
+  <rule ref="category/java/performance.xml"/>
+
+  <!-- Security -->
+  <rule ref="category/java/security.xml"/>
+</ruleset>
