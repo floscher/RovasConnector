@@ -9,6 +9,9 @@ import app.rovas.josm.api.ApiCreateWorkReport;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The second upload step, which creates the work report.
+ */
 public class UploadStep2CreateWorkReport extends UploadStep {
   private final ApiCredentials credentials;
   private final int minutes;
@@ -37,10 +40,10 @@ public class UploadStep2CreateWorkReport extends UploadStep {
         new UploadStep3CreateAur(parent, urlProvider, credentials, workReportId, minutes).showStep();
       },
       errorCode -> {
+        showErrorMessage(errorCode);
         if (errorCode.getContinueOption() == ApiCreateWorkReport.ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY) {
           new UploadStep3CreateAur(parent, urlProvider, credentials, 0, minutes).showStep();
         } else {
-          showErrorMessage(errorCode);
           parent.setVisible(true);
         }
       }

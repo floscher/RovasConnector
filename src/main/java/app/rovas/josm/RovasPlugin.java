@@ -67,7 +67,6 @@ public final class RovasPlugin extends Plugin {
       @Override
       public void actionPerformed(final ActionEvent e) {
         new CreateRovasReportDialog(Optional.empty(), TimeTrackingManager.getInstance().commit());
-        TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(0);
       }
     });
     rovasMenu.add(triggerReportItem);

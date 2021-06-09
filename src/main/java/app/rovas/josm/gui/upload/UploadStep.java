@@ -25,7 +25,11 @@ public abstract class UploadStep {
   protected void showErrorMessage(final ApiQuery.ErrorCode errorCode) {
     JOptionPane.showMessageDialog(
       parent,
-      I18n.tr("An error occured!: {0}", errorCode.getCode().map(it -> it + " ").orElse("") + I18n.tr(errorCode.getTranslatableMessage())),
+      I18n.tr(
+        "An error occured!: {0}{1}",
+        errorCode.getCode().map(it -> it + " ").orElse(""),
+        I18n.tr(errorCode.getTranslatableMessage())
+      ),
       I18n.tr("Error"),
       JOptionPane.ERROR_MESSAGE
     );

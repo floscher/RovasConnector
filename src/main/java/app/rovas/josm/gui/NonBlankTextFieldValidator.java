@@ -4,6 +4,7 @@ import java.util.Optional;
 import javax.swing.text.JTextComponent;
 
 import org.openstreetmap.josm.gui.widgets.AbstractTextComponentValidator;
+import org.openstreetmap.josm.tools.I18n;
 
 public class NonBlankTextFieldValidator extends AbstractTextComponentValidator {
 
@@ -17,7 +18,7 @@ public class NonBlankTextFieldValidator extends AbstractTextComponentValidator {
     if (isValid) {
       feedbackValid("");
     } else {
-      feedbackInvalid("This field has to be filled out!");
+      feedbackInvalid(I18n.tr("This field has to be filled out!"));
     }
   }
 

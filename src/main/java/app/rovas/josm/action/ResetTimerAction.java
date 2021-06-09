@@ -20,11 +20,11 @@ import app.rovas.josm.util.TimeConverterUtil;
  */
 public class ResetTimerAction extends JosmAction {
 
-  private static final String translatableLabel = I18n.marktr("Reset timer");
+  private static final String TRANSLATABLE_LABEL = I18n.marktr("Reset timer");
 
   public ResetTimerAction() {
     super(
-      I18n.tr(translatableLabel),
+      I18n.tr(TRANSLATABLE_LABEL),
       "preferences/reset",
       I18n.tr("Reset the timer (either to 0 or an arbitrary value)"),
       null,
@@ -39,7 +39,7 @@ public class ResetTimerAction extends JosmAction {
       JOptionPane.showConfirmDialog(
         MainApplication.getMainFrame(),
         resetPanel,
-        I18n.tr(translatableLabel),
+        I18n.tr(TRANSLATABLE_LABEL),
         JOptionPane.OK_CANCEL_OPTION,
         JOptionPane.PLAIN_MESSAGE
       ) == JOptionPane.OK_OPTION
@@ -53,7 +53,7 @@ public class ResetTimerAction extends JosmAction {
     private final SpinnerNumberModel minuteModel = new SpinnerNumberModel(0, 0, 59, 1);
 
     public ResetPanel() {
-      setLayout(new FlowLayout(FlowLayout.CENTER));
+      super(new FlowLayout(FlowLayout.CENTER));
       add(GuiComponentFactory.createLabel(I18n.tr("Reset the timer to"), false));
       add(GuiComponentFactory.createSpinner(hourModel, 3, true));
       add(GuiComponentFactory.createLabel(I18nStrings.trShorthandForHours(), false));

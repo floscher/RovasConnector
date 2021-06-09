@@ -14,6 +14,10 @@ import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The first upload step where it is just checked, if the user is a shareholder in the selected project,
+ * or if they can be made a shareholder. In the latter case, they are immediately made a shareholder.
+ */
 public class UploadStep1AddShareholder extends UploadStep {
 
   private final int minutes;

@@ -7,6 +7,7 @@ import org.openstreetmap.josm.tools.I18n;
 
 import app.rovas.josm.gui.RovasPreferencePanel;
 import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.util.VisibleForTesting;
 
 public final class RovasPreference extends DefaultTabPreferenceSetting {
 
@@ -14,6 +15,11 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
 
   public RovasPreference() {
     super("rovas_logo", I18n.tr("Rovas"), I18n.tr("Preferences to configure timetracking with Rovas"));
+  }
+
+  @VisibleForTesting
+  RovasPreferencePanel getPrefPanel() {
+    return prefPanel;
   }
 
   @Override
