@@ -17,6 +17,7 @@ import app.rovas.josm.model.RovasPreference;
 import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;
+import app.rovas.josm.util.TimeConverterUtil;
 
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private static final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
@@ -62,18 +63,18 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     if (n < 0) {
       throw new IllegalArgumentException("Number of tracked seconds must always be non-negative (was" + n + ")!");
     }
+    final long minutes = TimeConverterUtil.secondsToMinutes(n);
     GuiHelper.runInEDT(() ->
       counterValue.setText(String.format(
-        "<html><strong style='font-size:1.8em'>%d</strong>&thinsp;" +
+        "<html><strong style='font-size:1.8em'>%d</strong>&#8239;" +
           I18nStrings.trShorthandForHours() +
-          "&nbsp;<strong style='font-size:1.8em'>%02d</strong>&thinsp;" +
+          "&nbsp;<strong style='font-size:1.8em'>%02d</strong>&#8239;" +
           I18nStrings.trShorthandForMinutes() +
           "&nbsp;<span style='color:#bbbbbb'>(%d&nbsp;" +
           I18n.tr("seconds") +
           ")</span></html>",
-        // 30 seconds are added, so 30 or more seconds within a minute are rounded up to the next full minute
-        (n + 30) / 3600L,
-        (n + 30) % 3600 / 60,
+        minutes / 60,
+        minutes % 60,
         n
       ))
     );

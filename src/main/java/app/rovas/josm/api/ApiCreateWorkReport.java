@@ -19,17 +19,17 @@ import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
 
-  private final double hours;
+  private final double minutes;
   private final Optional<Changeset> changeset;
 
-  public ApiCreateWorkReport(final UrlProvider urlProvider, final double hours, @NotNull final Optional<Changeset> changeset) {
+  public ApiCreateWorkReport(final UrlProvider urlProvider, final double minutes, @NotNull final Optional<Changeset> changeset) {
     super(urlProvider, urlProvider.rulesCreateWorkReport());
-    this.hours = hours;
+    this.minutes = minutes;
     this.changeset = changeset;
   }
 
   @Override
-  protected ErrorCode[] getErrorCodes() {
+  protected ErrorCode[] getKnownErrorCodes() {
     return new ErrorCode[]{
       new ErrorCode(
         Optional.of(-1),
@@ -75,7 +75,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
           UrlProvider.toHtmlHyperlink(urlProvider.osmWikiPluginArticle(), I18n.tr("Rovas connector plugin for JOSM"))
         ))
         .add("wr_activity_name", I18n.tr("Creating map data with JOSM"))
-        .add("wr_hours", hours)
+        .add("wr_hours", minutes / 60.0)
         .add(
           "wr_web_address",
           changeset

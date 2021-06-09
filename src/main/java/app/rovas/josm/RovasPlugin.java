@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
@@ -38,12 +39,13 @@ public final class RovasPlugin extends Plugin {
     super(info);
     MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
     TimeTrackingManager.getInstance().trackChangeNow();
-    OsmServerWriter.registerPostprocessor((p, progress) ->
+    OsmServerWriter.registerPostprocessor((p, progress) -> {
+      final Optional<Changeset> changeset = Optional.ofNullable(OsmApi.getOsmApi()).map(OsmApi::getChangeset);
       new Thread(() -> new CreateRovasReportDialog(
-        Optional.ofNullable(OsmApi.getOsmApi()).map(OsmApi::getChangeset),
+        changeset,
         TimeTrackingManager.getInstance().commit()
-      ))
-    );
+      )).start();
+    });
 
     MainApplication.getMainFrame().getMenu().add(createRovasMenu());
   }

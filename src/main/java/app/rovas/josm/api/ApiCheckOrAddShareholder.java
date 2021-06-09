@@ -13,7 +13,7 @@ import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCheckOrAddShareholder extends ApiQuery<ApiCheckOrAddShareholder.ErrorCode> {
   @Override
-  protected ErrorCode[] getErrorCodes() {
+  protected ErrorCode[] getKnownErrorCodes() {
     return new ErrorCode[]{
       new ErrorCode(
         Optional.of(0),

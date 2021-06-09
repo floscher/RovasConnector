@@ -47,7 +47,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
   /**
    * @return the error codes that we know can happen for this endpoint
    */
-  protected abstract EC[] getErrorCodes();
+  protected abstract EC[] getKnownErrorCodes();
 
   /**
    * Creates a custom error code (used for errors that are not returned by the API, like connection errors or similar)
@@ -82,7 +82,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
   ) {
     try {
       final int result = query(credentials);
-      final Optional<EC> errorCode = Stream.of(getErrorCodes())
+      final Optional<EC> errorCode = Stream.of(getKnownErrorCodes())
         .filter(it -> it.getCode().map(code -> code == result).orElse(false))
         .findFirst();
       if (errorCode.isPresent()) {
@@ -90,6 +90,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       } else {
         final Optional<Integer> success = Optional.of(result).filter(it -> it > 0);
         if (success.isPresent()) {
+          Logging.debug("[rovas] API query successful ({0})", success.get());
           successCallback.accept(success.get());
         } else {
           errorCallback.accept(createAdditionalErrorCode(Optional.of(result), I18n.marktr("An unknown error occurred!")));
@@ -126,7 +127,9 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
         ((HttpURLConnection) connection).setRequestMethod("POST");
       }
       try (Writer writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
-        writer.write(requestContent.build().toString());
+        final String request = requestContent.build().toString();
+        Logging.debug("[rovas] API request:\n{0}", request);
+        writer.write(request);
       }
     } catch (IOException e) {
       disconnect(connection);

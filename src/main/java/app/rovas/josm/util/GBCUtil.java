@@ -4,6 +4,9 @@ import java.awt.GridBagConstraints;
 
 import com.drew.lang.annotations.NotNull;
 
+/**
+ * Utility methods for working with {@link GridBagConstraints}.
+ */
 public final class GBCUtil {
   /**
    * Modifies GridBagConstraints, so that {@link java.awt.GridBagConstraints#gridx} is set to {@code columnIndex}.

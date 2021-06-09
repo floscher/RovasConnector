@@ -2,6 +2,11 @@ package app.rovas.josm.gui.upload;
 
 import java.awt.Window;
 
+import javax.swing.JOptionPane;
+
+import org.openstreetmap.josm.tools.I18n;
+
+import app.rovas.josm.api.ApiQuery;
 import app.rovas.josm.util.UrlProvider;
 
 public abstract class UploadStep {
@@ -16,4 +21,13 @@ public abstract class UploadStep {
   }
 
   public abstract void showStep();
+
+  protected void showErrorMessage(final ApiQuery.ErrorCode errorCode) {
+    JOptionPane.showMessageDialog(
+      parent,
+      I18n.tr("An error occured!: {0}", errorCode.getCode().map(it -> it + " ").orElse("") + I18n.tr(errorCode.getTranslatableMessage())),
+      I18n.tr("Error"),
+      JOptionPane.ERROR_MESSAGE
+    );
+  }
 }

@@ -16,12 +16,12 @@ import app.rovas.josm.util.UrlProvider;
 
 public class UploadStep1AddShareholder extends UploadStep {
 
-  private final double hours;
+  private final int minutes;
   private final Optional<Changeset> changeset;
 
-  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final double hours, final Optional<Changeset> changeset) {
+  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final int minutes, final Optional<Changeset> changeset) {
     super(parent, urlProvider);
-    this.hours = hours;
+    this.minutes = minutes;
     this.changeset = changeset;
   }
 
@@ -59,7 +59,7 @@ public class UploadStep1AddShareholder extends UploadStep {
 
     new ApiCheckOrAddShareholder(urlProvider).query(
       credentials,
-      meritId -> new UploadStep2CreateWorkReport(parent, urlProvider, credentials, hours, changeset).showStep(),
+      meritId -> new UploadStep2CreateWorkReport(parent, urlProvider, credentials, minutes, changeset).showStep(),
       errorCode -> {
         final boolean forceCredentialsDialogAgain =
           ApiCheckOrAddShareholder.ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS == errorCode.getContinueOption();
