@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -23,37 +22,57 @@ import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
+import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.RovasPlugin;
 import app.rovas.josm.gui.upload.UploadStep1AddShareholder;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
+import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.UrlProvider;
 
 public class CreateRovasReportDialog extends JDialog {
+  private static final GBC GBC_START_ALIGNED = GBC.eol().anchor(GBC.LINE_START).fill(GBC.HORIZONTAL);
 
   private final SpinnerNumberModel hoursModel;
   private final SpinnerNumberModel minutesModel;
 
-  private final JButton submitReportButton = new JButton();
+  private final JMultilineLabel calculatedChronLabel = new JMultilineLabel("");
+  private final JButton submitReportButton = new JButton(
+    new AbstractAction(I18n.tr("Submit report"), ImageProvider.get("upload", ImageProvider.ImageSizes.SIDEBUTTON)) {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        new UploadStep1AddShareholder(
+          CreateRovasReportDialog.this,
+          UrlProvider.getInstance(),
+          hoursModel.getNumber().intValue() * 60 + minutesModel.getNumber().intValue(),
+          changeset
+        ).showStep();
+      }
+    }
+  );
 
-  private static final GBC DEFAULT_GBC = GBC.eol().anchor(GBC.LINE_START).fill(GBC.HORIZONTAL).insets(5);
   private final Optional<Changeset> changeset;
 
+  /**
+   * The dialog that is shown after an OSM upload completed. With it, the user can correct the recorded time
+   * and then submit the time to Rovas
+   * @param changeset the OSM {@link Changeset} for which the work report will be created. Usually present, but could be empty.
+   * @param defaultReportedSeconds the time (in seconds) that should be shown initially in the dialog, before the user edits it
+   */
   public CreateRovasReportDialog(final Optional<Changeset> changeset, final long defaultReportedSeconds) {
     super(MainApplication.getMainFrame(), I18n.tr("Create work report"), true);
 
-    final long defaultReportedMinutes = (defaultReportedSeconds + 30) / 60;
+    final int defaultReportedMinutes = (int) Math.min(Integer.MAX_VALUE, TimeConverterUtil.secondsToMinutes(defaultReportedSeconds));
 
     this.changeset = changeset;
-    this.hoursModel = new SpinnerNumberModel(Math.max(0, (int) Math.min(Integer.MAX_VALUE, defaultReportedMinutes / 60)), 0, Integer.MAX_VALUE, 1);
-    this.minutesModel = new SpinnerNumberModel((int) (defaultReportedMinutes % 60), 0, 59, 1);
+    this.hoursModel = new SpinnerNumberModel(Utils.clamp(defaultReportedMinutes / 60, 0, TimeConverterUtil.MAX_HOURS), 0, TimeConverterUtil.MAX_HOURS, 1);
+    this.minutesModel = new SpinnerNumberModel(defaultReportedMinutes % 60, 0, 59, 1);
 
     onTimeChange();
     hoursModel.addChangeListener(__ -> this.onTimeChange());
     minutesModel.addChangeListener(__ -> this.onTimeChange());
 
-    add(new JLabel(I18n.tr("Create work report")));
     setContentPane(buildGui());
     setMaximumSize(new Dimension(
       GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width / 2,
@@ -71,43 +90,45 @@ public class CreateRovasReportDialog extends JDialog {
     final JLabel heading = new JLabel(I18n.tr("Creating a work report in Rovas"));
     heading.setFont(heading.getFont().deriveFont(Font.BOLD, heading.getFont().getSize() * 1.8F));
     heading.setIcon(RovasPlugin.LOGO.setSize(heading.getFont().getSize(), heading.getFont().getSize()).get());
-    panel.add(heading, DEFAULT_GBC.insets(10, 10, 10, 5));
+    panel.add(heading, GBC_START_ALIGNED.insets(10, 10, 10, 5));
 
-    panel.add(GuiComponentFactory.createLabel(I18n.tr("Reported labor time:"), false), DEFAULT_GBC.insets(10, 5, 10, 0));
-    final JPanel timeFieldsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    timeFieldsPanel.add(GuiComponentFactory.createSpinner(hoursModel, 3, true));
-    timeFieldsPanel.add(GuiComponentFactory.createLabel(I18nStrings.trShorthandForHours(), false));
-    timeFieldsPanel.add(GuiComponentFactory.createSpinner(minutesModel, 3, true, "00"));
-    timeFieldsPanel.add(GuiComponentFactory.createLabel(I18nStrings.trShorthandForMinutes(), false));
-    panel.add(timeFieldsPanel, DEFAULT_GBC.insets(10, 5, 10, 5));
-
-    panel.add(new JMultilineLabel(
-      I18n.tr("Click the button below to create a report in Rovas for the time shown.<br>After approving the time by two Rovas-selected users, you will earn 1 chron for every 6 minutes.")),
-      DEFAULT_GBC.insets(10, 5, 10, 5)
+    panel.add(GuiComponentFactory.createLabel(I18n.tr("Reported labor time"), false, JLabel.CENTER), GBC_START_ALIGNED.insets(10, 5, 10, 0));
+    panel.add(
+      GuiComponentFactory.createWrapperPanel(
+        new FlowLayout(FlowLayout.CENTER),
+        GuiComponentFactory.createSpinner(hoursModel, 5, true),
+        GuiComponentFactory.createLabel(I18nStrings.trShorthandForHours(), false),
+        GuiComponentFactory.createSpinner(minutesModel, 2, true, "00"),
+        GuiComponentFactory.createLabel(I18nStrings.trShorthandForMinutes(), false)
+      ),
+      GBC_START_ALIGNED.insets(10, 5, 10, 5)
     );
 
-    submitReportButton.setIcon(ImageProvider.get("misc/statusreport", ImageProvider.ImageSizes.SIDEBUTTON));
-    submitReportButton.addActionListener(__ -> new UploadStep1AddShareholder(this, UrlProvider.getInstance(), hoursModel.getNumber().doubleValue() + minutesModel.getNumber().doubleValue() / 60.0, changeset).showStep());
-    panel.add(GuiComponentFactory.createWrapperPanel(submitReportButton, new FlowLayout(FlowLayout.LEFT)), DEFAULT_GBC.insets(10, 5, 10, 0));
+    panel.add(calculatedChronLabel, GBC_START_ALIGNED.insets(10, 5, 10, 5));
 
-    panel.add(GuiComponentFactory.createHyperlinkedMultilineLabel(I18nStrings.trVerificationWarningWithHyperlink()), DEFAULT_GBC.insets(10, 5, 10, 5));
+    panel.add(GuiComponentFactory.createHyperlinkedMultilineLabel(I18nStrings.trVerificationWarningWithHyperlink()), GBC_START_ALIGNED.insets(10, 5, 10, 5));
 
-    final JButton skipButton = new JButton(new AbstractAction(I18n.tr("Skip without creating a report"), ImageProvider.get("dialogs/next", ImageProvider.ImageSizes.SIDEBUTTON)) {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        dispose();
-      }
-    });
-    skipButton.setHorizontalTextPosition(SwingConstants.LEFT);
-    panel.add(skipButton, GBC.eol().anchor(GBC.LINE_END).insets(10));
+    panel.add(
+      GuiComponentFactory.createWrapperPanel(
+        new FlowLayout(FlowLayout.CENTER, 10, 10),
+        submitReportButton,
+        new JButton(new AbstractAction(I18n.tr("Cancel"), ImageProvider.get("cancel", ImageProvider.ImageSizes.SIDEBUTTON)) {
+          @Override
+          public void actionPerformed(final ActionEvent e) {
+            dispose();
+          }
+        })
+      ),
+      GBC_START_ALIGNED.insets(10)
+    );
 
     return panel;
   }
 
   private void onTimeChange() {
     GuiHelper.runInEDT(() -> {
-      final long minutes = 60 * hoursModel.getNumber().longValue() + minutesModel.getNumber().longValue();
-      submitReportButton.setText(I18n.tr("Submit report for {0} minutes", minutes));
+      final int minutes = 60 * hoursModel.getNumber().intValue() + minutesModel.getNumber().intValue();
+      calculatedChronLabel.setText(I18n.tr("After approving the time by two Rovas-selected users, you will earn {0} chrons", TimeConverterUtil.minutesToFractionalChrons(minutes)));
       submitReportButton.setEnabled(minutes > 0);
     });
   }

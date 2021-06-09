@@ -173,7 +173,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     add(activeProjectIdSpinner, GBC_COLUMN_B);
     add(activeProjectIdDescription, GBC_COLUMNS_CD);
     add(Box.createHorizontalGlue(), GBC_COLUMN_A);
-    add(GuiComponentFactory.createWrapperPanel(activeProjectOpenButton, new FlowLayout(FlowLayout.LEFT, 0, 0)), GBC_COLUMNS_BC);
+    add(GuiComponentFactory.createWrapperPanel(new FlowLayout(FlowLayout.LEFT, 0, 0), activeProjectOpenButton), GBC_COLUMNS_BC);
     add(Box.createHorizontalGlue(), GBC_COLUMN_D);
   }
 
