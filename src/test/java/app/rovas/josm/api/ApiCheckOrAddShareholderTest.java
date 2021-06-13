@@ -1,6 +1,7 @@
 package app.rovas.josm.api;
 
 import static app.rovas.josm.api.ApiCheckOrAddShareholder.ErrorCode;
+import static app.rovas.josm.api.ApiQueryTest.DEFAULT_CREDENTIALS;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -28,16 +29,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import app.rovas.josm.fixture.NoTimeConsumer;
 import app.rovas.josm.fixture.OneTimeConsumer;
 import app.rovas.josm.fixture.WiremockExtension;
-import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
 @ExtendWith(WiremockExtension.class)
 public class ApiCheckOrAddShareholderTest {
-  private static final ApiCredentials DEFAULT_CREDENTIALS = new ApiCredentials(
-    "--------------------key--------------------",
-    "-------------------token-------------------",
-    42
-  );
 
   @Test
   @DisplayName("Test cases that produce decode exceptions")
@@ -96,7 +91,6 @@ public class ApiCheckOrAddShareholderTest {
       server,
       urlProvider,
       -1,
-      ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS,
       okJson("{\"result\":\"-1\"}").withStatusMessage("OK")
     );
   }
@@ -108,7 +102,6 @@ public class ApiCheckOrAddShareholderTest {
       server,
       urlProvider,
       0,
-      ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS,
       okJson("{\"result\":\"0\"}").withStatusMessage("OK")
     );
   }
@@ -119,15 +112,13 @@ public class ApiCheckOrAddShareholderTest {
     assertQueryError(
       server,
       urlProvider,
-      -4,
-      ErrorCode.ContinueOption.RETRY_IMMEDIATELY,
-      okJson("{\"result\":\"-4\"}").withStatusMessage("OK")
+      -2,
+      okJson("{\"result\":\"-2\"}").withStatusMessage("OK")
     );
     assertQueryError(
       server,
       urlProvider,
       Integer.MIN_VALUE,
-      ErrorCode.ContinueOption.RETRY_IMMEDIATELY,
       okJson("{\"result\":\"" + Integer.MIN_VALUE + "\"}").withStatusMessage("OK")
     );
   }
@@ -145,22 +136,14 @@ public class ApiCheckOrAddShareholderTest {
     final WireMockServer server,
     final UrlProvider urlProvider,
     final Integer expectedErrorCode,
-    final ErrorCode.ContinueOption expectedContinueOption,
     final ResponseDefinitionBuilder response
   ) {
-    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
+    stubForCredentials(server, response);
     final OneTimeConsumer<ErrorCode> errorConsumer = new OneTimeConsumer<>(
-      new ErrorCode(Optional.ofNullable(expectedErrorCode), "", expectedContinueOption),
+      new ErrorCode(Optional.ofNullable(expectedErrorCode), ""),
       (a, b) ->
         (a != null && b != null) &&
-          Objects.equals(a.getCode(), b.getCode()) &&
-          Objects.equals(a.getContinueOption(), b.getContinueOption()),
-      it -> String.format(
-        "ErrorCode{code=%s, continueOption=%s} (message: %s)",
-        it.getCode().orElse(null),
-        it.getContinueOption().name(),
-        it.getTranslatableMessage()
-      )
+        Objects.equals(a.getCode(), b.getCode())
     );
     new ApiCheckOrAddShareholder(urlProvider).query(DEFAULT_CREDENTIALS, new NoTimeConsumer<>(), errorConsumer);
     errorConsumer.assertHasAccepted();
@@ -173,11 +156,11 @@ public class ApiCheckOrAddShareholderTest {
     final Class<? extends ApiException> expectedException,
     final ResponseDefinitionBuilder response
   ) {
-    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
+    stubForCredentials(server, response);
     assertThrows(expectedException, () -> new ApiCheckOrAddShareholder(urlProvider).query(DEFAULT_CREDENTIALS));
     verifyOneRequestAndReset(server);
 
-    assertQueryError(server, urlProvider, null, ErrorCode.ContinueOption.RETRY_IMMEDIATELY, response);
+    assertQueryError(server, urlProvider, null, response);
   }
 
   private void assertQuerySuccess(
@@ -186,7 +169,7 @@ public class ApiCheckOrAddShareholderTest {
     final int value,
     final ResponseDefinitionBuilder response
   ) {
-    stubForCredentials(server, DEFAULT_CREDENTIALS, response);
+    stubForCredentials(server, response);
     final OneTimeConsumer<Integer> successConsumer = new OneTimeConsumer<>(value);
     new ApiCheckOrAddShareholder(urlProvider).query(DEFAULT_CREDENTIALS, successConsumer, new NoTimeConsumer<>());
     successConsumer.assertHasAccepted();
@@ -199,11 +182,11 @@ public class ApiCheckOrAddShareholderTest {
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  private static StubMapping stubForCredentials(final Stubbing server, final ApiCredentials credentials, final ResponseDefinitionBuilder response) {
+  private static StubMapping stubForCredentials(final Stubbing server, final ResponseDefinitionBuilder response) {
     return server.stubFor(
       post("/rovas/rules/rules_proxy_check_or_add_shareholder")
-        .withHeader("API-KEY", equalTo(credentials.getApiKey()))
-        .withHeader("TOKEN", equalTo(credentials.getApiToken()))
+        .withHeader("API-KEY", equalTo(DEFAULT_CREDENTIALS.getApiKey()))
+        .withHeader("TOKEN", equalTo(DEFAULT_CREDENTIALS.getApiToken()))
         .withHeader("Content-Type", matching("application/json;.+"))
         .withRequestBody(
           equalToJson(

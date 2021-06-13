@@ -11,6 +11,6 @@ import java.util.function.Consumer;
 public class NoTimeConsumer<T> implements Consumer<T> {
   @Override
   public void accept(T t) {
-    fail("The consumer is expected to not accept any value!");
+    fail("The consumer is expected to not accept any value (got " + t + ")!");
   }
 }

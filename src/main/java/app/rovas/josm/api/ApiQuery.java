@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,7 +28,6 @@ import org.openstreetmap.josm.tools.Utils;
 import org.openstreetmap.josm.tools.bugreport.BugReportQueue;
 import org.openstreetmap.josm.tools.bugreport.ReportedException;
 
-import app.rovas.josm.StaticConfig;
 import app.rovas.josm.gen.PluginVersion;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.TeeInputStream;
@@ -62,8 +62,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * @return the response returned by the server, usually responses > 0 are successes, others are errors, but depends on the specific query
    * @throws ApiException.ConnectionFailure if the response can't even be read
    * @throws ApiException.DecodeResponse if the response can be read but not decoded as JSON
-   * @throws ApiException.WrongPluginApiCredentials if the API credentials for the plugin -
-   *   {@link StaticConfig#PLUGIN_API_KEY}/{@link StaticConfig#PLUGIN_API_TOKEN} - are not accepted by the server
+   * @throws ApiException.WrongPluginApiCredentials if the API credentials are invalid
    * @throws ApiException see the more specific descriptions of the subclasses
    */
   protected abstract int query(final ApiCredentials credentials) throws ApiException;
@@ -98,7 +97,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       }
     } catch (final ApiException e) {
       errorCallback.accept(createAdditionalErrorCode(Optional.empty(), e.getMessage()));
-      if (e instanceof ApiException.WrongPluginApiCredentials) {
+      if (e.isShouldBeReportedAsBug()) {
         BugReportQueue.getInstance().submit(new ReportedException(e));
       }
     }
@@ -165,12 +164,12 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
                 )
               )
           ).orElseThrow(() -> {
-            Logging.warn("Can't decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8));
+            Logging.warn(MessageFormat.format("Can''t decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8)));
             return new ApiException.DecodeResponse(connection.getURL(), null);
           });
       }
     } catch (JsonException je) { // can be thrown by readObject()
-      Logging.warn("Can't decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8));
+      Logging.warn("Can''t decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8));
       throw new ApiException.DecodeResponse(connection.getURL(), je);
     } catch (IOException e) {
       throw new ApiException.ConnectionFailure(connection.getURL(), e);
@@ -211,6 +210,13 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     @NotNull
     public String getTranslatableMessage() {
       return translatableMessage;
+    }
+
+    @Override
+    public String toString() {
+      return "ErrorCode " +
+        code.map(String::valueOf).orElse("‹null›") +
+        " (message: \"" + I18n.tr(translatableMessage) + "\")";
     }
   }
 }

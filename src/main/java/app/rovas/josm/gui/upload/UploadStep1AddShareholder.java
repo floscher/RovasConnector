@@ -11,7 +11,7 @@ import org.openstreetmap.josm.tools.I18n;
 import app.rovas.josm.api.ApiCheckOrAddShareholder;
 import app.rovas.josm.gui.ApiCredentialsPanel;
 import app.rovas.josm.model.ApiCredentials;
-import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 /**
@@ -65,26 +65,19 @@ public class UploadStep1AddShareholder extends UploadStep {
       credentials,
       meritId -> new UploadStep2CreateWorkReport(parent, urlProvider, credentials, minutes, changeset).showStep(),
       errorCode -> {
-        final boolean forceCredentialsDialogAgain =
-          ApiCheckOrAddShareholder.ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS == errorCode.getContinueOption();
-
         if (recursionDepth < MAX_STEP_REPETITIONS && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
           parent,
           "<html>" +
             I18n.tr(errorCode.getTranslatableMessage()) +
             errorCode.getCode().map(code -> " " + I18n.tr("(error {0})", code)).orElse("") +
             "<br>" +
-            (
-              forceCredentialsDialogAgain
-              ? I18n.tr("Do you want to modify the API credentials and then retry?")
-              : I18n.tr("Do you want to retry?")
-            ) +
+            I18n.tr("Do you want to modify the API credentials and then retry?") +
             "</html>",
-          I18n.tr("Retry?"),
+          I18n.tr("Error. Retry?"),
           JOptionPane.YES_NO_OPTION,
-          forceCredentialsDialogAgain ? JOptionPane.WARNING_MESSAGE : JOptionPane.ERROR_MESSAGE
+          JOptionPane.WARNING_MESSAGE
         )) {
-          showStep(forceCredentialsDialogAgain, recursionDepth + 1);
+          showStep(true, recursionDepth + 1);
         } else {
           parent.setVisible(true);
         }

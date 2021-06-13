@@ -8,15 +8,8 @@ import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.openstreetmap.josm.testutils.JOSMTestRules;
-import org.openstreetmap.josm.tools.Logging;
 
 public class NonBlankTextFieldValidatorTest {
-
-  @RegisterExtension
-  protected JOSMTestRules rules = new JOSMTestRules();
 
   @Test
   public void test() {
@@ -38,7 +31,6 @@ public class NonBlankTextFieldValidatorTest {
     }
 
     public void assertCorrectFeedback(final boolean isValid, final String fieldContent) {
-      Logging.warn("X");
       getComponent().setText(fieldContent);
       this.expectValid = isValid;
       this.inAssertion = true;

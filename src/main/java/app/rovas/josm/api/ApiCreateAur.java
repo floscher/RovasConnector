@@ -1,11 +1,15 @@
 package app.rovas.josm.api;
 
 import java.net.URLConnection;
+import java.util.Locale;
 import java.util.Optional;
 import javax.json.Json;
 
+import org.openstreetmap.josm.tools.I18n;
+
+import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
-import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCreateAur extends ApiQuery<ApiQuery.ErrorCode> {
@@ -33,10 +37,10 @@ public final class ApiCreateAur extends ApiQuery<ApiQuery.ErrorCode> {
     final URLConnection connection = sendPostRequest(
       credentials,
       Json.createObjectBuilder()
-        .add("project_id", credentials.getProjectId())
+        .add("project_id", StaticConfig.ROVAS_CONNECTOR_PROJECT_ID)
         .add("wr_id", workReportId)
-        .add("usage_fee", reportedMinutes / 6.0 * RovasProperties.ASSET_USAGE_FEE)
-        .add("note", String.format("%.2f%% fee levied by the 'JOSM Rovas connector' project for using the plugin", RovasProperties.ASSET_USAGE_FEE * 100))
+        .add("usage_fee", TimeConverterUtil.minutesToChrons(reportedMinutes) * StaticConfig.ASSET_USAGE_FEE)
+        .add("note", I18n.tr("{0}% fee levied by the ''JOSM Rovas connector'' project for using the plugin", String.format(Locale.ROOT, "%.2f", StaticConfig.ASSET_USAGE_FEE * 100)))
     );
     return decodeJsonResult(connection, "result");
   }

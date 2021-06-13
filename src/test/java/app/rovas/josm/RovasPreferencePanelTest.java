@@ -7,16 +7,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 import app.rovas.josm.gui.RovasPreferencePanel;
 
 public class RovasPreferencePanelTest {
-
-  @RegisterExtension
-  public static JOSMTestRules rules = new JOSMTestRules();
 
   private static final String TEST_STRING = "äöüßýôťž\uD83E\uDDB8\uD83C\uDFFF\u200D♂️";
 

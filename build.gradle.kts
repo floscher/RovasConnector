@@ -48,6 +48,9 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(Test::class) {
   useJUnitPlatform()
+  options {
+    jvmArgs("-Djunit.jupiter.extensions.autodetection.enabled=true")
+  }
 }
 tasks.withType(JacocoReport::class) {
   reports.xml.isEnabled = true
@@ -67,9 +70,12 @@ val generatePluginVersionClass by tasks.registering {
   val content = """
     package app.rovas.josm.gen;
     import javax.annotation.Generated;
-    @Generated(value = "gradle", date = "${Instant.now().toString()}")
+    @Generated(value = "gradle", date = "${Instant.now()}")
     public final class PluginVersion {
       public static final String VERSION_NAME = "${GitDescriber(projectDir).describe(trimLeading = true)}";
+      private PluginVersion() {
+        // private constructor to prevent instantiation
+      }
     }""".trimIndent()
   val file = generatedSrcDir.resolve("app/rovas/josm/gen/PluginVersion.java")
 
@@ -83,12 +89,18 @@ val generatePluginVersionClass by tasks.registering {
   )
 }
 
+tasks.withType(Javadoc::class) {
+  options {
+    (this as StandardJavadocDocletOptions).links("https://josm.openstreetmap.de/doc")
+  }
+}
+
 tasks.withType(JavaCompile::class) {
   dependsOn(generatePluginVersionClass)
 }
 josm {
   initialPreferences.set("<tag key='rovas.developer' value='true'/>")
-  josmCompileVersion = "17833"
+  josmCompileVersion = "17919"
   manifest {
     description = "A plugin to keep track of the time spent for mapping. Can be used to report that time to https://rovas.app ."
     mainClass = "app.rovas.josm.RovasPlugin"

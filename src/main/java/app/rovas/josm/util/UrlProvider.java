@@ -8,6 +8,8 @@ import com.drew.lang.annotations.Nullable;
 
 import org.openstreetmap.josm.tools.JosmRuntimeException;
 
+import app.rovas.josm.model.RovasProperties;
+
 public class UrlProvider {
 
   private static final String BASE_URL_DEVELOPMENT = "https://dev.merit.world";
@@ -26,11 +28,11 @@ public class UrlProvider {
   protected UrlProvider() {
     // private constructor to prevent instantiation
   }
-  private URL uncheckedURL(final String path) {
+  private static URL uncheckedURL(final String path) {
     try {
-      return new URL(getBaseUrl() + path);
+      return new URL(path);
     } catch (MalformedURLException e) {
-      throw new JosmRuntimeException("The rovas plugin builds broken URLs: " + getBaseUrl() + path, e);
+      throw new JosmRuntimeException("The rovas plugin builds broken URLs: " + path, e);
     }
   }
 
@@ -45,31 +47,31 @@ public class UrlProvider {
 
   @NotNull
   public URL node(final int id) {
-    return uncheckedURL(String.format("/node/%d", id));
+    return uncheckedURL(getBaseUrl() + String.format("/node/%d", id));
   }
 
   @NotNull
   public URL rules() {
-    return uncheckedURL("/rules");
+    return uncheckedURL(getBaseUrl() + "/rules");
   }
 
   @NotNull
   public URL userProfile() {
-    return uncheckedURL("/user");
+    return uncheckedURL(getBaseUrl() + "/user");
   }
 
   @NotNull
   public URL rulesCreateAUR() {
-    return uncheckedURL("/rovas/rules/rules_proxy_create_aur");
+    return uncheckedURL(getBaseUrl() + "/rovas/rules/rules_proxy_create_aur");
   }
 
   @NotNull
   public URL rulesCheckOrAddShareholder() {
-    return uncheckedURL("/rovas/rules/rules_proxy_check_or_add_shareholder");
+    return uncheckedURL(getBaseUrl() + "/rovas/rules/rules_proxy_check_or_add_shareholder");
   }
 
   @NotNull
   public URL rulesCreateWorkReport() {
-    return uncheckedURL("/rovas/rules/rules_proxy_create_work_report");
+    return uncheckedURL(getBaseUrl() + "/rovas/rules/rules_proxy_create_work_report");
   }
 }

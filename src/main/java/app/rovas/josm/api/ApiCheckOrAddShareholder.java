@@ -4,33 +4,29 @@ import java.net.URLConnection;
 import java.util.Optional;
 import javax.json.Json;
 
-import com.drew.lang.annotations.NotNull;
-
 import org.openstreetmap.josm.tools.I18n;
 
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
-public final class ApiCheckOrAddShareholder extends ApiQuery<ApiCheckOrAddShareholder.ErrorCode> {
+public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode> {
   @Override
   protected ErrorCode[] getKnownErrorCodes() {
     return new ErrorCode[]{
       new ErrorCode(
         Optional.of(0),
-        I18n.marktr("You could not have been made a shareholder of the project with the ID set in the preferences."),
-        ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS
+        I18n.marktr("You could not have been made a shareholder of the project with the ID set in the preferences.")
       ),
       new ErrorCode(
         Optional.of(-1),
-        I18n.marktr("Could not find any project with the project ID that is set in the preferences!"),
-        ErrorCode.ContinueOption.RETRY_UPDATE_API_CREDENTIALS
+        I18n.marktr("Could not find any project with the project ID that is set in the preferences!")
       ),
     };
   }
 
   @Override
   protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
-    return new ErrorCode(code, translatableMessage, ErrorCode.ContinueOption.RETRY_IMMEDIATELY);
+    return new ErrorCode(code, translatableMessage);
   }
 
   public ApiCheckOrAddShareholder(final UrlProvider urlProvider) {
@@ -57,31 +53,5 @@ public final class ApiCheckOrAddShareholder extends ApiQuery<ApiCheckOrAddShareh
       Json.createObjectBuilder().add("project_id", credentials.getProjectId())
     );
     return decodeJsonResult(connection, "result");
-  }
-
-  /** An error code that the API endpoint can return */
-  public static class ErrorCode extends ApiQuery.ErrorCode {
-    /**
-     * Determines what should be done, when an error code occurs.
-     */
-    public enum ContinueOption {
-      /** Shows the API credentials dialog and then tries again. */
-      RETRY_UPDATE_API_CREDENTIALS,
-      /** Shows a yes/no dialog asking if the step should be retried */
-      RETRY_IMMEDIATELY
-    }
-
-    @NotNull
-    private final ContinueOption continueOption;
-
-    public ErrorCode(final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
-      super(code, translatableMessage);
-      this.continueOption = continueOption;
-    }
-
-    @NotNull
-    public ContinueOption getContinueOption() {
-      return continueOption;
-    }
   }
 }

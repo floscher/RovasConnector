@@ -43,13 +43,20 @@ public abstract class ApiException extends Exception {
 
   public static class DecodeResponse extends ApiException {
     public DecodeResponse(final URL url, final Throwable cause) {
-      super(url, I18n.marktr("There was an error decoding the server response!"), false, cause);
+      super(url, I18n.marktr("There was an error decoding the server response!"), true, cause);
     }
   }
 
   public static class WrongPluginApiCredentials extends ApiException {
     public WrongPluginApiCredentials(final URL url) {
-      super(url, I18n.marktr("The server did not accept the credentials of the plugin. Please report this to the maintainer of the Rovas plugin!"), true, null);
+      super(
+        url,
+        I18n.marktr(
+          "A work report could not be created, because the API key and/or token set in the preferences are incorrect, or your Rovas access was restricted. Please log into Rovas to verify your credentials and status."
+        ),
+        false,
+        null
+      );
     }
   }
 

@@ -1,4 +1,4 @@
-package app.rovas.josm.util;
+package app.rovas.josm.model;
 
 import java.util.Optional;
 
@@ -10,34 +10,12 @@ import org.openstreetmap.josm.data.preferences.LongProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
 
 import app.rovas.josm.gui.ApiCredentialsPanel;
-import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.util.NullableProperty;
 
 /**
  * The available (user-configurable) properties
  */
 public final class RovasProperties {
-  /**
-   * The classification ID that determines what kind of work is reported.
-   */
-  public static final int NACE_CLASSIFICATION = 1645;
-  /**
-   * The fraction of all earnings that goes to the Rovas connector project.
-   * A value of 1.0 would be equal to 100%, 0.01 means 1%.
-   * So for a value of {@code 0.01} from every 100 chrons earned, one of them would go to project {@link #ROVAS_CONNECTOR_PROJECT_ID}.
-   */
-  public static final double ASSET_USAGE_FEE = 0.03;
-  /**
-   * The project ID of the JOSM connector project in Rovas.
-   */
-  public static final Integer ROVAS_CONNECTOR_PROJECT_ID = 35_259;
-  public static final String ROVAS_CONNECTOR_PROJECT_URL = "https://rovas.app/josm_rovas_connector";
-  /**
-   * The address at which the edits can be seen.<br>
-   * This <strong>must</strong> contain {@code %d} exactly one time. That will be replaced by the changeset ID.<br>
-   * Any other percent signs that occur in the URL would have to be encoded as two percent signs ({@code %%}).<br>
-   * @see java.util.Formatter
-   */
-  public static final String ROVAS_PROOF_URL = "https://overpass-api.de/achavi/?changeset=%d";
 
   public static final NullableProperty<String> ROVAS_API_KEY = new NullableProperty<>(
     new StringProperty("rovas.api-key", null),
@@ -57,7 +35,7 @@ public final class RovasProperties {
    * The Rovas project ID for which the JOSM user is submitting their work report.
    */
   public static final IntegerProperty ACTIVE_PROJECT_ID =
-    new IntegerProperty("rovas.active-project-id", ROVAS_CONNECTOR_PROJECT_ID);
+    new IntegerProperty("rovas.active-project-id", StaticConfig.ROVAS_OSM_PROJECT_ID);
 
   /**
    * The minimum value allowed for {@link #INACTIVITY_TOLERANCE}, smaller values are treated as if this value was set.

@@ -14,7 +14,6 @@ import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.gui.TimeTrackingUpdateListener;
 import app.rovas.josm.util.LoggingUtil;
-import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.VisibleForTesting;
 
@@ -223,9 +222,10 @@ public final class TimeTrackingManager {
   }
 
   /**
-   * This listener notifies the (singleton) {@link TimeTrackingManager} of all changes in any {@link OsmDataLayer}.
-   * Add this to JOSM's {@link LayerManager} using
-   * {@link LayerManager#addAndFireLayerChangeListener(LayerManager.LayerChangeListener)}.
+   * <p>This listener notifies the (singleton) {@link TimeTrackingManager} of all changes in any {@link OsmDataLayer}
+   * that are relevant for time tracking.</p>
+   * <p>Add this to JOSM's {@link LayerManager} using
+   * {@link LayerManager#addAndFireLayerChangeListener(LayerManager.LayerChangeListener)}.</p>
    */
   public static class AnyOsmDataChangeListener implements LayerManager.LayerChangeListener {
     @Override

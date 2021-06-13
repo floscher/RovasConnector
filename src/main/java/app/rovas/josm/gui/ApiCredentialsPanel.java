@@ -32,7 +32,7 @@ import org.openstreetmap.josm.tools.Utils;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.GuiComponentFactory;
-import app.rovas.josm.util.RovasProperties;
+import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 public class ApiCredentialsPanel extends VerticallyScrollablePanel {

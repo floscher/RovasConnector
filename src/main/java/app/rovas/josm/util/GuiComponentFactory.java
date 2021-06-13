@@ -96,7 +96,7 @@ public final class GuiComponentFactory {
    * Creates a spinner
    * @param model the {@link SpinnerModel} used by the spinner
    * @param columns the number of columns (essentially how many digits fit in the textfield)
-   * @param hideArrowButtons if {@link true}, the arrow buttons next to the text field are hidden.
+   * @param hideArrowButtons if {@code true}, the arrow buttons next to the text field are hidden.
    *   The value can still be adjusted by pressing the arrow keys on the keyboard.
    * @return the created spinner
    */
@@ -108,7 +108,7 @@ public final class GuiComponentFactory {
    * Creates a spinner
    * @param model the {@link SpinnerModel} used by the spinner
    * @param columns the number of columns (essentially how many digits fit in the textfield)
-   * @param hideArrowButtons if {@link true}, the arrow buttons next to the text field are hidden.
+   * @param hideArrowButtons if {@code true}, the arrow buttons next to the text field are hidden.
    *   The value can still be adjusted by pressing the arrow keys on the keyboard.
    * @param decimalFormatPattern the format pattern that should be used for the numbers
    *   (see {@link java.text.DecimalFormat#applyPattern(String)})

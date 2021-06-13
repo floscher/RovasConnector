@@ -13,8 +13,8 @@ import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.tools.I18n;
 
+import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
-import app.rovas.josm.util.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
@@ -22,7 +22,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
   private final double minutes;
   private final Optional<Changeset> changeset;
 
-  public ApiCreateWorkReport(final UrlProvider urlProvider, final double minutes, @NotNull final Optional<Changeset> changeset) {
+  public ApiCreateWorkReport(final UrlProvider urlProvider, final int minutes, @NotNull final Optional<Changeset> changeset) {
     super(urlProvider, urlProvider.rulesCreateWorkReport());
     this.minutes = minutes;
     this.changeset = changeset;
@@ -32,24 +32,25 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
   protected ErrorCode[] getKnownErrorCodes() {
     return new ErrorCode[]{
       new ErrorCode(
+        Optional.of(0),
+        // This error is not expected to happen. The report is always marked as published!
+        I18n.marktr("The report is unpublished and no verifiers were invited!"),
+        ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
+      ),
+      new ErrorCode(
         Optional.of(-1),
-        I18n.marktr("You are not authorized to post reports in the set project!"),
+        I18n.marktr("You are not a shareholder in the project with ID set in the preferences!"),
         ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
       ),
         new ErrorCode(
           Optional.of(-2),
-          I18n.marktr("No user found for the supplied API key and token!"),
+          I18n.marktr("The report you are trying to create has the `date_started` earlier than the date when you registered for Rovas!"),
           ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
         ),
         new ErrorCode(
           Optional.of(-3),
           I18n.marktr("A work report was created, but no verifiers were invited as you have outstanding reports to verify. Please login to Rovas and verify the reports!"),
           ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
-        ),
-        new ErrorCode(
-          Optional.of(-4),
-          I18n.marktr("A work report was not created, because the date of the report predates your Rovas registration date, which is against the rules."),
-          ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
         ),
     };
   }
@@ -68,7 +69,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
     final URLConnection connection = sendPostRequest(
       credentials,
       Json.createObjectBuilder()
-        .add("wr_classification", RovasProperties.NACE_CLASSIFICATION)
+        .add("wr_classification", StaticConfig.NACE_CLASSIFICATION)
         .add("wr_description", I18n.tr(
           // i18n: {0} will be replaced by a link labeled: "Rovas connector plugin for JOSM"
           "Made edits to the OpenStreetMap project. This report was created automatically by the {0}",
@@ -80,7 +81,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
           "wr_web_address",
           changeset
             .map(Changeset::getId)
-            .map(it -> String.format(RovasProperties.ROVAS_PROOF_URL, it))
+            .map(it -> String.format(StaticConfig.ROVAS_PROOF_URL, it))
             .orElse("")
         )
         .add("parent_project_nid", credentials.getProjectId())
@@ -126,6 +127,11 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
     @NotNull
     public ContinueOption getContinueOption() {
       return continueOption;
+    }
+
+    @Override
+    public String toString() {
+      return super.toString() + " (continue with " + continueOption.name() + ')';
     }
   }
 }

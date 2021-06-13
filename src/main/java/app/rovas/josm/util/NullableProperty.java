@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 
-import org.openstreetmap.josm.data.preferences.AbstractProperty;
 import org.openstreetmap.josm.data.preferences.AbstractToStringProperty;
 
 /**
@@ -67,13 +66,5 @@ public class NullableProperty<T> {
   @SuppressWarnings("UnusedReturnValue")
   public boolean put(@Nullable final T value) {
     return delegate.put(Optional.ofNullable(value).filter(acceptableValues).orElse(pseudoNull));
-  }
-
-  /**
-   * Simple delegate to {@link AbstractToStringProperty#addListener(AbstractProperty.ValueChangeListener)}
-   * @param listener the listener to add
-   */
-  public void addListener(final AbstractProperty.ValueChangeListener<? super T> listener) {
-    delegate.addListener(listener);
   }
 }
