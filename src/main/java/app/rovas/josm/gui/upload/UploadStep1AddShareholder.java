@@ -1,8 +1,11 @@
 package app.rovas.josm.gui.upload;
 
 import java.awt.Window;
+import java.util.Objects;
 import java.util.Optional;
 import javax.swing.JOptionPane;
+
+import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -23,10 +26,17 @@ public class UploadStep1AddShareholder extends UploadStep {
   private final int minutes;
   private final Optional<Changeset> changeset;
 
-  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final int minutes, final Optional<Changeset> changeset) {
+  /**
+   * Creates the first upload step
+   * @param parent the parent dialog
+   * @param urlProvider the URL provider that supplies the URLs used
+   * @param minutes the number of minutes that will be reported to the server in the work report
+   * @param changeset the changeset that should be associated with the work report, can be empty, but never null
+   */
+  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final int minutes, @NotNull final Optional<Changeset> changeset) {
     super(parent, urlProvider);
     this.minutes = minutes;
-    this.changeset = changeset;
+    this.changeset = Objects.requireNonNull(changeset);
   }
 
   @Override
@@ -36,7 +46,11 @@ public class UploadStep1AddShareholder extends UploadStep {
   }
 
   private void showStep(final boolean forceCredentialsDialog, final int recursionDepth) {
-    final Optional<ApiCredentials> initialCredentials = RovasProperties.getApiCredentials();
+    final Optional<ApiCredentials> initialCredentials = ApiCredentials.createFrom(
+      RovasProperties.ROVAS_API_KEY.get(),
+      RovasProperties.ROVAS_API_TOKEN.get(),
+      RovasProperties.ACTIVE_PROJECT_ID.get()
+    );
 
     final ApiCredentials credentials;
     if (!initialCredentials.isPresent() || forceCredentialsDialog) {

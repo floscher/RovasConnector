@@ -18,6 +18,9 @@ import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The panel in the JOSM settings that contains the main settings a user can modify about the plugin
+ */
 public final class RovasPreferencePanel extends ApiCredentialsPanel {
   private final JEditorPane feeNote = GuiComponentFactory.createHyperlinkedMultilineLabel(
     "<html>" +
@@ -48,6 +51,9 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
   private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5, true);
   private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
+  /**
+   * Creates a new panel for modifying the preferences
+   */
   public RovasPreferencePanel() {
     super(false);
     extendGui();
@@ -72,11 +78,17 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
     add(Box.createVerticalGlue(), GBC_COLUMN_A.fill(GBC.VERTICAL));
   }
 
-
+  /**
+   * @return the inactivity tolerance that is currently set in the associated number spinner
+   */
   public int getInactivityTolerance() {
     return inactivityToleranceModel.getNumber().intValue();
   }
 
+  /**
+   * Sets the displayed inactivity tolerance
+   * @param value the new inactivity tolerance to set
+   */
   public void setInactivityTolerance(final Integer value) {
     inactivityToleranceModel.setValue(
       Utils.clamp(

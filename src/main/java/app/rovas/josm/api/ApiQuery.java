@@ -33,19 +33,32 @@ import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.TeeInputStream;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * A query to an API endpoint.
+ * The preferred way to query is {@link #query(ApiCredentials, Consumer, Consumer)} with callbacks.
+ * But there's also {@link #query(ApiCredentials)} that will return for success and throw an
+ * {@link ApiException} in case of an error.
+ * @param <EC> the type of error code that will be returned in case of an error
+ */
 public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
   private static final Pattern POSITIVE_INT_PATTERN = Pattern.compile("^-?[0-9]+$");
 
   protected final UrlProvider urlProvider;
   protected final URL queryUrl;
 
+  /**
+   * Creates a new API query
+   * @param urlProvider the URL provider from which we can obtain URLs
+   * @param queryUrl our endpoint URL that we will query
+   */
   public ApiQuery(final UrlProvider urlProvider, final URL queryUrl) {
     this.urlProvider = urlProvider;
     this.queryUrl = queryUrl;
   }
 
+
   /**
-   * @return the error codes that we know can happen for this endpoint
+   * @return an array of all "known" error codes that the server returns
    */
   protected abstract EC[] getKnownErrorCodes();
 
@@ -103,6 +116,13 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     }
   }
 
+  /**
+   * Sends a POST request to {@link #queryUrl}, authorizing with the given credentials and sending the given JSON request
+   * @param credentials the credentials that should be presented to the API server in order to authorize the request
+   * @param requestContent the JSON request that should be sent
+   * @return the opened {@link URLConnection} after the request has been sent already
+   * @throws ApiException.ConnectionFailure if in the process a connection error occured
+   */
   protected URLConnection sendPostRequest(final ApiCredentials credentials, final JsonObjectBuilder requestContent) throws ApiException.ConnectionFailure {
     final URLConnection connection;
     try {
@@ -197,16 +217,23 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     @NotNull
     private final String translatableMessage;
 
+    /** Creates a new error code */
     public ErrorCode(@NotNull final Optional<Integer> code, @NotNull final String translatableMessage) {
       this.code = Objects.requireNonNull(code);
       this.translatableMessage = Objects.requireNonNull(translatableMessage);
     }
 
+    /**
+     * @return the error code, might be empty if an unknown error occured that doesn't have a number yet
+     */
     @NotNull
     public Optional<Integer> getCode() {
       return code;
     }
 
+    /**
+     * @return the error message, should preferably be a string that can be translated by {@link I18n#tr(String, Object...)}
+     */
     @NotNull
     public String getTranslatableMessage() {
       return translatableMessage;

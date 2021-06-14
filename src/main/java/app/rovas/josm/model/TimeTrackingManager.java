@@ -13,7 +13,6 @@ import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.gui.TimeTrackingUpdateListener;
-import app.rovas.josm.util.LoggingUtil;
 import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.VisibleForTesting;
 
@@ -193,17 +192,15 @@ public final class TimeTrackingManager {
       if (firstUncommitted == null || lastUncommitted == null) {
         Logging.debug("[TTM] Tried to commit time, but fields were null (firstUncommitted={0},lastUncommitted={1})", firstUncommitted, lastUncommitted);
       } else {
-        LoggingUtil.logIfEnabled(
-          () -> MessageFormat.format(
-          "[TTM] Committing uncommitted time of {0,number,#} seconds ({1,number,#} – {2,number,#}) with {3,number,#} seconds tolerance",
-          lastUncommitted - firstUncommitted,
-          firstUncommitted,
-          lastUncommitted,
-          RovasProperties.INACTIVITY_TOLERANCE.get()
-          ),
-          () -> null,
-          Logging.LEVEL_DEBUG
-        );
+        if (Logging.isDebugEnabled()) {
+          Logging.debug(MessageFormat.format(
+            "[TTM] Committing uncommitted time of {0,number,#} seconds ({1,number,#} – {2,number,#}) with {3,number,#} seconds tolerance",
+            lastUncommitted - firstUncommitted,
+            firstUncommitted,
+            lastUncommitted,
+            RovasProperties.INACTIVITY_TOLERANCE.get()
+          ));
+        }
         this.committedSeconds = TimeConverterUtil.clampToSeconds(
           this.committedSeconds +
           Math.max(0, lastUncommitted - firstUncommitted) + // uncommitted time

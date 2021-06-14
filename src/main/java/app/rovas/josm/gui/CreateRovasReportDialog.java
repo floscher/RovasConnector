@@ -31,6 +31,10 @@ import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The dialog that asks the user, if a work report should be created.
+ * The time reported to Rovas can be modified before submitting.
+ */
 public class CreateRovasReportDialog extends JDialog {
   private static final GBC GBC_START_ALIGNED = GBC.eol().anchor(GBC.LINE_START).fill(GBC.HORIZONTAL);
 
@@ -41,7 +45,7 @@ public class CreateRovasReportDialog extends JDialog {
   private final JButton submitReportButton = new JButton(
     new AbstractAction(I18n.tr("Submit report"), ImageProvider.get("upload", ImageProvider.ImageSizes.SIDEBUTTON)) {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(final ActionEvent e) {
         new UploadStep1AddShareholder(
           CreateRovasReportDialog.this,
           UrlProvider.getInstance(),
@@ -63,7 +67,7 @@ public class CreateRovasReportDialog extends JDialog {
   public CreateRovasReportDialog(final Optional<Changeset> changeset, final long defaultReportedSeconds) {
     super(MainApplication.getMainFrame(), I18n.tr("Create work report"), true);
 
-    final int defaultReportedMinutes = (int) Math.min(Integer.MAX_VALUE, TimeConverterUtil.secondsToMinutes(defaultReportedSeconds));
+    final int defaultReportedMinutes = Math.min(Integer.MAX_VALUE, TimeConverterUtil.secondsToMinutes(defaultReportedSeconds));
 
     this.changeset = changeset;
     this.hoursModel = new SpinnerNumberModel(Utils.clamp(defaultReportedMinutes / 60, 0, TimeConverterUtil.MAX_HOURS), 0, TimeConverterUtil.MAX_HOURS, 1);

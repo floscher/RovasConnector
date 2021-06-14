@@ -12,10 +12,19 @@ import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The API query that creates the Asset Usage Record (AUR) for the work report that has been created.
+ */
 public final class ApiCreateAur extends ApiQuery<ApiQuery.ErrorCode> {
   private final int workReportId;
   private final int reportedMinutes;
 
+  /**
+   * Create the query
+   * @param urlProvider the {@link UrlProvider} from which we can obtain the API URL
+   * @param workReportId the ID of the work report for which we create the AUR
+   * @param reportedMinutes the number of minutes that were reported for the work report (for this amount we'll calculate the appropriate fee)
+   */
   public ApiCreateAur(final UrlProvider urlProvider, final int workReportId, final int reportedMinutes) {
     super(urlProvider, urlProvider.rulesCreateAUR());
     this.workReportId = workReportId;

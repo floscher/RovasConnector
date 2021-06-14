@@ -22,6 +22,9 @@ public class ResetTimerAction extends JosmAction {
 
   private static final String TRANSLATABLE_LABEL = I18n.marktr("Reset timer");
 
+  /**
+   * Creates the default action to reset the timer to an arbitrary value (0 by default).
+   */
   public ResetTimerAction() {
     super(
       I18n.tr(TRANSLATABLE_LABEL),
@@ -32,6 +35,10 @@ public class ResetTimerAction extends JosmAction {
     );
   }
 
+  /**
+   * Open the reset dialog
+   * @param e parameter is ignored (see {@link JosmAction#actionPerformed(ActionEvent)})
+   */
   @Override
   public void actionPerformed(final ActionEvent e) {
     final ResetPanel resetPanel = new ResetPanel();
@@ -44,15 +51,18 @@ public class ResetTimerAction extends JosmAction {
         JOptionPane.PLAIN_MESSAGE
       ) == JOptionPane.OK_OPTION
     ) {
-      TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(resetPanel.getMinutes() * 60);
+      TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(resetPanel.getMinutes() * 60L);
     }
   }
 
+  /**
+   * The panel for the reset dialog
+   */
   private static class ResetPanel extends JPanel {
     private final SpinnerNumberModel hourModel = new SpinnerNumberModel(0, 0, TimeConverterUtil.MAX_HOURS, 1);
     private final SpinnerNumberModel minuteModel = new SpinnerNumberModel(0, 0, 59, 1);
 
-    public ResetPanel() {
+    private ResetPanel() {
       super(new FlowLayout(FlowLayout.CENTER));
       add(GuiComponentFactory.createLabel(I18n.tr("Reset the timer to"), false));
       add(GuiComponentFactory.createSpinner(hourModel, 3, true));
@@ -61,7 +71,7 @@ public class ResetTimerAction extends JosmAction {
       add(GuiComponentFactory.createLabel(I18nStrings.trShorthandForMinutes(), false));
     }
 
-    public int getMinutes() {
+    private int getMinutes() {
       return hourModel.getNumber().intValue() * 60 + minuteModel.getNumber().intValue();
     }
   }

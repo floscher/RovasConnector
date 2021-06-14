@@ -9,6 +9,11 @@ import org.openstreetmap.josm.tools.I18n;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The API call that checks if the user is a shareholder or can be made a shareholder.
+ * See <a href="https://merit.world/rovas-api#/rule/post_rovas_rules_rules_proxy_check_or_add_shareholder">
+ * the API documentation for this endpoint</a>.
+ */
 public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode> {
   @Override
   protected ErrorCode[] getKnownErrorCodes() {
@@ -29,6 +34,10 @@ public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode>
     return new ErrorCode(code, translatableMessage);
   }
 
+  /**
+   * Creates the API query.
+   * @param urlProvider the URL provider, from which the URL is retrieved using {@link UrlProvider#rulesCheckOrAddShareholder()}.
+   */
   public ApiCheckOrAddShareholder(final UrlProvider urlProvider) {
     super(urlProvider, urlProvider.rulesCheckOrAddShareholder());
   }

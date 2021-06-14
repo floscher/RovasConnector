@@ -35,26 +35,36 @@ import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * The main panel of the dialog asking for API credentials, shows fields to modify API key, API token and project ID.
+ */
 public class ApiCredentialsPanel extends VerticallyScrollablePanel {
 
+  /** Grid bag constraints for the leftmost column */
   protected static final GBC GBC_COLUMN_A = GBCUtil.fixedToColumn(0,
     GBC.std().insets(5).span(1).anchor(GBC.LINE_END)
   );
+  /** Grid bag constraints spanning all four columns */
   protected static final GBC GBC_COLUMNS_ABCD = GBCUtil.fixedToColumn(0,
     GBC.std().insets(5).span(4).fill(GBC.HORIZONTAL).anchor(GBC.CENTER)
   );
+  /** Grid bag constraints for the second and third column */
   protected static final GBC GBC_COLUMNS_BC = GBCUtil.fixedToColumn(1,
     GBC.std().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START)
   );
+  /** Grid bag constraints for the second column */
   protected static final GBC GBC_COLUMN_B = GBCUtil.fixedToColumn(1,
     GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).weight(0.0, 0.0).anchor(GBC.LINE_START)
   );
+  /** Grid bag constraints for the fourth and rightmost column */
   protected static final GBC GBC_COLUMN_D = GBCUtil.fixedToColumn(3,
     GBC.std().insets(5).span(1).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START)
   );
+  /** Grid bag constraints for the third and fourth column, the two rightmost columns */
   protected static final GBC GBC_COLUMNS_CD = GBCUtil.fixedToColumn(2,
     GBC.std().insets(5).span(2).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START)
   );
+  /** Grid bag constraints for the three rightmost columns, columns 2-4 */
   protected static final GBC GBC_COLUMNS_BCD = GBCUtil.fixedToColumn(1,
     GBC.std().insets(5).span(3).fill(GBC.HORIZONTAL).anchor(GBC.LINE_START)
   );
@@ -86,6 +96,11 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     "</div></html>"
   );
 
+  /**
+   * Creates a new panel for entering API credentials.
+   * @param showValidationWarning iff this is {@code true}, then the text fields will complain
+   *   if they have nothing in them, or only whitespace.
+   */
   public ApiCredentialsPanel(final boolean showValidationWarning) {
     super();
     validationWarning.setVisible(false);
@@ -177,12 +192,20 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     add(Box.createHorizontalGlue(), GBC_COLUMN_D);
   }
 
+  /**
+   * @return the current value of the number spinner for the active project ID, will be {@code null}
+   *   if the value does not satisfy {@link ApiCredentials#isValidProjectId(Integer)}.
+   */
   public int getActiveProjectIdValue() {
     return Optional.of(activeProjectIdSpinnerModel.getNumber().intValue())
       .filter(ApiCredentials::isValidProjectId)
       .orElse(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE);
   }
 
+  /**
+   * Sets the displayed value of the spinner for the active project ID
+   * @param projectId the new project ID to set the spinner to
+   */
   public final void setActiveProjectIdValue(@Nullable final Integer projectId) {
     activeProjectIdSpinnerModel.setValue(
       Utils.clamp(
@@ -205,18 +228,32 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
     fieldSupplier.get().setText(Optional.ofNullable(newValue).map(String::trim).orElse(null));
   }
 
+  /**
+   * @return the current content of the API key textfield (trimmed using {@link String#trim()}), {@code null} if empty
+   */
   public final String getApiKeyValue() {
     return getStringFieldValue(() -> apiKeyField);
   }
 
+  /**
+   * Sets the content of the API key text field
+   * @param apiKey the new API key to set
+   */
   public final void setApiKeyValue(final String apiKey) {
     setStringFieldValue(() -> apiKeyField, apiKey);
   }
 
+  /**
+   * Sets the content of the API token text field
+   */
   public final String getApiTokenValue() {
     return getStringFieldValue(() -> apiTokenField);
   }
 
+  /**
+   * Sets the content of the API token field
+   * @param apiToken the new API token to set
+   */
   public final void setApiTokenValue(final String apiToken) {
     setStringFieldValue(() -> apiTokenField, apiToken);
   }

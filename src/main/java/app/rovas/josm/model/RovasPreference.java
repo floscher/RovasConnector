@@ -8,10 +8,16 @@ import org.openstreetmap.josm.tools.I18n;
 import app.rovas.josm.gui.RovasPreferencePanel;
 import app.rovas.josm.util.VisibleForTesting;
 
+/**
+ * The Rovas preference tab in the main JOSM settings
+ */
 public final class RovasPreference extends DefaultTabPreferenceSetting {
 
   private final RovasPreferencePanel prefPanel = new RovasPreferencePanel();
 
+  /**
+   * Creates a new Rovas preferences tab
+   */
   public RovasPreference() {
     super("rovas_logo", I18n.tr("Rovas"), I18n.tr("Preferences to configure timetracking with Rovas"));
   }

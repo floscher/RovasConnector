@@ -1,7 +1,5 @@
 package app.rovas.josm.model;
 
-import java.util.Optional;
-
 import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
@@ -16,11 +14,16 @@ import app.rovas.josm.util.NullableProperty;
  * The available (user-configurable) properties
  */
 public final class RovasProperties {
-
+  /**
+   * The API key that is used to authenticate the user when talking with the Rovas API
+   */
   public static final NullableProperty<String> ROVAS_API_KEY = new NullableProperty<>(
     new StringProperty("rovas.api-key", null),
     it -> !it.trim().isEmpty()
   );
+  /**
+   * The API token that is used to authenticate the user when talking with the Rovas API
+   */
   public static final NullableProperty<String> ROVAS_API_TOKEN = new NullableProperty<>(
     new StringProperty("rovas.api-token", null),
     it -> !it.trim().isEmpty()
@@ -73,10 +76,10 @@ public final class RovasProperties {
     // private constructor to avoid instantiation
   }
 
-  public static Optional<ApiCredentials> getApiCredentials() {
-    return ApiCredentials.createFrom(ROVAS_API_KEY.get(), ROVAS_API_TOKEN.get(), ACTIVE_PROJECT_ID.get());
-  }
-
+  /**
+   * Convenience method that persists the settings of an {@link ApiCredentialsPanel} in the appropriate preferences
+   * @param apiCredentialsPanel the panel from which the new values are read
+   */
   public static void persistApiCredentials(@NotNull final ApiCredentialsPanel apiCredentialsPanel) {
     ROVAS_API_KEY.put(apiCredentialsPanel.getApiKeyValue());
     ROVAS_API_TOKEN.put(apiCredentialsPanel.getApiTokenValue());

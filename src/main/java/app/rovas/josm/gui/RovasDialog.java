@@ -19,6 +19,9 @@ import app.rovas.josm.util.GBCUtil;
 import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.TimeConverterUtil;
 
+/**
+ * The main dialog that displays a live timer of the time that the plugin has tracked so far.
+ */
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private static final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
   private static final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
@@ -28,6 +31,9 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
   private final SideButton resetButton = new SideButton(new ResetTimerAction());
 
+  /**
+   * Creates a new dialog and registers it with the {@link TimeTrackingManager}
+   */
   public RovasDialog() {
     super(
       I18n.tr("Rovas"),

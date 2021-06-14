@@ -70,6 +70,7 @@ val generatePluginVersionClass by tasks.registering {
   val content = """
     package app.rovas.josm.gen;
     import javax.annotation.Generated;
+    /** Makes the plugin version accessible at runtime. */
     @Generated(value = "gradle", date = "${Instant.now()}")
     public final class PluginVersion {
       public static final String VERSION_NAME = "${GitDescriber(projectDir).describe(trimLeading = true)}";

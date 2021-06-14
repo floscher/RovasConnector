@@ -1,6 +1,7 @@
 package app.rovas.josm.gui.upload;
 
 import java.awt.Window;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.openstreetmap.josm.data.osm.Changeset;
@@ -17,6 +18,14 @@ public class UploadStep2CreateWorkReport extends UploadStep {
   private final int minutes;
   private final Optional<Changeset> changeset;
 
+  /**
+   * Creates the second upload step
+   * @param parent the parent dialog
+   * @param urlProvider the URL provider, which can supply the URLs
+   * @param credentials the credentials used to authenticate with the API
+   * @param minutes the number of minutes that should be reported with tha work report
+   * @param changeset the changeset that should be associated with the work report, can be empty but not null
+   */
   public UploadStep2CreateWorkReport(
     final Window parent,
     final UrlProvider urlProvider,
@@ -25,9 +34,9 @@ public class UploadStep2CreateWorkReport extends UploadStep {
     final Optional<Changeset> changeset
   ) {
     super(parent, urlProvider);
-    this.credentials = credentials;
+    this.credentials = Objects.requireNonNull(credentials);
     this.minutes = minutes;
-    this.changeset = changeset;
+    this.changeset = Objects.requireNonNull(changeset);
   }
 
   @Override

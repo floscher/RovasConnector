@@ -22,6 +22,14 @@ public class UploadStep3CreateAur extends UploadStep {
   private final int workReportId;
   private final int reportedMinutes;
 
+  /**
+   * Creates the third upload step for creating the AUR
+   * @param parent the parent dialog
+   * @param urlProvider the URL provider that supplies the URLs used
+   * @param credentials the credentials used to authenticate with the API server
+   * @param workReportId the ID of the work report for which an AUR should be created
+   * @param reportedMinutes the number of minutes that were reported with the work report
+   */
   public UploadStep3CreateAur(final Window parent, final UrlProvider urlProvider, final ApiCredentials credentials, final int workReportId, final int reportedMinutes) {
     super(parent, urlProvider);
     this.credentials = credentials;

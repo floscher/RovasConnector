@@ -17,11 +17,20 @@ import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
 
+/**
+ * API query for creating a work report
+ */
 public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
 
   private final double minutes;
   private final Optional<Changeset> changeset;
 
+  /**
+   * Creates a new query to the API endpoint for creating work reports
+   * @param urlProvider the URL provider from which we get the URL
+   * @param minutes the number of minutes that should be reported
+   * @param changeset the changeset for which this work report is created, can be empty if there is no changeset
+   */
   public ApiCreateWorkReport(final UrlProvider urlProvider, final int minutes, @NotNull final Optional<Changeset> changeset) {
     super(urlProvider, urlProvider.rulesCreateWorkReport());
     this.minutes = minutes;
@@ -107,7 +116,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
      */
     public enum ContinueOption {
       /**
-       * Shows the original dialog again, so the user can try again
+       * Shows the original dialog again, so the user can try again. No AUR is created.
        */
       SHOW_WORK_REPORT_DIALOG_AGAIN,
       /**
@@ -119,6 +128,12 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
     @NotNull
     private final ContinueOption continueOption;
 
+    /**
+     * Creates a new error code for the work report
+     * @param code the code number of the error, or leave empty for errors unknown to the server
+     * @param translatableMessage a message describing the error, that can be passed into {@link I18n#tr}
+     * @param continueOption one of {@link ContinueOption}, never null
+     */
     public ErrorCode(@NotNull final Optional<Integer> code, @NotNull final String translatableMessage, @NotNull final ContinueOption continueOption) {
       super(code, translatableMessage);
       this.continueOption = Objects.requireNonNull(continueOption);
