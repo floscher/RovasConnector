@@ -33,6 +33,7 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
     prefPanel.setApiTokenValue(RovasProperties.ROVAS_API_TOKEN.get());
     prefPanel.setActiveProjectIdValue(RovasProperties.ACTIVE_PROJECT_ID.get());
     prefPanel.setInactivityTolerance(RovasProperties.INACTIVITY_TOLERANCE.get());
+    prefPanel.setUnpaidEditor(RovasProperties.UNPAID_EDITOR.get());
     gui.createPreferenceTab(this).add(prefPanel, GBC.eol().fill());
   }
 
@@ -40,6 +41,7 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
   public boolean ok() {
     RovasProperties.persistApiCredentials(prefPanel); // API key and token, active project ID
     RovasProperties.INACTIVITY_TOLERANCE.put(prefPanel.getInactivityTolerance());
+    RovasProperties.UNPAID_EDITOR.put(prefPanel.isUnpaidEditor());
     return false; // no restart required
   }
 }

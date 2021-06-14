@@ -71,6 +71,10 @@ public final class RovasProperties {
   public static final LongProperty ALREADY_TRACKED_TIME = new LongProperty("rovas.already-tracked-time", 0);
 
   public static final BooleanProperty DEVELOPER = new BooleanProperty("rovas.developer", false);
+  /**
+   * This property denotes, if the user is not paid by a company for editing OSM. Only if this is true, work reports should be created.
+   */
+  public static final BooleanProperty UNPAID_EDITOR = new BooleanProperty("rovas.is-unpaid-editor", true);
 
   private RovasProperties() {
     // private constructor to avoid instantiation

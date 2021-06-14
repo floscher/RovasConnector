@@ -2,6 +2,7 @@ package app.rovas.josm.gui;
 
 import java.util.Optional;
 import javax.swing.Box;
+import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,6 +52,8 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
   private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5, true);
   private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
+  private final JCheckBox unpaidEditorCheckbox = new JCheckBox("<html>" + I18n.tr("I am not paid for JOSM work by a company (you will only be prompted to send a work report, if you confirm this)") + "</html>");
+
   /**
    * Creates a new panel for modifying the preferences
    */
@@ -75,6 +78,9 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
     add(inactivityToleranceValue, GBC_COLUMN_B);
     add(inactivityToleranceDescription, GBC_COLUMNS_CD);
 
+    add(new JPanel(), GBC_COLUMN_A);
+    add(unpaidEditorCheckbox, GBC_COLUMNS_BCD);
+
     add(Box.createVerticalGlue(), GBC_COLUMN_A.fill(GBC.VERTICAL));
   }
 
@@ -96,5 +102,13 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
         RovasProperties.INACTIVITY_TOLERANCE_MIN_VALUE,
         RovasProperties.INACTIVITY_TOLERANCE_MAX_VALUE)
     );
+  }
+
+  public boolean isUnpaidEditor() {
+    return unpaidEditorCheckbox.isSelected();
+  }
+
+  public void setUnpaidEditor(final boolean isUnpaidEditor) {
+    unpaidEditorCheckbox.setSelected(isUnpaidEditor);
   }
 }
