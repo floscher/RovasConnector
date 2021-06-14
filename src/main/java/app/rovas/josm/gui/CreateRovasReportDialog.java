@@ -132,7 +132,7 @@ public class CreateRovasReportDialog extends JDialog {
   private void onTimeChange() {
     GuiHelper.runInEDT(() -> {
       final int minutes = 60 * hoursModel.getNumber().intValue() + minutesModel.getNumber().intValue();
-      calculatedChronLabel.setText(I18n.tr("After approving the time by two Rovas-selected users, you will earn {0} chrons", TimeConverterUtil.minutesToFractionalChrons(minutes)));
+      calculatedChronLabel.setText(I18n.tr("After approving the time by two Rovas-selected users, you will earn {0,number,#.##} chrons", TimeConverterUtil.minutesToChrons(minutes)));
       submitReportButton.setEnabled(minutes > 0);
     });
   }

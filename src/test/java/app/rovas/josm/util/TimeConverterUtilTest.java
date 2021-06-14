@@ -37,28 +37,27 @@ public class TimeConverterUtilTest implements UtilityClassTest<TimeConverterUtil
 
   @Test
   protected void minutesToFractionalChrons() {
-    assertMinutesToChrons("0", 0, Integer.MIN_VALUE);
-    assertMinutesToChrons("0", 0, 0);
-    assertMinutesToChrons("⅙", 1 / 6.0, 1);
-    assertMinutesToChrons("⅓", 1 / 3.0, 2);
-    assertMinutesToChrons("½", 1 / 2.0, 3);
-    assertMinutesToChrons("⅔", 2 / 3.0, 4);
-    assertMinutesToChrons("⅚", 5 / 6.0, 5);
-    assertMinutesToChrons("1", 1, 6);
-    assertMinutesToChrons("5 ⅚", 5 + 5 / 6.0, 35);
-    assertMinutesToChrons("7", 7, 42);
-    assertMinutesToChrons("10", 10, 60);
-    assertMinutesToChrons("20", 20, 120);
-    assertMinutesToChrons("288 ⅙", 288 + 1 / 6.0, 1729);
+    assertMinutesToChrons(0, Integer.MIN_VALUE);
+    assertMinutesToChrons(0, 0);
+    assertMinutesToChrons(1 / 6.0, 1);
+    assertMinutesToChrons(1 / 3.0, 2);
+    assertMinutesToChrons(1 / 2.0, 3);
+    assertMinutesToChrons(2 / 3.0, 4);
+    assertMinutesToChrons(5 / 6.0, 5);
+    assertMinutesToChrons(1, 6);
+    assertMinutesToChrons(5 + 5 / 6.0, 35);
+    assertMinutesToChrons(7, 42);
+    assertMinutesToChrons(10, 60);
+    assertMinutesToChrons(20, 120);
+    assertMinutesToChrons(288 + 1 / 6.0, 1729);
 
-    assertMinutesToChrons("357913939 ⅔", 357913939 + 4 / 6.0, TimeConverterUtil.MAX_MINUTES - 1);
-    assertMinutesToChrons("357913939 ⅚", 357913939 + 5 / 6.0, TimeConverterUtil.MAX_MINUTES);
-    assertMinutesToChrons("357913939 ⅚", 357913939 + 5 / 6.0, Integer.MAX_VALUE);
+    assertMinutesToChrons(357913939 + 4 / 6.0, TimeConverterUtil.MAX_MINUTES - 1);
+    assertMinutesToChrons(357913939 + 5 / 6.0, TimeConverterUtil.MAX_MINUTES);
+    assertMinutesToChrons(357913939 + 5 / 6.0, Integer.MAX_VALUE);
   }
 
-  private void assertMinutesToChrons(final String expectedFraction, final double expectedDecimal, final int actualMinutes) {
-    Logging.info("Expecting that {0,number,#} minutes are converted to {1} chrons = {2,number,#.########} chrons", actualMinutes, expectedFraction, expectedDecimal);
-    assertEquals(expectedFraction, TimeConverterUtil.minutesToFractionalChrons(actualMinutes));
+  private void assertMinutesToChrons(final double expectedDecimal, final int actualMinutes) {
+    Logging.info("Expecting that {0,number,#} minutes are converted to {1,number,#.##########} chrons", actualMinutes, expectedDecimal);
     final double actualDecimal = TimeConverterUtil.minutesToChrons(actualMinutes);
     assertEquals(expectedDecimal, actualDecimal, 1e-9, () -> String.format(Locale.ROOT, "Expected %f\n  actual %f\n", expectedDecimal, actualDecimal));
   }

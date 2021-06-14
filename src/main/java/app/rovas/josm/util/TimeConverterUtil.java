@@ -59,32 +59,4 @@ public final class TimeConverterUtil {
   public static double minutesToChrons(final int minutes) {
     return Utils.clamp(minutes, 0, MAX_MINUTES) / 6.0;
   }
-
-  public static String minutesToFractionalChrons(final int minutes) {
-    final int realMinutes = Utils.clamp(minutes, 0, MAX_MINUTES);
-    final String fraction;
-    switch (realMinutes % 6) {
-      case 1:
-        fraction = "⅙";
-        break;
-      case 2:
-        fraction = "⅓";
-        break;
-      case 3:
-        fraction = "½";
-        break;
-      case 4:
-        fraction = "⅔";
-        break;
-      case 5:
-        fraction = "⅚";
-        break;
-      default:
-        fraction = "";
-        break;
-    }
-    final int whole = (realMinutes / 6);
-    return (whole != 0 || fraction.isEmpty() ? whole : "") +
-      (fraction.isEmpty() || whole == 0 ? fraction : " " + fraction);
-  }
 }
