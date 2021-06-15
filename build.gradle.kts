@@ -1,5 +1,6 @@
 import org.openstreetmap.josm.gradle.plugin.GitDescriber
 import proguard.gradle.ProGuardTask
+import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 
@@ -103,7 +104,10 @@ josm {
   initialPreferences.set("<tag key='rovas.developer' value='true'/>")
   josmCompileVersion = "17919"
   manifest {
+    author = "Florian Schäfer (floscher)"
+    canLoadAtRuntime = true
     description = "A plugin to keep track of the time spent for mapping. Can be used to report that time to https://rovas.app ."
+    iconPath = "images/rovas_logo.svg"
     mainClass = "app.rovas.josm.RovasPlugin"
     minJosmVersion = "17717"
     /*
@@ -111,7 +115,7 @@ josm {
      * 17238: AbstractTextComponentValidator.addChangeListener()
      * 16438: MapFrame.getToggleDialog()
      */
-    iconPath = "images/rovas_logo.svg"
+    website = URL("https://wiki.openstreetmap.org/wiki/JOSM/Plugins/RovasConnector")
   }
 }
 
