@@ -77,12 +77,9 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
           I18nStrings.trShorthandForHours() +
           "&nbsp;<strong style='font-size:1.8em'>%02d</strong>&#8239;" +
           I18nStrings.trShorthandForMinutes() +
-          "&nbsp;<span style='color:#bbbbbb'>(%d&nbsp;" +
-          I18n.tr("seconds") +
-          ")</span></html>",
+          "</html>",
         minutes / 60,
-        minutes % 60,
-        n
+        minutes % 60
       ))
     );
   }

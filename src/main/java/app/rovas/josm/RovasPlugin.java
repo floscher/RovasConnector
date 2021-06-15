@@ -1,12 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package app.rovas.josm;
 
-import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.util.Optional;
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.data.osm.Changeset;
@@ -77,37 +72,6 @@ public final class RovasPlugin extends Plugin {
         }
       }).start();
     });
-
-    MainApplication.getMainFrame().getMenu().add(createRovasMenu());
-  }
-
-  /**
-   *
-   * @deprecated will be removed for production
-   */
-  @Deprecated
-  private JMenu createRovasMenu() {
-    final JMenu rovasMenu = new JMenu("Rovas");
-
-    final JMenuItem description = new JMenuItem("This menu will NOT be present in the production version!");
-    description.setFont(description.getFont().deriveFont(Font.PLAIN));
-    description.setEnabled(false);
-    rovasMenu.add(description);
-
-    final JMenuItem triggerReportItem = new JMenuItem(new AbstractAction("Open the work report upload dialog") {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        if (RovasProperties.UNPAID_EDITOR.get()) {
-          new CreateRovasReportDialog(Optional.empty(), TimeTrackingManager.getInstance().commit());
-        } else {
-          new Notification(I18n.tr("A Rovas work report can not be created, as your work is paid by a company. The setting can be changed in the Rovas Connector plugin preferences."))
-            .setIcon(JOptionPane.INFORMATION_MESSAGE)
-            .show();
-        }
-      }
-    });
-    rovasMenu.add(triggerReportItem);
-    return rovasMenu;
   }
 
   @Override
