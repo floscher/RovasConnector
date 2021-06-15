@@ -52,7 +52,7 @@ public final class RovasPlugin extends Plugin {
             TimeTrackingManager.getInstance().commit()
           );
         } else {
-          new Notification(I18n.tr("You selected in the JOSM preferences that you are a being paid for editing OSM. So you can't submit work reports to Rovas."))
+          new Notification(I18n.tr("A Rovas work report can not be created, as your work is paid by a company. The setting can be changed in the Rovas Connector plugin preferences."))
             .setIcon(JOptionPane.INFORMATION_MESSAGE)
             .show();
         }
@@ -81,7 +81,7 @@ public final class RovasPlugin extends Plugin {
         if (RovasProperties.UNPAID_EDITOR.get()) {
           new CreateRovasReportDialog(Optional.empty(), TimeTrackingManager.getInstance().commit());
         } else {
-          new Notification(I18n.tr("You selected in the JOSM preferences that you are a being paid for editing OSM. So you can't submit work reports to Rovas."))
+          new Notification(I18n.tr("A Rovas work report can not be created, as your work is paid by a company. The setting can be changed in the Rovas Connector plugin preferences."))
             .setIcon(JOptionPane.INFORMATION_MESSAGE)
             .show();
         }
