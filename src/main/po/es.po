@@ -1,10 +1,10 @@
-# Translations for the JOSM plugin 'RovasConnector' (sk)
+# Translations for the JOSM plugin 'RovasConnector' (es)
 # Copyright (C) 2021
 # This file is distributed under the same license as the josm-plugin_RovasConnector package.
 # FIRST AUTHOR, YEAR.
 #
 # Translators:
-# Alexander Zatko, 2021
+# Jorge Sanz, 2021
 #
 msgid ""
 msgstr ""
@@ -12,216 +12,221 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-06-17 15:56+0000\n"
 "PO-Revision-Date: 2021-06-16 19:43+0000\n"
-"Language-Team: Slovak (https://www.transifex.com/josm/teams/2544/sk/)\n"
+"Language-Team: Spanish (https://www.transifex.com/josm/teams/2544/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "(error {0})"
-msgstr "(chyba {0})"
+msgstr "(error {0})"
 
 msgid "(the parent project of the created work reports)"
-msgstr "(projekt, do ktorého patrí vytvorený pracovný výkaz)"
+msgstr "(el proyecto principal de los informes de trabajo creados)"
 
 msgid ""
 "<strong>Please note,</strong> by creating a work report you also agree to "
 "verify (typically) two work reports submitted by other users for each of "
 "your submitted work reports."
 msgstr ""
-"<strong>Upozornenie;</strong> za každý váš pracovný výkaz budete vyzvaný/á "
-"overiť (typicky) dva výkazy zaslané inými používateľmi."
+"<strong>Tenga en cuenta,</strong> al crear un informe de trabajo, también "
+"acepta verificar (normalmente) dos informes de trabajo enviados por otros "
+"usuarios para cada uno de sus informes de trabajo enviados."
 
 msgid ""
 "A Rovas work report can not be created, as your work is paid by a company. "
 "The setting can be changed in the Rovas Connector plugin preferences."
 msgstr ""
-"Pracovný výkaz nemôže byť v Rovasi vytvorený, pretože vaša práca je platená "
-"firmou. Toto nastavenie môžte zmeniť v predvoľbách pre Rovas Connector "
-"plugin."
+"No se puede crear un informe de trabajo de Rovas, ya que su trabajo lo paga "
+"una empresa. La configuración se puede cambiar en las preferencias del "
+"complemento de Rovas Connector."
 
 msgid ""
 "A work report could not be created, because the API key and/or token set in "
 "the preferences are incorrect, or your Rovas access was restricted. Please "
 "log into Rovas to verify your credentials and status."
 msgstr ""
-"Pracovný výkaz nebolo možné vytvoriť, pretože API kľúč alebo API token "
-"nastavené v predvoľbách sú nesprávne alebo bol obmedzený vaše Rovas "
-"privilégiá. Prihláste sa do Rovasa a overte svoje prihlasovacie údaje a "
-"stav."
+"No se pudo crear un informe de trabajo porque la clave API y/o el token "
+"configurado en las preferencias son incorrectos o su acceso a Rovas fue "
+"restringido. Inicie sesión en Rovas para verificar sus credenciales y "
+"estado."
 
 msgid ""
 "A work report was created, but no verifiers were invited as you have "
 "outstanding reports to verify. Please login to Rovas and verify the reports!"
 msgstr ""
-"Pracovný výkaz bol vytvorený, ale overovatelia preň neboli pozvaní, pretože "
-"na overenie máte v Rovasi správy na overenie. Prihláste sa do Rovasa a "
-"overte ich."
+"Se creó un informe de trabajo, pero no se invitó a verificadores ya que "
+"tiene informes pendientes para verificar. ¡Inicie sesión en Rovas y "
+"verifique los informes!"
 
 msgid "API key"
-msgstr "API kľúč"
+msgstr "API key"
 
 msgid "API token"
 msgstr "API token"
 
 msgid "Active time"
-msgstr "Aktívny čas"
+msgstr "Tiempo activo"
 
 msgid ""
 "After approving the time by two Rovas-selected users, you will earn "
 "{0,number,#.##} chrons"
 msgstr ""
-"Po schválení uvedeného času dvoma Rovasom vybranými používateľmi získate "
-"{0,number,#.##} chronov"
+"Después de que se apruebe la hora por dos usuarios seleccionados por Rovas, "
+"ganarás {0,number,#.##} chrons"
 
 msgid "All fields have to be filled out!"
-msgstr "Všetky polia musia byť vyplnené!"
+msgstr "¡Todos los campos deben completarse!"
 
 msgid "An error occured!: {0}{1}"
-msgstr "Nastala chyba!: {0}{1}"
+msgstr "¡Ocurrió un error!: {0} {1}"
 
 msgid "An unknown error occurred!"
-msgstr "Vyskytla sa neznáma chyba!"
+msgstr "¡Ha ocurrido un error desconocido!"
 
 msgid "Cancel"
-msgstr "Zrušiť"
+msgstr "Cancelar"
 
 msgid ""
 "Could not find any project with the project ID that is set in the "
 "preferences!"
 msgstr ""
-"Nepodarilo sa nájsť žiadny projekt s číslom, ktoré je nastavené v "
-"predvoľbách!"
+"¡No se pudo encontrar ningún proyecto con el ID de proyecto configurado en "
+"las preferencias!"
 
 msgid "Create work report"
-msgstr "Vytvoriť pracovný výkaz"
+msgstr "Crear informe de trabajo"
 
 msgid "Creating a work report in Rovas"
-msgstr "Vytváranie pracovného výkazu v Rovasi"
+msgstr "Creando un informe de trabajo en Rovas"
 
 msgid "Creating map data with JOSM"
-msgstr "Vytváranie mapových dát s JOSM"
+msgstr "Crear datos de mapas con JOSM"
 
 msgid "Do you want to modify the API credentials and then retry?"
-msgstr "Chcete upraviť nastavenia API a potom skúsiť odoslať znova?"
+msgstr ""
+"¿Quieres modificar las credenciales de la API y luego volver a intentarlo?"
 
 msgid "Enter API credentials"
-msgstr "Zadajte API prihlasovacie údaje"
+msgstr "Ingrese las credenciales de la API"
 
 msgid "Error"
-msgstr "Chyba"
+msgstr "Error"
 
 msgid "Error. Retry?"
-msgstr "Chyba. Skúsiť znovu?"
+msgstr "Error. ¿Reintentarr?"
 
 msgid "Failed to create AUR!"
-msgstr "Nepodarilo sa vytvoriť AUR!"
+msgstr "¡No se pudo crear AUR!"
 
 msgid ""
 "I am not paid for JOSM work by a company (you will only be prompted to send "
 "a work report, if you confirm this)"
 msgstr ""
-"Za moju prácu v JOSM nie som platený/á firmou (pracovný výkaz budete môcť "
-"zaslať len ak potvrdíte tento výrok)"
+"No me paga una empresa por el trabajo de JOSM (solo se le pedirá que envíe "
+"un informe de trabajo, si lo confirma)"
 
 msgid ""
 "Made edits to the OpenStreetMap project. This report was created "
 "automatically by the {0}"
 msgstr ""
-"Vykonal/a úpravy v projekte OpenStreetMap. Tento výkaz bol vytvorený "
-"automaticky programom {0}"
+"Realicé ediciones en el proyecto OpenStreetMap. Este informe fue creado "
+"automáticamente por {0}"
 
 msgid "Open project page in Rovas"
-msgstr "Otvoriť stránku projektu v Rovasi"
+msgstr "Abrir página del proyecto en Rovas"
 
 msgid "Preferences to configure timetracking with Rovas"
-msgstr "Konfiguračné predvoľby pre Rovas konektor"
+msgstr "Preferencias para configurar el seguimiento de tiempo con Rovas"
 
 msgid "Project ID"
-msgstr "ID Projektu"
+msgstr "Projecto ID"
 
 msgid "Reported labor time"
-msgstr "Uvedený odpracovaný čas"
+msgstr "Tiempo de trabajo informado"
 
 msgid "Reset the timer (either to 0 or an arbitrary value)"
-msgstr "Resetovať časomerač (vynulovať, alebo nastaviť ľubovoľnú hodnotu)"
+msgstr "Restablecer el temporizador (ya sea a 0 o un valor arbitrario)"
 
 msgid "Reset the timer to"
-msgstr "Nastaviť časomerač na"
+msgstr "Restablezca el temporizador a"
 
 msgid "Reset timer"
-msgstr "Resetovať časomerač"
+msgstr "Restablecer horas"
 
 msgid "Rovas"
 msgstr "Rovas"
 
 msgid "Rovas connector plugin"
-msgstr "Rovas connector plugin"
+msgstr "Complemento de conector Rovas"
 
 msgid "Rovas connector plugin for JOSM"
-msgstr "Rovas connector plugin pre JOSM"
+msgstr "Complemento de conector Rovas para JOSM"
 
 msgid "Rovas profile page"
-msgstr "Stránky profilu v Rovasi"
+msgstr "Página de perfil de Rovas"
 
 msgid "See the {0} for more information"
-msgstr "Pre ďalšie informácie viď. {0}"
+msgstr "Consulte {0} para obtener más información."
 
 msgid "Submit report"
-msgstr "Odoslať výkaz"
+msgstr "Enviar reporte"
 
 msgid "The project ID must be ≥ {0}!"
-msgstr "Číslo projektu musí byť ≥ {0}!"
+msgstr "¡El ID del proyecto debe ser ≥ {0}!"
 
 msgid "The report is unpublished and no verifiers were invited!"
-msgstr "Výkaz nie je zverejnený a neboli pozvaní žiadni overovatelia!"
+msgstr "El informe no está publicado y no se invitó a ningún verificador."
 
 msgid ""
 "The report you are trying to create has the `date_started` earlier than the "
 "date when you registered for Rovas!"
 msgstr ""
-"Správa, ktorú sa pokúšate vytvoriť, má hodnotu „date_started“ skoršiu, ako "
-"je dátum, keď ste sa zaregistrovali v Rovasi!"
+"¡El informe que está intentando crear tiene el `date_started` anterior a la "
+"fecha en que se registró en Rovas!"
 
 msgid "There was a connection issue!"
-msgstr "Vyskytol sa problém s pripojením!"
+msgstr "¡Hubo un problema de conexión!"
 
 msgid "There was an error decoding the server response!"
-msgstr "Chyba pri čítaní odpovede zo servera!"
+msgstr "Hubo un error al decodificar la respuesta del servidor!"
 
 msgid "This field has to be filled out!"
-msgstr "Toto pole musí byť vyplnené!"
+msgstr "¡Este campo debe ser completado!"
 
 msgid "Time tracking with Rovas"
-msgstr "Mreranie času s Rovasom"
+msgstr "Seguimiento del tiempo con Rovas"
 
 msgid "Timer tolerance"
-msgstr "Toleranica časomerača"
+msgstr "Tolerancia del temporizador"
 
 msgid ""
 "To reward the authors of this {1}, a fee equal to {0}% of the amount you "
 "earn from reports created by the plugin will be levied on those earnings."
 msgstr ""
-"Na odmenu autorov {1} vám bude odpočítaných {0}% zo sumy, ktorú získate za "
-"pracovné výkazy vytvorené týmto JOSM doplnkom."
+"Para recompensar a los autores de este {1}, se cobrará una tarifa "
+"equivalente al {0}% de la cantidad que gane de los informes creados por el "
+"complemento sobre esos ingresos."
 
 msgid "Values for these fields can be found on your {0}."
-msgstr "Hodnoty pre tieto polia nájdete na vašej {0}."
+msgstr "Los valores de estos campos se pueden encontrar en su {0} ."
 
 msgid ""
 "You are not a shareholder in the project with ID set in the preferences!"
-msgstr "Nie ste podielnikom projektu s ID, nastaveným v predvolbách!"
+msgstr ""
+"¡No eres un accionista del proyecto con el ID establecido en las "
+"preferencias!"
 
 msgid ""
 "You could not have been made a shareholder of the project with the ID set in"
 " the preferences."
 msgstr ""
-"Nebolo možné vás spraviť podielnikom v projekte, ktorého ID je nastavené v "
-"predvolbách."
+"No puedes convertirte en accionista del proyecto con el ID establecido en "
+"las preferencias."
 
 msgid "Your {0} was created successfully!"
-msgstr "Váš {0} bol úspešne vytvorený!"
+msgstr "¡Tu {0} se creó correctamente!"
 
 msgctxt "shorthand for hours"
 msgid "h"
@@ -232,28 +237,28 @@ msgid "m"
 msgstr "m"
 
 msgid "rules page in Rovas"
-msgstr "stránka pravidiel v Rovasi"
+msgstr "página de reglas en Rovas"
 
 msgid "seconds"
-msgstr "sekundy"
+msgstr "segundos"
 
 msgid "the lag in seconds after last edit to be counted as active time"
 msgstr ""
-"dĺžka časového intervalu meraná od ostatnej úpravy, ktorý sa bude zarátavať "
-"ako aktívny čas"
+"el retraso en segundos después de la última edición se contará como tiempo "
+"activo"
 
 msgid "work report"
-msgstr "pracovný výkaz"
+msgstr "reporte de trabajo"
 
 msgid ""
 "{0}% fee levied by the ''JOSM Rovas connector'' project for using the plugin"
 msgstr ""
-"{0}% poplatok projektu ''JOSM Rovas connector'', za použitie jeho JOSM "
-"doplnku"
+"{0}% de tarifa cobrada por el proyecto ''conector JOSM Rovas'' por usar el "
+"complemento"
 
 msgid ""
 "A plugin to keep track of the time spent for mapping. Can be used to report "
 "that time to https://rovas.app ."
 msgstr ""
-"Doplnok na sledovanie času stráveného mapovaním. Môže byť použitý na "
-"nahlásenie toho času na https://rovas.app."
+"Un complemento para realizar un seguimiento del tiempo dedicado al mapeo. Se"
+" puede usar para informar ese tiempo a https://rovas.app ."

@@ -34,7 +34,7 @@ javadoc:
 
 build:
   stage: test
-  script: ./gradlew test jacocoTestReport --stacktrace --build-cache
+  script: ./gradlew test jacocoTestReport pmdMain spotbugsMain
   artifacts:
     reports:
       junit:

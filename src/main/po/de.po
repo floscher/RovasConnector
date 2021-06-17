@@ -1,0 +1,267 @@
+# Translations for the JOSM plugin 'RovasConnector' (de)
+# Copyright (C) 2021
+# This file is distributed under the same license as the josm-plugin_RovasConnector package.
+# FIRST AUTHOR, YEAR.
+#
+# Translators:
+# Florian Schäfer, 2021
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_RovasConnector 6a0cd5a\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-17 15:56+0000\n"
+"PO-Revision-Date: 2021-06-16 19:43+0000\n"
+"Language-Team: German (https://www.transifex.com/josm/teams/2544/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "(error {0})"
+msgstr "(Fehler {0})"
+
+msgid "(the parent project of the created work reports)"
+msgstr "(Das Eltern-Projekt für die eingereichten Arbeitsberichte)"
+
+msgid ""
+"<strong>Please note,</strong> by creating a work report you also agree to "
+"verify (typically) two work reports submitted by other users for each of "
+"your submitted work reports."
+msgstr ""
+"<strong>Bitte beachten:</strong> Durch Erstellen eines Arbeitsberichts "
+"stimmen Sie zu, für jeden Ihrer eigenen Arbeitsberichte (üblicherweise zwei)"
+" andere Arbeitsberichte zu verifizieren, die andere Nutzer eingereicht "
+"haben."
+
+msgid ""
+"A Rovas work report can not be created, as your work is paid by a company. "
+"The setting can be changed in the Rovas Connector plugin preferences."
+msgstr ""
+"Ein Rovas-Arbeitsbericht konnte nicht erstellt werden, weil Ihre Arbeit von "
+"einem Unternehmen bezahlt wird. Diese Einstellung kann in den Einstellungen "
+"der Rovas-Verbinder-Erweiterung geändert werden."
+
+msgid ""
+"A work report could not be created, because the API key and/or token set in "
+"the preferences are incorrect, or your Rovas access was restricted. Please "
+"log into Rovas to verify your credentials and status."
+msgstr ""
+"Ein Arbeitsbericht konnte nicht erstellt werden, weil ein falscher API-"
+"Schlüssel und/oder ein falsches API-Token in den Einstellungen hinterlegt "
+"ist, oder Ihr Zugang zu Rovas ist eingeschränkt worden. Bitte melden Sie "
+"sich bei Rovas an und überprüfen Sie ihre Zugangsdaten und den Status Ihres "
+"Rovas-Kontos."
+
+msgid ""
+"A work report was created, but no verifiers were invited as you have "
+"outstanding reports to verify. Please login to Rovas and verify the reports!"
+msgstr ""
+"Ein Arbeitsbericht wurde erstellt, aber keine Verifizierer wurden "
+"eingeladen, weil Sie noch ausstehende Berichte haben, die auf Verifizierung "
+"warten. Bitte melden Sie sich bei Rovas  an und verifizieren Sie die "
+"Berichte!"
+
+msgid "API key"
+msgstr "API-Schlüssel"
+
+msgid "API token"
+msgstr "API-Token"
+
+msgid "Active time"
+msgstr "Aktive Zeit"
+
+msgid ""
+"After approving the time by two Rovas-selected users, you will earn "
+"{0,number,#.##} chrons"
+msgstr ""
+"Nachdem die Zeit von zwei von Rovas ausgewählten Nutzern bestätigt wurde, "
+"werden Ihnen {0,number,#.##} Chrons gutgeschrieben."
+
+msgid "All fields have to be filled out!"
+msgstr "Alle Felder müssen ausgefüllt werden!"
+
+msgid "An error occured!: {0}{1}"
+msgstr "Ein Fehler ist aufgetreten!: {0}{1}"
+
+msgid "An unknown error occurred!"
+msgstr "Ein unbekannter Fehler ist aufgetreten!"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid ""
+"Could not find any project with the project ID that is set in the "
+"preferences!"
+msgstr ""
+"Es konnte kein Projekt mit der Projekt-ID gefunden werden, die in den "
+"Einstellungen festgelegt ist!"
+
+msgid "Create work report"
+msgstr "Arbeitsbericht erstellen"
+
+msgid "Creating a work report in Rovas"
+msgstr "Einen Arbeitsbericht in Rovas erstellen"
+
+msgid "Creating map data with JOSM"
+msgstr "Kartendaten mit JOSM erstellen"
+
+msgid "Do you want to modify the API credentials and then retry?"
+msgstr ""
+"Möchten Sie die API-Zugangsdaten bearbeiten und es dann nochmal versuchen?"
+
+msgid "Enter API credentials"
+msgstr "Die API-Anmeldedaten eingeben"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Error. Retry?"
+msgstr "Fehler. Nochmal versuchen?"
+
+msgid "Failed to create AUR!"
+msgstr "Der AUR konnte nicht erstellt werden!"
+
+msgid ""
+"I am not paid for JOSM work by a company (you will only be prompted to send "
+"a work report, if you confirm this)"
+msgstr ""
+"Ich werde nicht für die Arbeit mit JOSM von einem Unternehmen bezahlt (nur "
+"wenn Sie dies bestätigen, werden Sie Arbeitsberichte einreichen können)"
+
+msgid ""
+"Made edits to the OpenStreetMap project. This report was created "
+"automatically by the {0}"
+msgstr ""
+"Änderungen zum OpenStreetMap-Projekt beigetragen. Dieser Bericht wurde "
+"automatisch vom {0} erstellt."
+
+msgid "Open project page in Rovas"
+msgstr "Die Projektseite in Rovas öffnen"
+
+msgid "Preferences to configure timetracking with Rovas"
+msgstr "Einstellungen für die Zeiterfassung mit Rovas"
+
+msgid "Project ID"
+msgstr "Projekt-ID"
+
+msgid "Reported labor time"
+msgstr "Berichtete Arbeitszeit"
+
+msgid "Reset the timer (either to 0 or an arbitrary value)"
+msgstr "Zeitmesser zurücksetzen (entweder auf 0 oder einen beliebigen Wert)"
+
+msgid "Reset the timer to"
+msgstr "Zeitmesser zurücksetzen auf"
+
+msgid "Reset timer"
+msgstr "Zeitmesser zurücksetzen"
+
+msgid "Rovas"
+msgstr "Rovas"
+
+msgid "Rovas connector plugin"
+msgstr "Rovas-Verbinder-Erweiterung"
+
+msgid "Rovas connector plugin for JOSM"
+msgstr "Rovas-Verbinder-Erweiterung für JOSM"
+
+msgid "Rovas profile page"
+msgstr "Rovas-Profilseite"
+
+msgid "See the {0} for more information"
+msgstr "Siehe die {0} für mehr Informationen"
+
+msgid "Submit report"
+msgstr "Bericht einreichen"
+
+msgid "The project ID must be ≥ {0}!"
+msgstr "Die Projekt-ID muss ≥ {0} sein!"
+
+msgid "The report is unpublished and no verifiers were invited!"
+msgstr ""
+"Der Bericht ist unveröffentlicht und keine Verifizierer wurden eingeladen!"
+
+msgid ""
+"The report you are trying to create has the `date_started` earlier than the "
+"date when you registered for Rovas!"
+msgstr ""
+"Der Bericht, den Sie zu erstellen versuchen hat einen Startzeitpunkt, der "
+"vor Ihrer Registrierung bei Rovas liegt!"
+
+msgid "There was a connection issue!"
+msgstr "Es gab ein Problem mit der Netzwerkverbindung!"
+
+msgid "There was an error decoding the server response!"
+msgstr "Es gab einen Fehler, die Antwort des Servers zu entziffern!"
+
+msgid "This field has to be filled out!"
+msgstr "Dieses Feld muss ausgefüllt werden!"
+
+msgid "Time tracking with Rovas"
+msgstr "Zeiterfassung mit Rovas"
+
+msgid "Timer tolerance"
+msgstr "Zeitmesser-Toleranz"
+
+msgid ""
+"To reward the authors of this {1}, a fee equal to {0}% of the amount you "
+"earn from reports created by the plugin will be levied on those earnings."
+msgstr ""
+"Um die Autoren dieses {1} zu belohnen, werden {0}% von den Beträgen "
+"abgezogen, die Sie an mit der Erweiterung eingereichten Arbeitsberichten "
+"verdienen. "
+
+msgid "Values for these fields can be found on your {0}."
+msgstr "Werte für diese Felder finden Sie auf Ihrer {0}."
+
+msgid ""
+"You are not a shareholder in the project with ID set in the preferences!"
+msgstr ""
+"Sie sind kein Teilhaber an dem Projekt mit der ID, die in den Einstellungen "
+"eingetragen ist!"
+
+msgid ""
+"You could not have been made a shareholder of the project with the ID set in"
+" the preferences."
+msgstr ""
+"Sie konnten nicht zum Teilhaber des Projekts gemacht werden, das in den "
+"Einstellungen gesetzt ist."
+
+msgid "Your {0} was created successfully!"
+msgstr "Ihr {0} wurde erfolgreich erstellt!"
+
+msgctxt "shorthand for hours"
+msgid "h"
+msgstr "h"
+
+msgctxt "shorthand for minutes"
+msgid "m"
+msgstr "m"
+
+msgid "rules page in Rovas"
+msgstr "Regeln-Seite in Rovas"
+
+msgid "seconds"
+msgstr "Sekunden"
+
+msgid "the lag in seconds after last edit to be counted as active time"
+msgstr ""
+"Die Dauer in Sekunden nach jeder Änderung, die als aktive Zeit gezählt wird"
+
+msgid "work report"
+msgstr "Arbeitsbericht"
+
+msgid ""
+"{0}% fee levied by the ''JOSM Rovas connector'' project for using the plugin"
+msgstr ""
+"{0}% Gebühren werden vom Projekt ''JOSM Rovas-Verbinder'' für die Benutzung "
+"der Erweiterung erhoben"
+
+msgid ""
+"A plugin to keep track of the time spent for mapping. Can be used to report "
+"that time to https://rovas.app ."
+msgstr ""
+"Eine Erweiterung zur Zeiterfassung beim Mapping. Die erfasste Zeit kann an "
+"https://rovas.app berichtet werden."
