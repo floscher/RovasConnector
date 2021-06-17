@@ -57,7 +57,7 @@ public class CreateRovasReportDialog extends JDialog {
     }
   );
 
-  private final Optional<Changeset> changeset;
+  private final transient Optional<Changeset> changeset;
 
   /**
    * The dialog that is shown after an OSM upload completed. With it, the user can correct the recorded time

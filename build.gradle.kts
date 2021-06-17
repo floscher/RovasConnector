@@ -35,7 +35,7 @@ josm {
     website = URL("https://wiki.openstreetmap.org/wiki/JOSM/Plugins/RovasConnector")
   }
   i18n {
-    pathTransformer = getPathTransformer(projectDir, "gitlab.com/JOSM/plugin/RovasConnector")
+    pathTransformer = getPathTransformer(projectDir, "gitlab.com/JOSM/plugin/RovasConnector/-/blob")
   }
 }
 
@@ -127,8 +127,8 @@ tasks.withType(Javadoc::class) {
 
 // JaCoCo code coverage
 tasks.withType(JacocoReport::class) {
-  reports.xml.isEnabled = true
-  reports.html.isEnabled = true
+  reports.xml.required.set(true)
+  reports.html.required.set(true)
 }
 
 // PMD
@@ -137,6 +137,12 @@ pmd {
   ruleSetConfig = resources.text.fromFile(projectDir.resolve("config/pmd.xml"))
   isIgnoreFailures = true
   toolVersion = Version.PMD
+}
+tasks.withType(Pmd::class) {
+  group = "PMD"
+  doLast {
+    convertXmlToOpenMetric(reports.xml.outputLocation, "count(/pmd/file/violation)", "pmd", this)
+  }
 }
 
 // SpotBugs
@@ -147,21 +153,27 @@ spotbugs {
   toolVersion.set(Version.SPOTBUGS)
 }
 tasks.withType(SpotBugsTask::class) {
+  group = "SpotBugs"
   reports.register("XML")
   doLast {
-    XPathFactory.newInstance().newXPath().evaluate(
-      "/BugCollection/FindBugsSummary/attribute::total_bugs",
-      DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-        reports.first().destination
-      )
-    )
-      ?.takeIf {
-        it.matches("^0|[1-9][0-9]*$".toRegex())
-      }
-      ?.let {
-        buildDir
-          .resolve("reports/spotbugs/${this@withType.baseName}.txt")
-          .writeText(it)
-      } ?: throw TaskExecutionException(this, Exception("Could not extract bug count!"))
+    convertXmlToOpenMetric(reports.first().outputLocation, "/BugCollection/FindBugsSummary/attribute::total_bugs", "spotbugs", this)
   }
+}
+
+fun convertXmlToOpenMetric(xmlFile: RegularFileProperty, xpath: String, metricName: String, forTask: Task) {
+  XPathFactory.newInstance().newXPath().evaluate(
+    xpath,
+    DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile.get().asFile)
+  )
+    ?.takeIf { it.matches("^0|[1-9][0-9]*$".toRegex()) }
+    ?.let {
+      buildDir.resolve("metrics/task/${forTask.name}.txt")
+        .also { it.parentFile.mkdirs() }
+        .writeText(
+          """
+          # TYPE ${metricName} counter
+          ${metricName}_total $it
+          """.trimIndent()
+        )
+    } ?: throw TaskExecutionException(forTask, Exception("Could not extract $metricName count!"))
 }

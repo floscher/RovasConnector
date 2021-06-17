@@ -23,6 +23,8 @@ public class NullableProperty<T> {
   private final T pseudoNull;
 
   /**
+   * @param delegate the delegate property that is encapsulated by this wrapper
+   * @param acceptableValues any values for which this predicate returns {@code false} will be represented as {@code null} in the delegate property
    * @see NullableProperty#NullableProperty(AbstractToStringProperty, Predicate, Object)
    */
   public NullableProperty(@NotNull final AbstractToStringProperty<T> delegate, @NotNull final Predicate<T> acceptableValues) {

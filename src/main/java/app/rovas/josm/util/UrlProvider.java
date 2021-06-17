@@ -46,11 +46,19 @@ public class UrlProvider {
   protected UrlProvider() {
     // only needed to be able to extend this class for testing
   }
-  public static URL uncheckedURL(final String path) {
+
+  /**
+   * Creates a {@link URL} instance without throwing a checked exception.
+   * Use this only if you are sure that the URL is valid!
+   * @param urlString the string representation of the URL
+   * @return the {@link URL} object for the given string
+   * @throws JosmRuntimeException in case the URL was malformed
+   */
+  public static URL uncheckedURL(final String urlString) {
     try {
-      return new URL(path);
+      return new URL(urlString);
     } catch (MalformedURLException e) {
-      throw new JosmRuntimeException("The rovas plugin builds broken URLs: " + path, e);
+      throw new JosmRuntimeException("The rovas plugin builds broken URLs: " + urlString, e);
     }
   }
 

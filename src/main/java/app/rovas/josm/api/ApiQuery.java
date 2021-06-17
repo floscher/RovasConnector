@@ -162,6 +162,8 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * Decodes JSON in the form {@code {"result": "42"}} from the given input stream.
    * @param connection the connection from which the response is read
    * @param key the JSON key to which the resulting value is mapped
+   * @return the result, that was encoded in the result. Either an error code, or an ID.
+   * @throws ApiException if an unexpected error occured, like decoding failed or connection was aborted
    */
   protected static int decodeJsonResult(final URLConnection connection, final String key) throws ApiException {
     final ByteArrayOutputStream capture = new ByteArrayOutputStream();
@@ -218,7 +220,11 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     @NotNull
     private final String translatableMessage;
 
-    /** Creates a new error code */
+    /**
+     * Creates a new error code
+     * @param code the number that represents the type of code, can be empty but not null if it is an unknown or unexpected error
+     * @param translatableMessage an error message, should be a string that can be passed to {@link I18n#tr(String, Object...)}
+     */
     public ErrorCode(@NotNull final Optional<Integer> code, @NotNull final String translatableMessage) {
       this.code = Objects.requireNonNull(code);
       this.translatableMessage = Objects.requireNonNull(translatableMessage);

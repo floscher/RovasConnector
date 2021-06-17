@@ -105,10 +105,17 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
     );
   }
 
+  /**
+   * @return {@code true} iff the unpaid editor checkbox is checked
+   */
   public boolean isUnpaidEditor() {
     return unpaidEditorCheckbox.isSelected();
   }
 
+  /**
+   * Sets the state of the unpaid editor checkbox
+   * @param isUnpaidEditor the new checked state, {@code true} means checked, otherwise it will be unchecked
+   */
   public void setUnpaidEditor(final boolean isUnpaidEditor) {
     unpaidEditorCheckbox.setSelected(isUnpaidEditor);
   }

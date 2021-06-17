@@ -245,7 +245,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
   }
 
   /**
-   * Sets the content of the API token text field
+   * @return the current content of the API token text field
    */
   public final String getApiTokenValue() {
     return getStringFieldValue(() -> apiTokenField);
