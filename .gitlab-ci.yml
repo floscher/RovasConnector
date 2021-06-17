@@ -91,3 +91,5 @@ pages:
   needs:
     - assemble
     - javadoc
+  only:
+    - tags
