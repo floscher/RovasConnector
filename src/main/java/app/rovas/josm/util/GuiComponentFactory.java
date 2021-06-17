@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package app.rovas.josm.util;
 
 import java.awt.Component;

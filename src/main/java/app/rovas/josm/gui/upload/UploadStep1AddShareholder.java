@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package app.rovas.josm.gui.upload;
 
 import java.awt.Window;

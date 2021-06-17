@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package app.rovas.josm.gui;
 
 import app.rovas.josm.model.TimeTrackingManager;
