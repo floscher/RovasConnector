@@ -1,5 +1,7 @@
+// License: GPL. For details, see LICENSE file.
 package app.rovas.josm.model;
 
+import org.openstreetmap.josm.gui.help.HelpUtil;
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.tools.GBC;
@@ -43,5 +45,10 @@ public final class RovasPreference extends DefaultTabPreferenceSetting {
     RovasProperties.INACTIVITY_TOLERANCE.put(prefPanel.getInactivityTolerance());
     RovasProperties.UNPAID_EDITOR.put(prefPanel.isUnpaidEditor());
     return false; // no restart required
+  }
+
+  @Override
+  public String getHelpContext() {
+    return HelpUtil.ht("/Preferences/RovasConnector");
   }
 }

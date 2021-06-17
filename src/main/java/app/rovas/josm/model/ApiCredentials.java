@@ -48,7 +48,7 @@ public class ApiCredentials {
   }
 
   /**
-   * Checks if the project ID is in the expected range (>= {@link #MIN_PROJECT_ID})
+   * Checks if the project ID is in the expected range ({@code >=} {@link #MIN_PROJECT_ID})
    * @param value the project ID to check
    * @return {@code true} iff the value is in the correct range
    */

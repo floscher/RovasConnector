@@ -46,7 +46,7 @@ public class UrlProvider {
   protected UrlProvider() {
     // only needed to be able to extend this class for testing
   }
-  private static URL uncheckedURL(final String path) {
+  public static URL uncheckedURL(final String path) {
     try {
       return new URL(path);
     } catch (MalformedURLException e) {
@@ -59,14 +59,6 @@ public class UrlProvider {
    */
   protected String getBaseUrl() {
     return RovasProperties.DEVELOPER.get() ? BASE_URL_DEVELOPMENT : BASE_URL_PRODUCTION;
-  }
-
-  /**
-   * @return the URL to the article about this plugin in the OSM Wiki
-   */
-  @NotNull
-  public URL osmWikiPluginArticle() {
-    return uncheckedURL("https://wiki.openstreetmap.org/wiki/JOSM/Plugins/RovasConnector");
   }
 
   /**

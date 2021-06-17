@@ -29,7 +29,7 @@ import org.openstreetmap.josm.tools.Utils;
 import org.openstreetmap.josm.tools.bugreport.BugReportQueue;
 import org.openstreetmap.josm.tools.bugreport.ReportedException;
 
-import app.rovas.josm.gen.PluginVersion;
+import app.rovas.josm.gen.BuildInfo;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.TeeInputStream;
 import app.rovas.josm.util.UrlProvider;
@@ -73,7 +73,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
 
   /**
    * @param credentials the user's API credentials
-   * @return the response returned by the server, usually responses > 0 are successes, others are errors, but depends on the specific query
+   * @return the response returned by the server, usually responses {@code > 0} are successes, others are errors, but depends on the specific query
    * @throws ApiException.ConnectionFailure if the response can't even be read
    * @throws ApiException.DecodeResponse if the response can be read but not decoded as JSON
    * @throws ApiException.WrongPluginApiCredentials if the API credentials are invalid
@@ -135,7 +135,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       connection.setRequestProperty("API-KEY", credentials.getApiKey());
       connection.setRequestProperty("TOKEN", credentials.getApiToken());
       connection.setRequestProperty("Content-Type", "application/json;charset=" + StandardCharsets.UTF_8.name());
-      connection.setRequestProperty("User-Agent", "JOSM-rovas/" + PluginVersion.VERSION_NAME);
+      connection.setRequestProperty("User-Agent", "JOSM-rovas/" + BuildInfo.VERSION_NAME);
       connection.setRequestProperty("Accept", "application/json");
       connection.setRequestProperty("Accept-Charset", StandardCharsets.UTF_8.name());
       connection.setDoOutput(true);

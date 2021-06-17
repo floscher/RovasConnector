@@ -1,0 +1,10 @@
+[main]
+host = https://www.transifex.com
+
+[josm.josm-plugin_RovasConnector]
+file_filter = src/main/po/<lang>.po
+lang_map = ca@valencia: ca-valencia, sr@latin: sr-latin
+minimum_perc = 50
+source_file = build/i18n/pot/josm-plugin_RovasConnector.pot
+source_lang = en
+type = PO

@@ -16,14 +16,21 @@ code_quality:
 
 assemble:
   stage: build
-  script: ./gradlew assemble --stacktrace --build-cache
+  script: ./gradlew assemble generatePot
   artifacts:
     paths:
       - build/
 
 minJosm:
   stage: build
-  script: ./gradlew compileJava_minJosm --stacktrace --build-cache
+  script: ./gradlew compileJava_minJosm
+
+javadoc:
+  stage: build
+  script: ./gradlew javadoc
+  artifacts:
+    paths:
+      - build/docs/javadoc/
 
 build:
   stage: test
@@ -52,3 +59,35 @@ coverage:
   artifacts:
     reports:
       cobertura: build/cobertura.xml
+
+transifex:
+  image: registry.gitlab.com/josm/docker-library/python-transifex:latest
+  stage: deploy
+  environment:
+    name: transifex
+    url: https://www.transifex.com/josm/josm/josm-plugin_RovasConnector/
+  script:
+    - TX_TOKEN="$TRANSIFEX_TOKEN" tx push -s --no-interactive
+  needs:
+    - assemble
+  only:
+    - master@JOSM/plugin/RovasConnector
+  except:
+    - schedules
+
+
+pages:
+  stage: deploy
+  environment:
+    name: pages
+    url: https://josm.gitlab.io/plugin/RovasConnector/
+  script:
+    - mkdir -p public/dist/
+    - cp build/dist/RovasConnector.jar public/dist/
+    - cp -r build/docs/javadoc/ public/
+  artifacts:
+    paths:
+      - public
+  needs:
+    - assemble
+    - javadoc

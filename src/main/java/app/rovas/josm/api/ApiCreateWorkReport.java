@@ -14,6 +14,7 @@ import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.tools.I18n;
 
+import app.rovas.josm.gen.BuildInfo;
 import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.util.UrlProvider;
@@ -22,6 +23,7 @@ import app.rovas.josm.util.UrlProvider;
  * API query for creating a work report
  */
 public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
+  private static final SecureRandom RANDOM = new SecureRandom();
 
   private final double minutes;
   private final Optional<Changeset> changeset;
@@ -72,9 +74,8 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
 
   @Override
   protected int query(final ApiCredentials credentials) throws ApiException {
-    final SecureRandom random = new SecureRandom();
     final byte[] accessToken = new byte[12]; // 12 bytes → 16 Base64 characters
-    random.nextBytes(accessToken);
+    RANDOM.nextBytes(accessToken);
 
     final URLConnection connection = sendPostRequest(
       credentials,
@@ -83,7 +84,11 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
         .add("wr_description", I18n.tr(
           // i18n: {0} will be replaced by a link labeled: "Rovas connector plugin for JOSM"
           "Made edits to the OpenStreetMap project. This report was created automatically by the {0}",
-          UrlProvider.toHtmlHyperlink(urlProvider.osmWikiPluginArticle(), I18n.tr("Rovas connector plugin for JOSM"))
+          UrlProvider.toHtmlHyperlink(
+            BuildInfo.OSM_WIKI_URL,
+            // i18n: link label, will be inserted into: "This report was created automatically by the {0}"
+            I18n.tr("Rovas connector plugin for JOSM")
+          )
         ))
         .add("wr_activity_name", I18n.tr("Creating map data with JOSM"))
         .add("wr_hours", minutes / 60.0)
