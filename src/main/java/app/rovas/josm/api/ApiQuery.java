@@ -18,8 +18,10 @@ import java.util.stream.Stream;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonNumber;
+import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
+import javax.json.JsonValue;
 
 import com.drew.lang.annotations.NotNull;
 
@@ -173,20 +175,8 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       }
       try (TeeInputStream stream = new TeeInputStream(connection.getInputStream(), capture2)) {
         return Optional.ofNullable(Json.createReader(stream).readObject())
-          .flatMap(it ->
-            Optional.ofNullable(it.get(key))
-              .flatMap(result ->
-                result instanceof JsonString
-                  ? Optional.ofNullable(((JsonString) result).getString())
-                  .filter(string -> POSITIVE_INT_PATTERN.matcher(string).matches())
-                  .map(Integer::parseInt)
-                  : (
-                  result instanceof JsonNumber
-                    ? Optional.of(((JsonNumber) result).intValue())
-                    : Optional.empty()
-                )
-              )
-          ).orElseThrow(() -> {
+          .flatMap(it -> decodeJsonResult(it, key))
+          .orElseThrow(() -> {
             Logging.warn(MessageFormat.format("Can''t decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8)));
             return new ApiException.DecodeResponse(connection.getURL(), null);
           });
@@ -198,6 +188,21 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       throw new ApiException.ConnectionFailure(connection.getURL(), e);
     } finally {
       disconnect(connection);
+    }
+  }
+
+  private static Optional<Integer> decodeJsonResult(final JsonObject json, final String key) {
+    final JsonValue value = json.get(key);
+    if (value instanceof JsonString) {
+      return Optional.of((JsonString) value)
+        .map(JsonString::getString)
+        .filter(string -> POSITIVE_INT_PATTERN.matcher(string).matches())
+        .map(Integer::parseInt);
+    } else if (value instanceof JsonNumber) {
+      return Optional.of((JsonNumber) value)
+        .map(JsonNumber::intValue);
+    } else {
+      return Optional.empty();
     }
   }
 
