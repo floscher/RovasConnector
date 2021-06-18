@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.text.JTextComponent;
 
 import com.drew.lang.annotations.Nullable;
 
@@ -89,7 +90,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
   private final SpinnerNumberModel activeProjectIdSpinnerModel = new SpinnerNumberModel(RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, RovasProperties.ACTIVE_PROJECT_ID_NO_VALUE, Integer.MAX_VALUE, 0);
   private final JSpinner activeProjectIdSpinner = GuiComponentFactory.createSpinner(activeProjectIdSpinnerModel, 5, true);
   private final JButton activeProjectOpenButton = new JButton(I18n.tr("Open project page in Rovas"), ImageProvider.get("help", "internet", ImageProvider.ImageSizes.SIDEBUTTON));
-  private final JLabel activeProjectIdDescription = GuiComponentFactory.createLabel(I18n.tr("(the parent project of the created work reports)"), false);
+  private final JTextComponent activeProjectIdDescription = new JMultilineLabel(I18n.tr("(the parent project of the created work reports)"));
 
   private final JEditorPane validationWarning = new JMultilineLabel(
     "<html><div style='background:#fdc14b;padding:5px 10px'>" +

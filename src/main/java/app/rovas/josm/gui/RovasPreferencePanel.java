@@ -9,8 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.text.JTextComponent;
 
 import org.openstreetmap.josm.actions.ExpertToggleAction;
+import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Utils;
@@ -51,7 +53,7 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
     1
   );
   private final JSpinner inactivityToleranceValue = GuiComponentFactory.createSpinner(inactivityToleranceModel, 5, true);
-  private final JLabel inactivityToleranceDescription = GuiComponentFactory.createLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
+  private final JTextComponent inactivityToleranceDescription = new JMultilineLabel(I18n.tr("the lag in seconds after last edit to be counted as active time"), false);
 
   private final JCheckBox unpaidEditorCheckbox = new JCheckBox("<html>" + I18n.tr("I am not paid for JOSM work by a company (you will only be prompted to send a work report, if you confirm this)") + "</html>");
 
