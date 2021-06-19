@@ -1,22 +1,34 @@
 // License: GPL. For details, see LICENSE file.
 package app.rovas.josm.gui;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.util.Collections;
+import javax.swing.AbstractAction;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
+import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.util.GuiHelper;
+import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
+import org.openstreetmap.josm.tools.ImageProvider;
 
+import app.rovas.josm.RovasPlugin;
 import app.rovas.josm.action.ResetTimerAction;
 import app.rovas.josm.model.RovasPreference;
+import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.GBCUtil;
+import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.TimeConverterUtil;
 
@@ -26,11 +38,36 @@ import app.rovas.josm.util.TimeConverterUtil;
 public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private static final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
   private static final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
+  private static final GBC GBC_BOTH_COLUMNS = GBCUtil.fixedToColumn(0, GBC.eol().insets(5).span(2).fill(GBC.HORIZONTAL));
 
-  private final JLabel counterLabel = new JLabel(I18n.tr("Active time"));
-  private final JLabel counterValue = new JLabel("");
+  private final JLabel timerValue = new JLabel(); // populated later with appropriate text
 
-  private final SideButton resetButton = new SideButton(new ResetTimerAction());
+  private final JMultilineLabel previousTimeLabel = new JMultilineLabel(""); // populated later with appropriate text
+  private final JPanel previousTimePanel = new JPanel(new BorderLayout());
+
+  {
+    previousTimePanel.add(previousTimeLabel, BorderLayout.CENTER);
+    previousTimePanel.add(
+      GuiComponentFactory.createWrapperPanel(
+        new FlowLayout(),
+        new JButton(new AbstractAction(I18n.tr("Add")) {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(true);
+            previousTimePanel.setVisible(false);
+          }
+        }),
+        new JButton(new AbstractAction(I18n.tr("Discard")) {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(false);
+            previousTimePanel.setVisible(false);
+          }
+        })
+      ),
+      BorderLayout.SOUTH
+    );
+  }
 
   /**
    * Creates a new dialog and registers it with the {@link TimeTrackingManager}
@@ -47,22 +84,52 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
       false
     );
 
+    updatePreviousTime();
+
     final VerticallyScrollablePanel panel = new VerticallyScrollablePanel(new GridBagLayout());
 
-    panel.add(counterLabel, GBC_LEFT_COLUMN);
-    panel.add(counterValue, GBC_RIGHT_COLUMN);
+    panel.add(new JLabel(I18n.tr("Active time")), GBC_LEFT_COLUMN);
+    panel.add(timerValue, GBC_RIGHT_COLUMN);
+
+    panel.add(previousTimePanel, GBC_BOTH_COLUMNS);
 
     panel.add(Box.createVerticalGlue(), GBC_LEFT_COLUMN.fill(GBC.VERTICAL));
 
-    createLayout(panel.getVerticalScrollPane(), false, Collections.singletonList(resetButton));
+    createLayout(
+      panel.getVerticalScrollPane(),
+      false,
+      Collections.singletonList(
+        new SideButton(new ResetTimerAction())
+      )
+    );
 
     TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(this);
+  }
+
+  private void updatePreviousTime() {
+    final int previousMinutes = TimeConverterUtil.secondsToMinutes(TimeTrackingManager.getInstance().getPreviouslyTrackedSeconds());
+    final String commonMessage = I18n.trn(
+      "Previously you already tracked {0} minute for Rovas without creating a work report.",
+      "Previously you already tracked {0} minutes for Rovas without creating a work report.",
+      previousMinutes,
+      previousMinutes
+    );
+
+    if (previousMinutes > 0) {
+      new Notification(commonMessage + "<br>" + I18n.tr("If you want to add that time to your current timer, you can do that in the Rovas dialog."))
+        .setDuration(Notification.TIME_LONG)
+        .setIcon(RovasPlugin.LOGO.setSize(ImageProvider.ImageSizes.DEFAULT).get())
+        .show();
+    }
+    previousTimePanel.setVisible(previousMinutes > 0);
+    previousTimeLabel.setText(commonMessage + "<br>" + I18n.tr("Should this time be added to the timer, or discarded?"));
   }
 
   @Override
   public void destroy() {
     super.destroy();
     TimeTrackingManager.getInstance().removeTimeTrackingUpdateListener(this);
+    RovasProperties.ALREADY_TRACKED_TIME.put(TimeTrackingManager.getInstance().commit());
   }
 
   @Override
@@ -72,7 +139,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     }
     final long minutes = TimeConverterUtil.secondsToMinutes(n);
     GuiHelper.runInEDT(() ->
-      counterValue.setText(String.format(
+      timerValue.setText(String.format(
         "<html><strong style='font-size:1.8em'>%d</strong>&#8239;" +
           I18nStrings.trShorthandForHours() +
           "&nbsp;<strong style='font-size:1.8em'>%02d</strong>&#8239;" +

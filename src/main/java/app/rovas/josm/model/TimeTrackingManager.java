@@ -4,6 +4,7 @@ package app.rovas.josm.model;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.openstreetmap.josm.data.osm.event.DataSetListener;
 import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
@@ -37,6 +38,12 @@ public final class TimeTrackingManager {
   private static final DataSetListener DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
 
   /**
+   * Saves the initial value when the time tracking manager is initialized
+   */
+  private final long previouslyTrackedSeconds = RovasProperties.ALREADY_TRACKED_TIME.get();
+  private final AtomicBoolean previouslyTrackedTimeIsAlreadyAdded = new AtomicBoolean(false);
+
+  /**
    * The number of seconds that are already committed.
    */
   private long committedSeconds; // = 0L
@@ -65,6 +72,33 @@ public final class TimeTrackingManager {
     fireTimeTrackingUpdateListeners();
   }
 
+  /**
+   * <p>Adds or discards the number of seconds saved in {@link RovasProperties#ALREADY_TRACKED_TIME}.
+   * This is used to keep tracked time across restarts of JOSM.</p>
+   *
+   * <p>This will not interfere with any uncommitted time, but instead the time is immediately committed.
+   * Also, the property {@link RovasProperties#ALREADY_TRACKED_TIME} is set to {@code 0}.</p>
+   *
+   * @param shouldBeAdded if this is {@code true}, the previously tracked time is added, otherwise it is discarded
+   *   without changing the currently tracked time.
+   */
+  public void handlePreviouslyTrackedSeconds(final boolean shouldBeAdded) {
+    synchronized (INSTANCE) {
+      if (!previouslyTrackedTimeIsAlreadyAdded.get()) {
+        previouslyTrackedTimeIsAlreadyAdded.set(true);
+        RovasProperties.ALREADY_TRACKED_TIME.put(0L);
+        if (shouldBeAdded) {
+          try {
+            committedSeconds = Math.addExact(committedSeconds, previouslyTrackedSeconds);
+          } catch (ArithmeticException e) {
+            committedSeconds = TimeConverterUtil.MAX_SECONDS;
+          }
+          fireTimeTrackingUpdateListeners();
+        }
+      }
+    }
+  }
+
   private void fireTimeTrackingUpdateListeners() {
     listeners.fireEvent(it -> it.updateNumberOfTrackedSeconds(
       committedSeconds +
@@ -75,6 +109,18 @@ public final class TimeTrackingManager {
         )
         .orElse(0L)
     ));
+  }
+
+  /**
+   * @return the amount of previously tracked time that could be added to the currently tracked time
+   */
+  public long getPreviouslyTrackedSeconds() {
+    synchronized (INSTANCE) {
+      return
+        previouslyTrackedTimeIsAlreadyAdded.get() || TimeConverterUtil.secondsToMinutes(previouslyTrackedSeconds) <= 0
+          ? 0
+          : previouslyTrackedSeconds;
+    }
   }
 
   /**
