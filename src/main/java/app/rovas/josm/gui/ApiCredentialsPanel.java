@@ -118,6 +118,7 @@ public class ApiCredentialsPanel extends VerticallyScrollablePanel {
             feedbackInvalid(I18n.tr("The project ID must be ≥ {0}!", ApiCredentials.MIN_PROJECT_ID));
           }
         }
+
         @Override
         public boolean isValid() {
           return ApiCredentials.isValidProjectId(activeProjectIdSpinnerModel.getNumber().intValue());

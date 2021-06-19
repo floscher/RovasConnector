@@ -59,7 +59,6 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     this.queryUrl = queryUrl;
   }
 
-
   /**
    * @return an array of all "known" error codes that the server returns
    */
@@ -193,17 +192,19 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
 
   private static Optional<Integer> decodeJsonResult(final JsonObject json, final String key) {
     final JsonValue value = json.get(key);
+    final Optional<Integer> result;
     if (value instanceof JsonString) {
-      return Optional.of((JsonString) value)
+      result = Optional.of((JsonString) value)
         .map(JsonString::getString)
         .filter(string -> POSITIVE_INT_PATTERN.matcher(string).matches())
         .map(Integer::parseInt);
     } else if (value instanceof JsonNumber) {
-      return Optional.of((JsonNumber) value)
+      result = Optional.of((JsonNumber) value)
         .map(JsonNumber::intValue);
     } else {
-      return Optional.empty();
+      result = Optional.empty();
     }
+    return result;
   }
 
   private static void disconnect(final URLConnection connection) {

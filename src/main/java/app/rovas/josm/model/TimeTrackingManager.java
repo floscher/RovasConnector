@@ -169,7 +169,13 @@ public final class TimeTrackingManager {
       final Long lastTimestamp = lastUncommittedChangeTimestamp;
       final long currentTimestamp = instant.getEpochSecond();
 
-      Logging.debug("[TTM] {0,number,#} seconds committed, {1,number,#} - {2,number,#} uncommitted, new change at {3,number,#}", this.committedSeconds, firstTimestamp, lastTimestamp, currentTimestamp);
+      Logging.debug(
+        "[TTM] {0,number,#} seconds committed, {1,number,#} - {2,number,#} uncommitted, new change at {3,number,#}",
+        this.committedSeconds,
+        firstTimestamp,
+        lastTimestamp,
+        currentTimestamp
+      );
 
       if (firstTimestamp == null) {
         // initialize when no time was tracked before
@@ -278,11 +284,13 @@ public final class TimeTrackingManager {
       Utils.instanceOfAndCast(e.getAddedLayer(), OsmDataLayer.class)
         .ifPresent(layer -> layer.data.addDataSetListener(DATASET_LISTENER_ADAPTER));
     }
+
     @Override
     public void layerRemoving(final LayerManager.LayerRemoveEvent e) {
       Utils.instanceOfAndCast(e.getRemovedLayer(), OsmDataLayer.class)
         .ifPresent(layer -> layer.data.removeDataSetListener(DATASET_LISTENER_ADAPTER));
     }
+
     @Override
     public void layerOrderChanged(final LayerManager.LayerOrderChangeEvent e) {
       // do nothing

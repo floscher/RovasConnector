@@ -79,6 +79,7 @@ tasks {
   val generateBuildInfoClass by registering {
     val content = provider {
       """
+// License: GPL. For details, see LICENSE file.
 package app.rovas.josm.gen;
 
 import java.net.URL;

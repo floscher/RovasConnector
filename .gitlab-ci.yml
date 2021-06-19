@@ -28,6 +28,8 @@ assemble:
 minJosm:
   stage: build
   script: ./gradlew compileJava_minJosm
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
 
 latestJosm:
   stage: build

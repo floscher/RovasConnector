@@ -59,7 +59,7 @@ public class ResetTimerAction extends JosmAction {
   /**
    * The panel for the reset dialog
    */
-  private static class ResetPanel extends JPanel {
+  private final static class ResetPanel extends JPanel {
     private final SpinnerNumberModel hourModel = new SpinnerNumberModel(0, 0, TimeConverterUtil.MAX_HOURS, 1);
     private final SpinnerNumberModel minuteModel = new SpinnerNumberModel(0, 0, 59, 1);
 

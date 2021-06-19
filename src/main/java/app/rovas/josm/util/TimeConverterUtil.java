@@ -32,7 +32,7 @@ public final class TimeConverterUtil {
 
   /**
    * Clamps the amount of seconds to the range 0..{@link #MAX_SECONDS}.
-   * Basically equivalent to {@link Utils#clamp(int, int, int)}, but for
+   * Basically equivalent to {@link Utils#clamp(int, int, int)}, but for a {@link Long} value and this specific range.
    * @param seconds the original amount
    * @return the clamped amount
    */

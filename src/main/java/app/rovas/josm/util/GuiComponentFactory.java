@@ -130,6 +130,7 @@ public final class GuiComponentFactory {
         protected Component createNextButton() {
           return null;
         }
+
         @Override
         protected Component createPreviousButton() {
           return null;

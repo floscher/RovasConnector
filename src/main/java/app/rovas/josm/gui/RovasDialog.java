@@ -45,30 +45,6 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
   private final JMultilineLabel previousTimeLabel = new JMultilineLabel(""); // populated later with appropriate text
   private final JPanel previousTimePanel = new JPanel(new BorderLayout());
 
-  {
-    previousTimePanel.add(previousTimeLabel, BorderLayout.CENTER);
-    previousTimePanel.add(
-      GuiComponentFactory.createWrapperPanel(
-        new FlowLayout(),
-        new JButton(new AbstractAction(I18n.tr("Add")) {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(true);
-            previousTimePanel.setVisible(false);
-          }
-        }),
-        new JButton(new AbstractAction(I18n.tr("Discard")) {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(false);
-            previousTimePanel.setVisible(false);
-          }
-        })
-      ),
-      BorderLayout.SOUTH
-    );
-  }
-
   /**
    * Creates a new dialog and registers it with the {@link TimeTrackingManager}
    */
@@ -84,12 +60,21 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
       false
     );
 
-    updatePreviousTime();
-
     final VerticallyScrollablePanel panel = new VerticallyScrollablePanel(new GridBagLayout());
 
     panel.add(new JLabel(I18n.tr("Active time")), GBC_LEFT_COLUMN);
     panel.add(timerValue, GBC_RIGHT_COLUMN);
+
+    updatePreviousTime();
+    previousTimePanel.add(previousTimeLabel, BorderLayout.CENTER);
+    previousTimePanel.add(
+      GuiComponentFactory.createWrapperPanel(
+        new FlowLayout(),
+        new JButton(new HandlePreviouslyTrackedTimeAction(true, I18n.tr("Add"))),
+        new JButton(new HandlePreviouslyTrackedTimeAction(false, I18n.tr("Discard")))
+      ),
+      BorderLayout.SOUTH
+    );
 
     panel.add(previousTimePanel, GBC_BOTH_COLUMNS);
 
@@ -149,5 +134,24 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
         minutes % 60
       ))
     );
+  }
+
+  /**
+   * Action for either adding or discarding time that has previously been tracked, but for which
+   * no work report has been submitted yet.
+   */
+  private final class HandlePreviouslyTrackedTimeAction extends AbstractAction {
+    private final boolean shouldBeAdded;
+
+    private HandlePreviouslyTrackedTimeAction(final boolean shouldBeAdded, final String name) {
+      super(name);
+      this.shouldBeAdded = shouldBeAdded;
+    }
+
+    @Override
+    public void actionPerformed(final ActionEvent e) {
+      TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(shouldBeAdded);
+      previousTimePanel.setVisible(false);
+    }
   }
 }
