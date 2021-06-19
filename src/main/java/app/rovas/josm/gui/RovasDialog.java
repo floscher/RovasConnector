@@ -2,12 +2,11 @@
 package app.rovas.josm.gui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,6 +15,7 @@ import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.util.GuiHelper;
+import org.openstreetmap.josm.gui.util.MultiLineFlowLayout;
 import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.gui.widgets.VerticallyScrollablePanel;
 import org.openstreetmap.josm.tools.GBC;
@@ -67,9 +67,10 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
     updatePreviousTime();
     previousTimePanel.add(previousTimeLabel, BorderLayout.CENTER);
+    previousTimePanel.setBackground(new Color(0xffcc33));
     previousTimePanel.add(
       GuiComponentFactory.createWrapperPanel(
-        new FlowLayout(),
+        new MultiLineFlowLayout(),
         new JButton(new HandlePreviouslyTrackedTimeAction(true, I18n.tr("Add"))),
         new JButton(new HandlePreviouslyTrackedTimeAction(false, I18n.tr("Discard")))
       ),
@@ -77,8 +78,6 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     );
 
     panel.add(previousTimePanel, GBC_BOTH_COLUMNS);
-
-    panel.add(Box.createVerticalGlue(), GBC_LEFT_COLUMN.fill(GBC.VERTICAL));
 
     createLayout(
       panel.getVerticalScrollPane(),
@@ -93,11 +92,16 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
   private void updatePreviousTime() {
     final int previousMinutes = TimeConverterUtil.secondsToMinutes(TimeTrackingManager.getInstance().getPreviouslyTrackedSeconds());
-    final String commonMessage = I18n.trn(
-      "Previously you already tracked {0} minute for Rovas without creating a work report.",
-      "Previously you already tracked {0} minutes for Rovas without creating a work report.",
-      previousMinutes,
-      previousMinutes
+    final String commonMessage = I18n.tr(
+      // i18n: {0} is the amount of previously tracked time as something like: "0h 42m"
+      "You have tracked {0} of active time before, which was not reported to Rovas.",
+      String.format(
+        "<strong>%d %s %d %s</strong>",
+        previousMinutes / 60,
+        I18nStrings.trShorthandForHours(),
+        previousMinutes % 60,
+        I18nStrings.trShorthandForMinutes()
+      )
     );
 
     if (previousMinutes > 0) {
@@ -107,7 +111,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
         .show();
     }
     previousTimePanel.setVisible(previousMinutes > 0);
-    previousTimeLabel.setText(commonMessage + "<br>" + I18n.tr("Should this time be added to the timer, or discarded?"));
+    previousTimeLabel.setText(commonMessage + "<br>" + I18n.tr("Should this time be added to the currently tracked active time, or discard the previous time?"));
   }
 
   @Override

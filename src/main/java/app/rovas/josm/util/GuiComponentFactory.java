@@ -52,6 +52,7 @@ public final class GuiComponentFactory {
    */
   public static JPanel createWrapperPanel(final LayoutManager layoutManager, final Component... components) {
     final JPanel panel = new JPanel(layoutManager);
+    panel.setOpaque(false);
     Arrays.stream(components).forEach(panel::add);
     return panel;
   }
