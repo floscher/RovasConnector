@@ -6,13 +6,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.openstreetmap.josm.data.osm.event.DataSetListener;
-import org.openstreetmap.josm.data.osm.event.DataSetListenerAdapter;
-import org.openstreetmap.josm.gui.layer.LayerManager;
-import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.tools.ListenerList;
 import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.gui.TimeTrackingUpdateListener;
 import app.rovas.josm.util.TimeConverterUtil;
@@ -34,14 +29,11 @@ public final class TimeTrackingManager {
 
   private final ListenerList<TimeTrackingUpdateListener> listeners = ListenerList.create();
 
-  private static final TimeTrackingManager INSTANCE = new TimeTrackingManager();
-  private static final DataSetListener DATASET_LISTENER_ADAPTER = new DataSetListenerAdapter(__ -> INSTANCE.trackChangeNow());
-
   /**
    * Saves the initial value when the time tracking manager is initialized
    */
-  private final long previouslyTrackedSeconds = RovasProperties.ALREADY_TRACKED_TIME.get();
-  private final AtomicBoolean previouslyTrackedTimeIsAlreadyAdded = new AtomicBoolean(false);
+  private final long previouslyTrackedSeconds;
+  private final AtomicBoolean previouslyTrackedTimeIsAlreadyAdded;
 
   /**
    * The number of seconds that are already committed.
@@ -59,8 +51,12 @@ public final class TimeTrackingManager {
    */
   private Long lastUncommittedChangeTimestamp; // = null
 
-  private TimeTrackingManager() {
-    // private constructor to avoid instantiation
+  /**
+   * Creates a new time tracking manager.
+   */
+  public TimeTrackingManager() {
+    this.previouslyTrackedSeconds = TimeConverterUtil.clampToSeconds(RovasProperties.ALREADY_TRACKED_TIME.get());
+    this.previouslyTrackedTimeIsAlreadyAdded = new AtomicBoolean(false);
   }
 
   /**
@@ -83,16 +79,12 @@ public final class TimeTrackingManager {
    *   without changing the currently tracked time.
    */
   public void handlePreviouslyTrackedSeconds(final boolean shouldBeAdded) {
-    synchronized (INSTANCE) {
+    synchronized (this) {
       if (!previouslyTrackedTimeIsAlreadyAdded.get()) {
         previouslyTrackedTimeIsAlreadyAdded.set(true);
         RovasProperties.ALREADY_TRACKED_TIME.put(0L);
         if (shouldBeAdded) {
-          try {
-            committedSeconds = Math.addExact(committedSeconds, previouslyTrackedSeconds);
-          } catch (ArithmeticException e) {
-            committedSeconds = TimeConverterUtil.MAX_SECONDS;
-          }
+          committedSeconds += Math.min(previouslyTrackedSeconds, TimeConverterUtil.MAX_SECONDS - committedSeconds);
           fireTimeTrackingUpdateListeners();
         }
       }
@@ -115,7 +107,7 @@ public final class TimeTrackingManager {
    * @return the amount of previously tracked time that could be added to the currently tracked time
    */
   public long getPreviouslyTrackedSeconds() {
-    synchronized (INSTANCE) {
+    synchronized (this) {
       return
         previouslyTrackedTimeIsAlreadyAdded.get() || TimeConverterUtil.secondsToMinutes(previouslyTrackedSeconds) <= 0
           ? 0
@@ -129,13 +121,6 @@ public final class TimeTrackingManager {
    */
   public void removeTimeTrackingUpdateListener(final TimeTrackingUpdateListener listener) {
     listeners.removeListener(listener);
-  }
-
-  /**
-   * @return the singleton instance of the {@link TimeTrackingManager}
-   */
-  public static TimeTrackingManager getInstance() {
-    return INSTANCE;
   }
 
   /**
@@ -163,7 +148,7 @@ public final class TimeTrackingManager {
    */
   @VisibleForTesting
   void trackChangeAt(final Instant instant) {
-    synchronized (INSTANCE) {
+    synchronized (this) {
       final int tolerance = Math.max(0, RovasProperties.INACTIVITY_TOLERANCE.get());
       final Long firstTimestamp = firstUncommittedChangeTimestamp;
       final Long lastTimestamp = lastUncommittedChangeTimestamp;
@@ -203,7 +188,7 @@ public final class TimeTrackingManager {
    * @param numSeconds the number of seconds that should be set as {@link #committedSeconds}
    */
   public void setCurrentlyTrackedSeconds(final long numSeconds) {
-    synchronized (INSTANCE) {
+    synchronized (this) {
       resetAutomaticTracker(null, Optional.empty());
       this.committedSeconds = TimeConverterUtil.clampToSeconds(numSeconds);
       fireTimeTrackingUpdateListeners();
@@ -226,7 +211,7 @@ public final class TimeTrackingManager {
 
   @VisibleForTesting
   long commit(final Instant instant) {
-    synchronized (INSTANCE) {
+    synchronized (this) {
       return resetAutomaticTracker(null, Optional.of(instant));
     }
   }
@@ -269,31 +254,5 @@ public final class TimeTrackingManager {
     this.lastUncommittedChangeTimestamp = newValue;
     fireTimeTrackingUpdateListeners();
     return this.committedSeconds;
-  }
-
-  /**
-   * <p>This listener notifies the (singleton) {@link TimeTrackingManager} of all changes in any {@link OsmDataLayer}
-   * that are relevant for time tracking.</p>
-   * <p>Add this to JOSM's {@link LayerManager} using
-   * {@link LayerManager#addAndFireLayerChangeListener(LayerManager.LayerChangeListener)}.</p>
-   */
-  public static class AnyOsmDataChangeListener implements LayerManager.LayerChangeListener {
-    @Override
-    public void layerAdded(final LayerManager.LayerAddEvent e) {
-      INSTANCE.trackChangeNow();
-      Utils.instanceOfAndCast(e.getAddedLayer(), OsmDataLayer.class)
-        .ifPresent(layer -> layer.data.addDataSetListener(DATASET_LISTENER_ADAPTER));
-    }
-
-    @Override
-    public void layerRemoving(final LayerManager.LayerRemoveEvent e) {
-      Utils.instanceOfAndCast(e.getRemovedLayer(), OsmDataLayer.class)
-        .ifPresent(layer -> layer.data.removeDataSetListener(DATASET_LISTENER_ADAPTER));
-    }
-
-    @Override
-    public void layerOrderChanged(final LayerManager.LayerOrderChangeEvent e) {
-      // do nothing
-    }
   }
 }

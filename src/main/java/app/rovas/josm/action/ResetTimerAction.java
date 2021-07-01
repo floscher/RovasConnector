@@ -22,11 +22,12 @@ import app.rovas.josm.util.TimeConverterUtil;
 public class ResetTimerAction extends JosmAction {
 
   private static final String TRANSLATABLE_LABEL = I18n.marktr("Reset timer");
+  private final TimeTrackingManager timeTrackingManager;
 
   /**
    * Creates the default action to reset the timer to an arbitrary value (0 by default).
    */
-  public ResetTimerAction() {
+  public ResetTimerAction(final TimeTrackingManager timeTrackingManager) {
     super(
       I18n.tr(TRANSLATABLE_LABEL),
       "preferences/reset",
@@ -34,6 +35,7 @@ public class ResetTimerAction extends JosmAction {
       null,
       false
     );
+    this.timeTrackingManager = timeTrackingManager;
   }
 
   /**
@@ -52,7 +54,7 @@ public class ResetTimerAction extends JosmAction {
         JOptionPane.PLAIN_MESSAGE
       ) == JOptionPane.OK_OPTION
     ) {
-      TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(resetPanel.getMinutes() * 60L);
+      timeTrackingManager.setCurrentlyTrackedSeconds(resetPanel.getMinutes() * 60L);
     }
   }
 

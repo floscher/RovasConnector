@@ -17,7 +17,8 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 import app.rovas.josm.gui.CreateRovasReportDialog;
-import app.rovas.josm.gui.RovasDialog;
+import app.rovas.josm.gui.RovasConnectorDialog;
+import app.rovas.josm.model.AnyOsmDataChangeTracker;
 import app.rovas.josm.model.RovasPreference;
 import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.model.TimeTrackingManager;
@@ -46,7 +47,8 @@ import app.rovas.josm.model.TimeTrackingManager;
 public final class RovasPlugin extends Plugin {
   public static final ImageProvider LOGO = new ImageProvider("rovas_logo");
 
-  public static final PreferenceSetting PREFERENCE = new RovasPreference();
+  private final PreferenceSetting preference = new RovasPreference();
+  private final TimeTrackingManager timeTrackingManager = new TimeTrackingManager();
 
   /**
    * Creates the plugin
@@ -55,20 +57,24 @@ public final class RovasPlugin extends Plugin {
    */
   public RovasPlugin(final PluginInformation info) {
     super(info);
-    MainApplication.getLayerManager().addAndFireLayerChangeListener(new TimeTrackingManager.AnyOsmDataChangeListener());
-    TimeTrackingManager.getInstance().trackChangeNow();
-    OsmServerWriter.registerPostprocessor((p, progress) -> {
+    MainApplication.getLayerManager().addAndFireLayerChangeListener(new AnyOsmDataChangeTracker(timeTrackingManager));
+    timeTrackingManager.trackChangeNow();
+
+    OsmServerWriter.registerPostprocessor((__, ___) -> {
       final Optional<Changeset> changeset = Optional.ofNullable(OsmApi.getOsmApi()).map(OsmApi::getChangeset);
       new Thread(() -> {
         if (RovasProperties.UNPAID_EDITOR.get()) {
           new CreateRovasReportDialog(
+            timeTrackingManager,
             changeset,
-            TimeTrackingManager.getInstance().commit()
+            timeTrackingManager.commit()
           );
         } else {
           new Notification(I18n.tr("A Rovas work report can not be created, as your work is paid by a company. The setting can be changed in the Rovas Connector plugin preferences."))
             .setIcon(JOptionPane.INFORMATION_MESSAGE)
             .show();
+          // Reset the time tracker when submitting a changeset, for which a company paid
+          timeTrackingManager.setCurrentlyTrackedSeconds(0);
         }
       }).start();
     });
@@ -77,13 +83,13 @@ public final class RovasPlugin extends Plugin {
   @Override
   public void mapFrameInitialized(final MapFrame oldFrame, final MapFrame newFrame) {
     super.mapFrameInitialized(oldFrame, newFrame);
-    if (newFrame != null && newFrame.getToggleDialog(RovasDialog.class) == null) {
-      newFrame.addToggleDialog(new RovasDialog());
+    if (newFrame != null && newFrame.getToggleDialog(RovasConnectorDialog.class) == null) {
+      newFrame.addToggleDialog(new RovasConnectorDialog(timeTrackingManager));
     }
   }
 
   @Override
   public PreferenceSetting getPreferenceSetting() {
-    return PREFERENCE;
+    return preference;
   }
 }

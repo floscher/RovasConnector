@@ -5,7 +5,7 @@ import app.rovas.josm.model.TimeTrackingManager;
 
 /**
  * This listener is used to notify other components about changes in {@link TimeTrackingManager}.
- * E.g. {@link RovasDialog} implements this interface.
+ * E.g. {@link RovasConnectorDialog} implements this interface.
  */
 public interface TimeTrackingUpdateListener {
   /**

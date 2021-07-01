@@ -35,7 +35,7 @@ import app.rovas.josm.util.TimeConverterUtil;
 /**
  * The main dialog that displays a live timer of the time that the plugin has tracked so far.
  */
-public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListener {
+public class RovasConnectorDialog extends ToggleDialog implements TimeTrackingUpdateListener {
   private static final GBC GBC_LEFT_COLUMN = GBCUtil.fixedToColumn(0, GBC.std().insets(5).span(1)).anchor(GBC.LINE_END);
   private static final GBC GBC_RIGHT_COLUMN = GBCUtil.fixedToColumn(1, GBC.eol().insets(5).span(1).fill(GBC.HORIZONTAL));
   private static final GBC GBC_BOTH_COLUMNS = GBCUtil.fixedToColumn(0, GBC.eol().insets(5).span(2).fill(GBC.HORIZONTAL));
@@ -44,11 +44,12 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
   private final JMultilineLabel previousTimeLabel = new JMultilineLabel(""); // populated later with appropriate text
   private final JPanel previousTimePanel = new JPanel(new BorderLayout());
+  private final TimeTrackingManager timeTrackingManager;
 
   /**
    * Creates a new dialog and registers it with the {@link TimeTrackingManager}
    */
-  public RovasDialog() {
+  public RovasConnectorDialog(final TimeTrackingManager timeTrackingManager) {
     super(
       I18n.tr("Rovas"),
       "rovas_logo",
@@ -59,6 +60,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
       RovasPreference.class,
       false
     );
+    this.timeTrackingManager = timeTrackingManager;
 
     final VerticallyScrollablePanel panel = new VerticallyScrollablePanel(new GridBagLayout());
 
@@ -83,18 +85,18 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
       panel.getVerticalScrollPane(),
       false,
       Collections.singletonList(
-        new SideButton(new ResetTimerAction())
+        new SideButton(new ResetTimerAction(timeTrackingManager))
       )
     );
 
-    TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(this);
+    timeTrackingManager.addAndFireTimeTrackingUpdateListener(this);
   }
 
   private void updatePreviousTime() {
-    final int previousMinutes = TimeConverterUtil.secondsToMinutes(TimeTrackingManager.getInstance().getPreviouslyTrackedSeconds());
+    final int previousMinutes = TimeConverterUtil.secondsToMinutes(timeTrackingManager.getPreviouslyTrackedSeconds());
     final String commonMessage = I18n.tr(
-      // i18n: {0} is the amount of previously tracked time as something like: "0h 42m"
-      "You have tracked {0} of active time before, which was not reported to Rovas.",
+      // i18n: {0} is the amount of previously tracked time as something like: "0 h 42 m"
+      "You have tracked {0} of active time in a previous JOSM session, which was not reported to Rovas.",
       String.format(
         "<strong>%d %s %d %s</strong>",
         previousMinutes / 60,
@@ -105,20 +107,26 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
     );
 
     if (previousMinutes > 0) {
-      new Notification(commonMessage + "<br>" + I18n.tr("If you want to add that time to your current timer, you can do that in the Rovas dialog."))
+      new Notification(
+        commonMessage + "<br>" +
+        I18n.tr("If you want to add that time to your current timer, you can do that in the Rovas dialog.")
+      )
         .setDuration(Notification.TIME_LONG)
         .setIcon(RovasPlugin.LOGO.setSize(ImageProvider.ImageSizes.DEFAULT).get())
         .show();
     }
     previousTimePanel.setVisible(previousMinutes > 0);
-    previousTimeLabel.setText(commonMessage + "<br>" + I18n.tr("Should this time be added to the currently tracked active time, or discard the previous time?"));
+    previousTimeLabel.setText(
+      commonMessage + "<br>" +
+      I18n.tr("Should this time be added to the currently tracked active time, or should the previous time be discarded?")
+    );
   }
 
   @Override
   public void destroy() {
     super.destroy();
-    TimeTrackingManager.getInstance().removeTimeTrackingUpdateListener(this);
-    RovasProperties.ALREADY_TRACKED_TIME.put(TimeTrackingManager.getInstance().commit());
+    timeTrackingManager.removeTimeTrackingUpdateListener(this);
+    RovasProperties.ALREADY_TRACKED_TIME.put(timeTrackingManager.commit());
   }
 
   @Override
@@ -154,7 +162,7 @@ public class RovasDialog extends ToggleDialog implements TimeTrackingUpdateListe
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-      TimeTrackingManager.getInstance().handlePreviouslyTrackedSeconds(shouldBeAdded);
+      timeTrackingManager.handlePreviouslyTrackedSeconds(shouldBeAdded);
       previousTimePanel.setVisible(false);
     }
   }

@@ -16,37 +16,51 @@ import app.rovas.josm.api.ApiCheckOrAddShareholder;
 import app.rovas.josm.gui.ApiCredentialsPanel;
 import app.rovas.josm.model.ApiCredentials;
 import app.rovas.josm.model.RovasProperties;
+import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.UrlProvider;
 
 /**
  * The first upload step where it is just checked, if the user is a shareholder in the selected project,
  * or if they can be made a shareholder. In the latter case, they are immediately made a shareholder.
  */
-public class UploadStep1AddShareholder extends UploadStep {
+public class UploadStep1AddShareholder implements UploadStep {
+
+  protected static final int MAX_STEP_REPETITIONS = 5;
 
   private final int minutes;
   private final Optional<Changeset> changeset;
 
   /**
    * Creates the first upload step
-   * @param parent the parent dialog
-   * @param urlProvider the URL provider that supplies the URLs used
    * @param minutes the number of minutes that will be reported to the server in the work report
    * @param changeset the changeset that should be associated with the work report, can be empty, but never null
    */
-  public UploadStep1AddShareholder(final Window parent, final UrlProvider urlProvider, final int minutes, @NotNull final Optional<Changeset> changeset) {
-    super(parent, urlProvider);
+  public UploadStep1AddShareholder(
+    final int minutes,
+    @NotNull final Optional<Changeset> changeset
+  ) {
+    super();
     this.minutes = minutes;
     this.changeset = Objects.requireNonNull(changeset);
   }
 
   @Override
-  public void showStep() {
+  public void showStep(
+    final Window parent,
+    final UrlProvider urlProvider,
+    final TimeTrackingManager timeTrackingManager
+  ) {
     parent.setVisible(false);
-    showStep(false, 0);
+    showStep(parent, urlProvider, timeTrackingManager, false, 0);
   }
 
-  private void showStep(final boolean forceCredentialsDialog, final int recursionDepth) {
+  private void showStep(
+    final Window parent,
+    final UrlProvider urlProvider,
+    final TimeTrackingManager timeTrackingManager,
+    final boolean forceCredentialsDialog,
+    final int recursionDepth
+  ) {
     final Optional<ApiCredentials> initialCredentials = ApiCredentials.createFrom(
       RovasProperties.ROVAS_API_KEY.get(),
       RovasProperties.ROVAS_API_TOKEN.get(),
@@ -78,7 +92,7 @@ public class UploadStep1AddShareholder extends UploadStep {
 
     new ApiCheckOrAddShareholder(urlProvider).query(
       credentials,
-      meritId -> new UploadStep2CreateWorkReport(parent, urlProvider, credentials, minutes, changeset).showStep(),
+      meritId -> new UploadStep2CreateWorkReport(credentials, minutes, changeset).showStep(parent, urlProvider, timeTrackingManager),
       errorCode -> {
         if (recursionDepth < MAX_STEP_REPETITIONS && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
           parent,
@@ -92,7 +106,7 @@ public class UploadStep1AddShareholder extends UploadStep {
           JOptionPane.YES_NO_OPTION,
           JOptionPane.WARNING_MESSAGE
         )) {
-          showStep(true, recursionDepth + 1);
+          showStep(parent, urlProvider, timeTrackingManager, true, recursionDepth + 1);
         } else {
           parent.setVisible(true);
         }

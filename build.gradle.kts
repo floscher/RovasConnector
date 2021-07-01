@@ -18,6 +18,7 @@ plugins {
 }
 
 josm {
+  pluginName = "RovasConnector"
   initialPreferences.set("<tag key='rovas.developer' value='true'/>")
   josmCompileVersion = "17919"
   manifest {
@@ -77,7 +78,7 @@ sourceSets.main {
 
 tasks {
   val generateBuildInfoClass by registering {
-    val content = provider {
+    val content: (Instant) -> String = {
       """
 // License: GPL. For details, see LICENSE file.
 package app.rovas.josm.gen;
@@ -88,7 +89,7 @@ import ${ if (JavaVersion.current().isJava9Compatible) "javax.annotation.process
 import app.rovas.josm.util.UrlProvider;
 
 /** Makes the plugin version and OSM wiki URL accessible at runtime. */
-@Generated(value = "gradle", date = "${Instant.now()}")
+@Generated(value = "gradle", date = "$it")
 public final class BuildInfo {
   public static final URL OSM_WIKI_URL = UrlProvider.uncheckedURL("${josm.manifest.website}");
   public static final String VERSION_NAME = "${GitDescriber(projectDir).describe(trimLeading = true)}";
@@ -100,13 +101,13 @@ public final class BuildInfo {
     }
     val file = generatedSrcDir.map { it.resolve("app/rovas/josm/gen/BuildInfo.java") }
 
-    inputs.property("content", content)
+    inputs.property("content", provider { content(Instant.ofEpochSecond(0)) })
     outputs.file(file)
     actions = listOf(
       Action {
         file.get().apply {
           parentFile.mkdirs()
-          writeText(content.get())
+          writeText(content(Instant.now()))
         }
       }
     )

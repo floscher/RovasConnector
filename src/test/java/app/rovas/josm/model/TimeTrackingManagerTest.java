@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.openstreetmap.josm.tools.Logging;
@@ -21,9 +23,17 @@ import app.rovas.josm.gui.TimeTrackingUpdateListener;
 
 public class TimeTrackingManagerTest {
 
+  private TimeTrackingManager timeTrackingManager;
+
   @BeforeAll
   public static void before() {
     Logging.setLogLevel(Level.FINEST);
+  }
+
+  @BeforeEach
+  protected void beforeEach() {
+    RovasProperties.ALREADY_TRACKED_TIME.put(42L);
+    timeTrackingManager = new TimeTrackingManager();
   }
 
   @Test
@@ -34,11 +44,15 @@ public class TimeTrackingManagerTest {
       1000
     );
 
+    timeTrackingManager.setCurrentlyTrackedSeconds(0);
+
     assertChangeEventSeries(
       new long[] { 0, 0, 1, 2, 3, 33, 35, 65 },
       new long[] {    1, 2, 3, 4, 60, 62 },
       1000
     );
+
+    timeTrackingManager.setCurrentlyTrackedSeconds(0);
 
     assertChangeEventSeries(
       new long[] { 0, 0, 15, 45, 50, 55, 75,  90, 120 },
@@ -57,6 +71,8 @@ public class TimeTrackingManagerTest {
     );
     assertBackwardsClockWarningWasFired(2);
 
+    timeTrackingManager.setCurrentlyTrackedSeconds(0);
+
     assertChangeEventSeries(
       new long[] { 0,   0,   5,  12, 12,  22,  27, 57 },
       new long[] {    100, 105, 112, 90, 100, 105 },
@@ -74,6 +90,21 @@ public class TimeTrackingManagerTest {
     );
   }
 
+  @Test
+  protected void testAddPreviousTime() throws ReflectiveOperationException {
+    final MockTimeListener listener = new MockTimeListener();
+    timeTrackingManager.addAndFireTimeTrackingUpdateListener(listener);
+
+    Stream.of(50, 73, 101).map(Instant::ofEpochSecond).forEach(timeTrackingManager::trackChangeAt);
+    timeTrackingManager.handlePreviouslyTrackedSeconds(true);
+    Stream.of(120, 125).map(Instant::ofEpochSecond).forEach(timeTrackingManager::trackChangeAt);
+    timeTrackingManager.commit(Instant.ofEpochSecond(130));
+
+    assertArrayEquals(new long[]{ 0, 0, 23, 51, 93, 112, 117, 122 }, listener.getReceivedUpdates());
+
+    timeTrackingManager.removeTimeTrackingUpdateListener(listener);
+  }
+
   /**
    * @param expectedUpdates the expected values that are reported by the {@link TimeTrackingManager} to the {@link TimeTrackingUpdateListener}
    * @param changeEventTimestamps the unix timestamps at which {@link TimeTrackingManager#trackChangeAt(Instant)} is called
@@ -84,23 +115,21 @@ public class TimeTrackingManagerTest {
     final long commitTimestamp
   ) {
     final MockTimeListener listener = new MockTimeListener();
-    TimeTrackingManager.getInstance().addAndFireTimeTrackingUpdateListener(listener);
+    timeTrackingManager.addAndFireTimeTrackingUpdateListener(listener);
 
     Arrays.stream(changeEventTimestamps)
       .mapToObj(Instant::ofEpochSecond)
-      .forEach(TimeTrackingManager.getInstance()::trackChangeAt);
+      .forEach(timeTrackingManager::trackChangeAt);
     Logging.info("Expectation: " + Arrays.stream(expectedUpdates).mapToObj(String::valueOf).collect(Collectors.joining(", ")));
     assertEquals(
       expectedUpdates[expectedUpdates.length - 1],
-      TimeTrackingManager.getInstance().commit(Instant.ofEpochSecond(commitTimestamp)),
+      timeTrackingManager.commit(Instant.ofEpochSecond(commitTimestamp)),
       () -> "Expected different time after commit. Received these updates: " + Arrays.stream(listener.getReceivedUpdates()).mapToObj(String::valueOf).collect(Collectors.joining(", "))
     );
     Logging.info("     Actual: " + Arrays.stream(listener.getReceivedUpdates()).mapToObj(String::valueOf).collect(Collectors.joining(", ")));
     assertArrayEquals(expectedUpdates, listener.getReceivedUpdates());
 
-    // Reset time tracking manager
-    TimeTrackingManager.getInstance().setCurrentlyTrackedSeconds(0);
-    TimeTrackingManager.getInstance().removeTimeTrackingUpdateListener(listener);
+    timeTrackingManager.removeTimeTrackingUpdateListener(listener);
   }
 
   private void assertBackwardsClockWarningWasFired(final int n) {

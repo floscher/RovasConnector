@@ -1,7 +1,10 @@
 /.gradle/
 /.idea/
 /.run/
+/.settings/
 /build/
 /buildSrc/.gradle/
 /buildSrc/build/
 /out/
+/.classpath
+/.project

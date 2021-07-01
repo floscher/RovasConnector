@@ -27,6 +27,7 @@ import org.openstreetmap.josm.tools.Utils;
 
 import app.rovas.josm.RovasPlugin;
 import app.rovas.josm.gui.upload.UploadStep1AddShareholder;
+import app.rovas.josm.model.TimeTrackingManager;
 import app.rovas.josm.util.GuiComponentFactory;
 import app.rovas.josm.util.I18nStrings;
 import app.rovas.josm.util.TimeConverterUtil;
@@ -48,16 +49,19 @@ public class CreateRovasReportDialog extends JDialog {
       @Override
       public void actionPerformed(final ActionEvent e) {
         new UploadStep1AddShareholder(
-          CreateRovasReportDialog.this,
-          UrlProvider.getInstance(),
           hoursModel.getNumber().intValue() * 60 + minutesModel.getNumber().intValue(),
           changeset
-        ).showStep();
+        ).showStep(
+          CreateRovasReportDialog.this,
+          UrlProvider.getInstance(),
+          CreateRovasReportDialog.this.timeTrackingManager
+        );
       }
     }
   );
 
   private final transient Optional<Changeset> changeset;
+  private final TimeTrackingManager timeTrackingManager;
 
   /**
    * The dialog that is shown after an OSM upload completed. With it, the user can correct the recorded time
@@ -65,11 +69,12 @@ public class CreateRovasReportDialog extends JDialog {
    * @param changeset the OSM {@link Changeset} for which the work report will be created. Usually present, but could be empty.
    * @param defaultReportedSeconds the time (in seconds) that should be shown initially in the dialog, before the user edits it
    */
-  public CreateRovasReportDialog(final Optional<Changeset> changeset, final long defaultReportedSeconds) {
+  public CreateRovasReportDialog(final TimeTrackingManager timeTrackingManager, final Optional<Changeset> changeset, final long defaultReportedSeconds) {
     super(MainApplication.getMainFrame(), I18n.tr("Create work report"), true);
 
     final int defaultReportedMinutes = Math.min(Integer.MAX_VALUE, TimeConverterUtil.secondsToMinutes(defaultReportedSeconds));
 
+    this.timeTrackingManager = timeTrackingManager;
     this.changeset = changeset;
     this.hoursModel = new SpinnerNumberModel(Utils.clamp(defaultReportedMinutes / 60, 0, TimeConverterUtil.MAX_HOURS), 0, TimeConverterUtil.MAX_HOURS, 1);
     this.minutesModel = new SpinnerNumberModel(defaultReportedMinutes % 60, 0, 59, 1);
@@ -121,6 +126,10 @@ public class CreateRovasReportDialog extends JDialog {
           @Override
           public void actionPerformed(final ActionEvent e) {
             dispose();
+            if (changeset.isPresent()) {
+              // Reset the timer if there is a changeset but no work report created
+              timeTrackingManager.setCurrentlyTrackedSeconds(0);
+            }
           }
         })
       ),
