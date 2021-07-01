@@ -52,7 +52,7 @@ public class CreateRovasReportDialog extends JDialog {
           hoursModel.getNumber().intValue() * 60 + minutesModel.getNumber().intValue(),
           changeset
         ).showStep(
-          CreateRovasReportDialog.this,
+          Optional.of(CreateRovasReportDialog.this),
           UrlProvider.getInstance(),
           CreateRovasReportDialog.this.timeTrackingManager
         );

@@ -46,16 +46,16 @@ public class UploadStep1AddShareholder implements UploadStep {
 
   @Override
   public void showStep(
-    final Window parent,
-    final UrlProvider urlProvider,
-    final TimeTrackingManager timeTrackingManager
+    @NotNull final Optional<Window> parent,
+    @NotNull final UrlProvider urlProvider,
+    @NotNull final TimeTrackingManager timeTrackingManager
   ) {
-    parent.setVisible(false);
+    parent.ifPresent(it -> it.setVisible(false));
     showStep(parent, urlProvider, timeTrackingManager, false, 0);
   }
 
   private void showStep(
-    final Window parent,
+    @NotNull final Optional<Window> parent,
     final UrlProvider urlProvider,
     final TimeTrackingManager timeTrackingManager,
     final boolean forceCredentialsDialog,
@@ -80,7 +80,7 @@ public class UploadStep1AddShareholder implements UploadStep {
           );
         } else {
           // Go back to the main dialog
-          parent.setVisible(true);
+          parent.ifPresent(it -> it.setVisible(true));
           return;
         }
       }
@@ -95,7 +95,7 @@ public class UploadStep1AddShareholder implements UploadStep {
       meritId -> new UploadStep2CreateWorkReport(credentials, minutes, changeset).showStep(parent, urlProvider, timeTrackingManager),
       errorCode -> {
         if (recursionDepth < MAX_STEP_REPETITIONS && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-          parent,
+          parent.orElse(null),
           "<html>" +
             I18n.tr(errorCode.getTranslatableMessage()) +
             errorCode.getCode().map(code -> " " + I18n.tr("(error {0})", code)).orElse("") +
@@ -108,7 +108,7 @@ public class UploadStep1AddShareholder implements UploadStep {
         )) {
           showStep(parent, urlProvider, timeTrackingManager, true, recursionDepth + 1);
         } else {
-          parent.setVisible(true);
+          parent.ifPresent(it -> it.setVisible(true));
         }
       }
     );

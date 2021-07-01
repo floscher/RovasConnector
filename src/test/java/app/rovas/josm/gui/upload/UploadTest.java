@@ -9,9 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
-import java.awt.Window;
 import java.util.Optional;
-import javax.swing.JFrame;
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -31,7 +29,6 @@ public class UploadTest {
   @Test
   @DisplayName("Test that the upload steps run through if all the steps are successful")
   protected void test(final Stubbing server, final UrlProvider urlProvider) {
-    final Window parent = new JFrame();
     final TimeTrackingManager timeTrackingManager = new TimeTrackingManager();
 
     RovasProperties.ROVAS_API_KEY.put("abc");
@@ -42,7 +39,7 @@ public class UploadTest {
     server.stubFor(post("/rovas/rules/rules_proxy_create_work_report").willReturn(okJson("{\"created_wr_nid\": 5678}")));
     server.stubFor(post("/rovas/rules/rules_proxy_create_aur").willReturn(okJson("{\"result\": 91011}")));
 
-    new UploadStep1AddShareholder(12, Optional.empty()).showStep(parent, urlProvider, timeTrackingManager);
+    new UploadStep1AddShareholder(12, Optional.empty()).showStep(Optional.empty(), urlProvider, timeTrackingManager);
 
     server.verify(
       exactly(1),

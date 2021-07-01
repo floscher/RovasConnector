@@ -4,8 +4,9 @@ package app.rovas.josm.gui.upload;
 import java.awt.Window;
 import java.util.Objects;
 import java.util.Optional;
-
 import javax.swing.JOptionPane;
+
+import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.tools.I18n;
@@ -43,11 +44,11 @@ public class UploadStep2CreateWorkReport implements UploadStep {
 
   @Override
   public void showStep(
-    final Window parent,
-    final UrlProvider urlProvider,
-    final TimeTrackingManager timeTrackingManager
+    @NotNull final Optional<Window> parent,
+    @NotNull final UrlProvider urlProvider,
+    @NotNull final TimeTrackingManager timeTrackingManager
   ) {
-    parent.setVisible(false);
+    parent.ifPresent(it -> it.setVisible(false));
 
     new ApiCreateWorkReport(urlProvider, minutes, changeset).query(
       credentials,
@@ -59,7 +60,7 @@ public class UploadStep2CreateWorkReport implements UploadStep {
         if (errorCode.getContinueOption() == ApiCreateWorkReport.ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY) {
           new UploadStep3CreateAur(credentials, 0, minutes).showStep(parent, urlProvider, timeTrackingManager);
         } else {
-          parent.setVisible(true);
+          parent.ifPresent(it -> it.setVisible(true));
         }
       }
     );
@@ -69,9 +70,9 @@ public class UploadStep2CreateWorkReport implements UploadStep {
    * Displays a {@link JOptionPane} as a warning with an error message
    * @param errorCode the error code with the message to show
    */
-  private void showErrorMessage(final Window parent, final ApiQuery.ErrorCode errorCode) {
+  private void showErrorMessage(final Optional<Window> parent, final ApiQuery.ErrorCode errorCode) {
     JOptionPane.showMessageDialog(
-      parent,
+      parent.orElse(null),
       I18n.tr(
         "An error occured!: {0}{1}",
         errorCode.getCode().map(it -> it + " ").orElse(""),

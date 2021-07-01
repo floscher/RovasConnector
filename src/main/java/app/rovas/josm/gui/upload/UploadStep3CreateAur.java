@@ -2,7 +2,10 @@
 package app.rovas.josm.gui.upload;
 
 import java.awt.Window;
+import java.util.Optional;
 import javax.swing.JOptionPane;
+
+import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.widgets.HtmlPanel;
@@ -37,12 +40,12 @@ public class UploadStep3CreateAur implements UploadStep {
 
   @Override
   public void showStep(
-    final Window parent,
-    final UrlProvider urlProvider,
-    final TimeTrackingManager timeTrackingManager
+    @NotNull final Optional<Window> parent,
+    @NotNull final UrlProvider urlProvider,
+    @NotNull final TimeTrackingManager timeTrackingManager
   ) {
     timeTrackingManager.setCurrentlyTrackedSeconds(0);
-    parent.dispose();
+    parent.ifPresent(Window::dispose);
     new ApiCreateAur(urlProvider, workReportId, reportedMinutes).query(
       credentials,
       result -> {
@@ -55,7 +58,7 @@ public class UploadStep3CreateAur implements UploadStep {
           .setDuration(Notification.TIME_LONG)
           .show();
       },
-      errorCode -> JOptionPane.showMessageDialog(parent, I18n.tr("Failed to create AUR!"))
+      errorCode -> JOptionPane.showMessageDialog(parent.orElse(null), I18n.tr("Failed to create AUR!"))
     );
   }
 }
