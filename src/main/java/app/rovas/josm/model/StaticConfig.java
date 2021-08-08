@@ -20,6 +20,10 @@ public final class StaticConfig {
    * The project ID of the JOSM connector project in Rovas.
    */
   public static final int ROVAS_CONNECTOR_PROJECT_ID = 35_259;
+  /**
+   * The project ID of the JOSM connector project on the dev server.
+   */
+  public static final int ROVAS_CONNECTOR_PROJECT_ID_DEV = 24_682;
   public static final int ROVAS_OSM_PROJECT_ID = 1998;
   public static final String ROVAS_CONNECTOR_PROJECT_URL = "https://rovas.app/josm_rovas_connector";
   /**

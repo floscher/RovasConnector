@@ -120,4 +120,8 @@ public class UrlProvider {
   public URL rulesCreateWorkReport() {
     return uncheckedURL(getBaseUrl() + "/rovas/rules/rules_proxy_create_work_report");
   }
+
+  public URL rulesFetchUserData() {
+    return uncheckedURL(getBaseUrl() + "/rovas/rules/rules_fetch_user_data");
+  }
 }

@@ -7,10 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class NonBlankTextFieldValidatorTest {
 
+  @DisplayName("Basic check that blank field is considered invalid")
   @Test
   public void test() {
     final JTextField field = new JTextField();

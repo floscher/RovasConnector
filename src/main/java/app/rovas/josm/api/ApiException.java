@@ -34,6 +34,9 @@ public abstract class ApiException extends Exception {
     return translatableMessage;
   }
 
+  /**
+   * @return a message that can be displayed to the user, it is already translated by {@link I18n#tr(String, Object...)}
+   */
   @Override
   public String getLocalizedMessage() {
     return I18n.tr(translatableMessage);
@@ -93,7 +96,7 @@ public abstract class ApiException extends Exception {
       super(
         url,
         I18n.marktr(
-          "A work report could not be created, because the API key and/or token set in the preferences are incorrect, or your Rovas access was restricted. Please log into Rovas to verify your credentials and status."
+          "Could not log in to the Rovas API! The API key and/or token set in the preferences are incorrect, or your Rovas access was restricted. Please log into Rovas to verify your credentials and status."
         ),
         false,
         null

@@ -13,17 +13,14 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.function.Function;
 import javax.json.Json;
 import javax.json.JsonException;
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonString;
-import javax.json.JsonValue;
 
 import com.drew.lang.annotations.NotNull;
+import com.drew.lang.annotations.Nullable;
 
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
@@ -43,9 +40,7 @@ import app.rovas.josm.util.UrlProvider;
  * {@link ApiException} in case of an error.
  * @param <EC> the type of error code that will be returned in case of an error
  */
-public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
-  private static final Pattern POSITIVE_INT_PATTERN = Pattern.compile("^-?[0-9]+$");
-
+public abstract class ApiQuery<R, EC extends ApiQuery.ErrorCode> {
   protected final UrlProvider urlProvider;
   protected final URL queryUrl;
 
@@ -59,18 +54,13 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     this.queryUrl = queryUrl;
   }
 
-  /**
-   * @return an array of all "known" error codes that the server returns
-   */
-  protected abstract EC[] getKnownErrorCodes();
+  @NotNull
+  protected abstract Optional<EC> getErrorCodeForResult(@NotNull final R result);
 
-  /**
-   * Creates a custom error code (used for errors that are not returned by the API, like connection errors or similar)
-   * @param code the error code, can be empty if the API didn't return a number
-   * @param translatableMessage a message describing the error, this should be a message that can be passed to {@link I18n#tr(String, Object...)}
-   * @return the newly created error code
-   */
-  protected abstract EC createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage);
+  @NotNull
+  protected abstract EC getErrorCodeForException(@NotNull final ApiException exception);
+
+  protected abstract String getQueryLabel();
 
   /**
    * @param credentials the user's API credentials
@@ -80,7 +70,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * @throws ApiException.WrongPluginApiCredentials if the API credentials are invalid
    * @throws ApiException see the more specific descriptions of the subclasses
    */
-  protected abstract int query(final ApiCredentials credentials) throws ApiException;
+  protected abstract R query(final ApiCredentials credentials) throws ApiException;
 
   /**
    * A wrapper for {@link #query(ApiCredentials)} that uses callbacks instead of throwing exceptions
@@ -91,27 +81,20 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
   @SuppressWarnings("PMD.AvoidInstanceofChecksInCatchClause")
   public void query(
     final ApiCredentials credentials,
-    final Consumer<Integer> successCallback,
+    final Consumer<R> successCallback,
     final Consumer<EC> errorCallback
   ) {
     try {
-      final int result = query(credentials);
-      final Optional<EC> errorCode = Stream.of(getKnownErrorCodes())
-        .filter(it -> it.getCode().map(code -> code == result).orElse(false))
-        .findFirst();
+      final R result = query(credentials);
+      final Optional<EC> errorCode = getErrorCodeForResult(result);
       if (errorCode.isPresent()) {
         errorCallback.accept(errorCode.get());
       } else {
-        final Optional<Integer> success = Optional.of(result).filter(it -> it > 0);
-        if (success.isPresent()) {
-          Logging.debug("[rovas] API query successful ({0})", success.get());
-          successCallback.accept(success.get());
-        } else {
-          errorCallback.accept(createAdditionalErrorCode(Optional.of(result), I18n.marktr("An unknown error occurred!")));
-        }
+        Logging.debug("[rovas] API query successful ({0})", result);
+        successCallback.accept(result);
       }
     } catch (final ApiException e) {
-      errorCallback.accept(createAdditionalErrorCode(Optional.empty(), e.getMessage()));
+      errorCallback.accept(getErrorCodeForException(e));
       if (e.isShouldBeReportedAsBug()) {
         BugReportQueue.getInstance().submit(new ReportedException(e));
       }
@@ -125,7 +108,8 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
    * @return the opened {@link URLConnection} after the request has been sent already
    * @throws ApiException.ConnectionFailure if in the process a connection error occured
    */
-  protected URLConnection sendPostRequest(final ApiCredentials credentials, final JsonObjectBuilder requestContent) throws ApiException.ConnectionFailure {
+  protected URLConnection sendPostRequest(@NotNull final ApiCredentials credentials, @Nullable final JsonObjectBuilder requestContent) throws ApiException.ConnectionFailure {
+    Logging.debug("Sending POST request to " + queryUrl);
     final URLConnection connection;
     try {
       connection = queryUrl.openConnection();
@@ -148,7 +132,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
         ((HttpURLConnection) connection).setRequestMethod("POST");
       }
       try (Writer writer = new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8)) {
-        final String request = requestContent.build().toString();
+        final String request = Optional.ofNullable(requestContent).map(it -> it.build().toString()).orElse("");
         Logging.debug("[rovas] API request:\n{0}", request);
         writer.write(request);
       }
@@ -162,11 +146,10 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
   /**
    * Decodes JSON in the form {@code {"result": "42"}} from the given input stream.
    * @param connection the connection from which the response is read
-   * @param key the JSON key to which the resulting value is mapped
    * @return the result, that was encoded in the result. Either an error code, or an ID.
    * @throws ApiException if an unexpected error occured, like decoding failed or connection was aborted
    */
-  protected static int decodeJsonResult(final URLConnection connection, final String key) throws ApiException {
+  protected R decodeJsonResult(final URLConnection connection, final Function<JsonObject, Optional<R>> decoder) throws ApiException {
     final ByteArrayOutputStream capture = new ByteArrayOutputStream();
     try (ByteArrayOutputStream capture2 = capture) {
       if (connection instanceof HttpURLConnection && HttpURLConnection.HTTP_UNAUTHORIZED == ((HttpURLConnection) connection).getResponseCode()) {
@@ -174,7 +157,7 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
       }
       try (TeeInputStream stream = new TeeInputStream(connection.getInputStream(), capture2)) {
         return Optional.ofNullable(Json.createReader(stream).readObject())
-          .flatMap(it -> decodeJsonResult(it, key))
+          .flatMap(decoder)
           .orElseThrow(() -> {
             Logging.warn(MessageFormat.format("Can''t decode this ({0} bytes):\n{1}", capture.toByteArray().length, new String(capture.toByteArray(), StandardCharsets.UTF_8)));
             return new ApiException.DecodeResponse(connection.getURL(), null);
@@ -188,23 +171,6 @@ public abstract class ApiQuery<EC extends ApiQuery.ErrorCode> {
     } finally {
       disconnect(connection);
     }
-  }
-
-  private static Optional<Integer> decodeJsonResult(final JsonObject json, final String key) {
-    final JsonValue value = json.get(key);
-    final Optional<Integer> result;
-    if (value instanceof JsonString) {
-      result = Optional.of((JsonString) value)
-        .map(JsonString::getString)
-        .filter(string -> POSITIVE_INT_PATTERN.matcher(string).matches())
-        .map(Integer::parseInt);
-    } else if (value instanceof JsonNumber) {
-      result = Optional.of((JsonNumber) value)
-        .map(JsonNumber::intValue);
-    } else {
-      result = Optional.empty();
-    }
-    return result;
   }
 
   private static void disconnect(final URLConnection connection) {

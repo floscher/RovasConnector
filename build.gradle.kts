@@ -108,6 +108,7 @@ public final class BuildInfo {
         file.get().apply {
           parentFile.mkdirs()
           writeText(content(Instant.now()))
+          logger.lifecycle("Generated ${file.get()}")
         }
       }
     )

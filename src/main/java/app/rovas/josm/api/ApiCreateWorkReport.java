@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.json.Json;
 
 import com.drew.lang.annotations.NotNull;
@@ -15,14 +16,15 @@ import org.openstreetmap.josm.data.osm.Changeset;
 import org.openstreetmap.josm.tools.I18n;
 
 import app.rovas.josm.gen.BuildInfo;
-import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.model.StaticConfig;
+import app.rovas.josm.util.JsonUtil;
 import app.rovas.josm.util.UrlProvider;
 
 /**
  * API query for creating a work report
  */
-public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.ErrorCode> {
+public final class ApiCreateWorkReport extends ApiQuery<Integer, ApiCreateWorkReport.ErrorCode> {
   private static final SecureRandom RANDOM = new SecureRandom();
 
   private final double minutes;
@@ -40,40 +42,64 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
     this.changeset = changeset;
   }
 
-  @Override
-  protected ErrorCode[] getKnownErrorCodes() {
-    return new ErrorCode[]{
+  private static final ErrorCode[] KNOWN_CODES = new ErrorCode[]{
+    new ErrorCode(
+      Optional.of(0),
+      // This error is not expected to happen. The report is always marked as published!
+      I18n.marktr("The report is unpublished and no verifiers were invited!"),
+      ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
+    ),
+    new ErrorCode(
+      Optional.of(-1),
+      I18n.marktr("You are not a shareholder in the project with ID set in the preferences!"),
+      ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
+    ),
       new ErrorCode(
-        Optional.of(0),
-        // This error is not expected to happen. The report is always marked as published!
-        I18n.marktr("The report is unpublished and no verifiers were invited!"),
-        ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
-      ),
-      new ErrorCode(
-        Optional.of(-1),
-        I18n.marktr("You are not a shareholder in the project with ID set in the preferences!"),
+        Optional.of(-2),
+        I18n.marktr("The report you are trying to create has the `date_started` earlier than the date when you registered for Rovas!"),
         ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
       ),
-        new ErrorCode(
-          Optional.of(-2),
-          I18n.marktr("The report you are trying to create has the `date_started` earlier than the date when you registered for Rovas!"),
-          ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
-        ),
-        new ErrorCode(
-          Optional.of(-3),
-          I18n.marktr("A work report was created, but no verifiers were invited as you have outstanding reports to verify. Please login to Rovas and verify the reports!"),
-          ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
-        ),
-    };
+      new ErrorCode(
+        Optional.of(-3),
+        I18n.marktr("A work report was created, but no verifiers were invited as you have outstanding reports to verify. Please login to Rovas and verify the reports!"),
+        ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
+      ),
+  };
+
+
+  @NotNull
+  @Override
+  protected Optional<ErrorCode> getErrorCodeForResult(@NotNull Integer result) {
+    if (result > 0) {
+      return Optional.empty();
+    }
+    return Optional.of(
+      Stream.of(KNOWN_CODES)
+        .filter(it -> it.getCode().isPresent() && it.getCode().get().equals(result))
+        .findFirst()
+        .orElse(new ErrorCode(Optional.of(result), I18n.marktr("An unknown error occured (code=" + result + ")!"), ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN))
+    );
+  }
+
+  @NotNull
+  @Override
+  protected ErrorCode getErrorCodeForException(@NotNull ApiException exception) {
+    return new ErrorCode(
+      Optional.empty(),
+      exception.getMessage(),
+      exception instanceof ApiException.DecodeResponse || exception instanceof ApiException.ConnectionFailure
+        ? ErrorCode.ContinueOption.CONTINUE_TO_AUR_QUERY
+        : ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN
+    );
   }
 
   @Override
-  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
-    return new ErrorCode(code, translatableMessage, ErrorCode.ContinueOption.SHOW_WORK_REPORT_DIALOG_AGAIN);
+  protected String getQueryLabel() {
+    return "create work report";
   }
 
   @Override
-  protected int query(final ApiCredentials credentials) throws ApiException {
+  protected Integer query(final ApiCredentials credentials) throws ApiException {
     final byte[] accessToken = new byte[12]; // 12 bytes → 16 Base64 characters
     RANDOM.nextBytes(accessToken);
 
@@ -110,7 +136,7 @@ public final class ApiCreateWorkReport extends ApiQuery<ApiCreateWorkReport.Erro
         .add("access_token", Base64.getEncoder().encodeToString(accessToken))
         .add("publish_status", 1)
     );
-    return decodeJsonResult(connection, "created_wr_nid");
+    return decodeJsonResult(connection, it -> JsonUtil.extractResponseCode(it, "created_wr_nid"));
   }
 
   /**

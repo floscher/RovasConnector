@@ -6,17 +6,21 @@ import java.util.Locale;
 import java.util.Optional;
 import javax.json.Json;
 
+import com.drew.lang.annotations.NotNull;
+
 import org.openstreetmap.josm.tools.I18n;
 
-import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.model.RovasProperties;
+import app.rovas.josm.model.StaticConfig;
+import app.rovas.josm.util.JsonUtil;
 import app.rovas.josm.util.TimeConverterUtil;
 import app.rovas.josm.util.UrlProvider;
 
 /**
  * The API query that creates the Asset Usage Record (AUR) for the work report that has been created.
  */
-public final class ApiCreateAur extends ApiQuery<ApiQuery.ErrorCode> {
+public final class ApiCreateAur extends ApiQuery<Integer, ApiQuery.ErrorCode> {
   private final int workReportId;
   private final int reportedMinutes;
 
@@ -32,26 +36,41 @@ public final class ApiCreateAur extends ApiQuery<ApiQuery.ErrorCode> {
     this.reportedMinutes = reportedMinutes;
   }
 
+  @NotNull
   @Override
-  protected ErrorCode[] getKnownErrorCodes() {
-    return new ErrorCode[0];
+  protected Optional<ErrorCode> getErrorCodeForResult(@NotNull Integer result) {
+    if (result > 0) {
+      return Optional.empty();
+    }
+    return Optional.of(new ErrorCode(Optional.of(result), I18n.marktr("An unknown error occured!")));
+  }
+
+  @NotNull
+  @Override
+  protected ErrorCode getErrorCodeForException(@NotNull ApiException exception) {
+    return new ErrorCode(Optional.empty(), exception.getLocalizedMessage());
   }
 
   @Override
-  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
-    return new ErrorCode(code, translatableMessage);
+  protected String getQueryLabel() {
+    return "create AUR";
   }
 
   @Override
-  protected int query(final ApiCredentials credentials) throws ApiException {
+  protected Integer query(final ApiCredentials credentials) throws ApiException {
     final URLConnection connection = sendPostRequest(
       credentials,
       Json.createObjectBuilder()
-        .add("project_id", StaticConfig.ROVAS_CONNECTOR_PROJECT_ID)
+        .add(
+          "project_id",
+          RovasProperties.DEVELOPER.get()
+            ? StaticConfig.ROVAS_CONNECTOR_PROJECT_ID_DEV
+            : StaticConfig.ROVAS_CONNECTOR_PROJECT_ID
+        )
         .add("wr_id", workReportId)
         .add("usage_fee", TimeConverterUtil.minutesToChrons(reportedMinutes) * StaticConfig.ASSET_USAGE_FEE)
         .add("note", I18n.tr("{0}% fee levied by the ''JOSM Rovas connector'' project for using the plugin", String.format(Locale.ROOT, "%.2f", StaticConfig.ASSET_USAGE_FEE * 100)))
     );
-    return decodeJsonResult(connection, "result");
+    return decodeJsonResult(connection, it -> JsonUtil.extractResponseCode(it, "result"));
   }
 }

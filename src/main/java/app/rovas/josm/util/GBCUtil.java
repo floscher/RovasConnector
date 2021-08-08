@@ -4,6 +4,7 @@ package app.rovas.josm.util;
 import java.awt.GridBagConstraints;
 
 import com.drew.lang.annotations.NotNull;
+
 import org.openstreetmap.josm.tools.GBC;
 
 /**

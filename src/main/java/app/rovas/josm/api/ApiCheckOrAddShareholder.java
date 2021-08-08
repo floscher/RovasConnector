@@ -3,11 +3,15 @@ package app.rovas.josm.api;
 
 import java.net.URLConnection;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.json.Json;
+
+import com.drew.lang.annotations.NotNull;
 
 import org.openstreetmap.josm.tools.I18n;
 
 import app.rovas.josm.model.ApiCredentials;
+import app.rovas.josm.util.JsonUtil;
 import app.rovas.josm.util.UrlProvider;
 
 /**
@@ -15,25 +19,17 @@ import app.rovas.josm.util.UrlProvider;
  * See <a href="https://merit.world/rovas-api#/rule/post_rovas_rules_rules_proxy_check_or_add_shareholder">
  * the API documentation for this endpoint</a>.
  */
-public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode> {
-  @Override
-  protected ErrorCode[] getKnownErrorCodes() {
-    return new ErrorCode[]{
-      new ErrorCode(
-        Optional.of(0),
-        I18n.marktr("You could not have been made a shareholder of the project with the ID set in the preferences.")
-      ),
-      new ErrorCode(
-        Optional.of(-1),
-        I18n.marktr("Could not find any project with the project ID that is set in the preferences!")
-      ),
-    };
-  }
-
-  @Override
-  protected ErrorCode createAdditionalErrorCode(final Optional<Integer> code, final String translatableMessage) {
-    return new ErrorCode(code, translatableMessage);
-  }
+public final class ApiCheckOrAddShareholder extends ApiQuery<Integer, ApiQuery.ErrorCode> {
+  private static final ErrorCode[] KNOWN_CODES = new ErrorCode[]{
+    new ErrorCode(
+      Optional.of(0),
+      I18n.marktr("You could not have been made a shareholder of the project with the ID set in the preferences.")
+    ),
+    new ErrorCode(
+      Optional.of(-1),
+      I18n.marktr("Could not find any project with the project ID that is set in the preferences!")
+    ),
+  };
 
   /**
    * Creates the API query.
@@ -41,6 +37,31 @@ public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode>
    */
   public ApiCheckOrAddShareholder(final UrlProvider urlProvider) {
     super(urlProvider, urlProvider.rulesCheckOrAddShareholder());
+  }
+
+  @NotNull
+  @Override
+  protected Optional<ErrorCode> getErrorCodeForResult(@NotNull Integer result) {
+    if (result > 0) {
+      return Optional.empty();
+    }
+    return Optional.of(
+      Stream.of(KNOWN_CODES)
+        .filter(it -> it.getCode().isPresent() && it.getCode().get().equals(result))
+        .findFirst()
+        .orElse(new ErrorCode(Optional.of(result), I18n.marktr("An unknown error occured (code=" + result + ")!")))
+    );
+  }
+
+  @NotNull
+  @Override
+  protected ErrorCode getErrorCodeForException(@NotNull ApiException exception) {
+    return new ErrorCode(Optional.empty(), exception.getLocalizedMessage());
+  }
+
+  @Override
+  protected String getQueryLabel() {
+    return "check or add shareholder";
   }
 
   /**
@@ -56,12 +77,13 @@ public final class ApiCheckOrAddShareholder extends ApiQuery<ApiQuery.ErrorCode>
    * @throws ApiException.ConnectionFailure if any connection error occurs, so the response can not be read completely
    * @throws ApiException.DecodeResponse if the response was received, but can't be decoded
    */
+  @NotNull
   @Override
-  public int query(final ApiCredentials credentials) throws ApiException {
+  public Integer query(final ApiCredentials credentials) throws ApiException {
     final URLConnection connection = sendPostRequest(
       credentials,
       Json.createObjectBuilder().add("project_id", credentials.getProjectId())
     );
-    return decodeJsonResult(connection, "result");
+    return decodeJsonResult(connection, it -> JsonUtil.extractResponseCode(it, "result"));
   }
 }

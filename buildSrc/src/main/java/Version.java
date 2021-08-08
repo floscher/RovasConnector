@@ -9,7 +9,7 @@ public final class Version {
    * </a>.
    */
   public static final String PMD = "6.30.0";
-  public static final String GRADLE_SPOTBUGS_PLUGIN = "4.7.1";
-  public static final String SPOTBUGS = "4.2.3";
+  public static final String GRADLE_SPOTBUGS_PLUGIN = "4.7.2";
+  public static final String SPOTBUGS = "4.3.0";
   public static final String WIREMOCK = "2.27.2";
 }

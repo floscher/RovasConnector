@@ -17,9 +17,9 @@ import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Utils;
 
+import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.model.StaticConfig;
 import app.rovas.josm.util.GuiComponentFactory;
-import app.rovas.josm.model.RovasProperties;
 import app.rovas.josm.util.UrlProvider;
 
 /**
@@ -34,7 +34,11 @@ public final class RovasPreferencePanel extends ApiCredentialsPanel {
         "To reward the authors of this {1}, a fee equal to {0}% of the amount you earn from reports created by the plugin will be levied on those earnings.",
         String.format("%.2f", StaticConfig.ASSET_USAGE_FEE * 100),
         UrlProvider.toHtmlHyperlink(
-          UrlProvider.getInstance().node(StaticConfig.ROVAS_CONNECTOR_PROJECT_ID),
+          UrlProvider.getInstance().node(
+            RovasProperties.DEVELOPER.get()
+              ? StaticConfig.ROVAS_CONNECTOR_PROJECT_ID_DEV
+              : StaticConfig.ROVAS_CONNECTOR_PROJECT_ID
+          ),
           I18n.tr("Rovas connector plugin").replace(" ", "&nbsp;")
         )
       ) +
